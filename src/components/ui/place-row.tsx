@@ -3,7 +3,6 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { AppText } from './app-text';
 import { ScoreDial } from './score-dial';
 
-import { band } from '@/lib/scoring';
 import { radius } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
 import { strings } from '@/strings';
@@ -16,12 +15,11 @@ type Props = {
   report?: string;
   reportStale?: boolean;
   homeTag?: boolean;
-  bandWord?: boolean;
   onPress: () => void;
 };
 
 /** A tappable place card with a 48px dial — Today's alternatives and My places. */
-export function PlaceRow({ name, meta, score, report, reportStale, homeTag, bandWord, onPress }: Props) {
+export function PlaceRow({ name, meta, score, report, reportStale, homeTag, onPress }: Props) {
   const theme = useTheme();
   return (
     <Pressable
@@ -31,7 +29,7 @@ export function PlaceRow({ name, meta, score, report, reportStale, homeTag, band
       <ScoreDial score={score} size={48} />
       <View style={styles.body}>
         <View style={styles.nameRow}>
-          <AppText size={bandWord ? 14 : 13.5} weight={700}>
+          <AppText size={14} weight={700} style={styles.name}>
             {name}
           </AppText>
           {homeTag && <HomeTag />}
@@ -45,16 +43,9 @@ export function PlaceRow({ name, meta, score, report, reportStale, homeTag, band
           </AppText>
         )}
       </View>
-      <View style={styles.trail}>
-        {bandWord && (
-          <AppText size={11} weight={700} color={theme.accent}>
-            {band(score).word}
-          </AppText>
-        )}
-        <AppText size={15} muted>
-          {strings.common.chevron}
-        </AppText>
-      </View>
+      <AppText size={15} muted>
+        {strings.common.chevron}
+      </AppText>
     </Pressable>
   );
 }
@@ -82,8 +73,9 @@ const styles = StyleSheet.create({
   },
   pressed: { opacity: 0.8 },
   body: { flex: 1, gap: 2 },
-  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  trail: { alignItems: 'flex-end', gap: 2 },
+  // Wraps so the HOME tag drops under a long name instead of overflowing.
+  nameRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
+  name: { flexShrink: 1 },
   tag: {
     paddingVertical: 2,
     paddingHorizontal: 7,

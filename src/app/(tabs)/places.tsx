@@ -48,7 +48,6 @@ export default function PlacesScreen() {
             report={fmtAge(o.l.reportMin)}
             reportStale={o.l.reportMin > TUNING.staleReportMin}
             homeTag={o.l.id === s.home}
-            bandWord
             onPress={() => router.push({ pathname: '/place/[id]', params: { id: o.l.id, from: strings.tabs.places } })}
           />
         ))}
