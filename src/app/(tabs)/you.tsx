@@ -35,12 +35,12 @@ export default function YouScreen() {
           const on = s.myActs.includes(a.key);
           const last = on && s.myActs.length === 1;
           return (
-            <View key={a.key} style={[styles.actRow, { backgroundColor: on ? theme.ramps.accent[100] : theme.track }]}>
+            <View key={a.key} style={[styles.actRow, { backgroundColor: on ? theme.tagAccent.bg : theme.track }]}>
               <View style={styles.actText}>
-                <AppText size={13.5} weight={700} lh={1.2} color={on ? theme.ramps.accent[900] : theme.text}>
+                <AppText size={13.5} weight={700} lh={1.2} color={on ? theme.tagAccent.fg : theme.text}>
                   {a.label}
                 </AppText>
-                <AppText size={10.5} lh={1.25} color={on ? 'rgba(13,38,55,0.7)' : theme.muted}>
+                <AppText size={10.5} lh={1.25} color={on ? theme.tagAccent.fg : theme.muted} style={on && styles.noteOn}>
                   {ACT_NOTES[a.key]}
                 </AppText>
               </View>
@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
   },
   actText: { flex: 1, gap: 1 },
+  noteOn: { opacity: 0.75 },
   gap7: { gap: 7 },
   gap13: { gap: 13 },
   gap15: { gap: 15 },
