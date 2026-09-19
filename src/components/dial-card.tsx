@@ -5,6 +5,7 @@ import { MetricGrid } from './ui/metric-grid';
 import { ScoreDial } from './ui/score-dial';
 
 import type { Metric } from '@/lib/scoring';
+import { strings } from '@/strings';
 
 type Props = {
   score: number | null;
@@ -19,7 +20,7 @@ export function DialCard({ score, line, metrics, onPressDial }: Props) {
   return (
     <Card style={styles.card}>
       {onPressDial ? (
-        <Pressable onPress={onPressDial} accessibilityRole="button" accessibilityLabel="Toggle breakdown">
+        <Pressable onPress={onPressDial} accessibilityRole="button" accessibilityLabel={strings.common.toggleBreakdown}>
           {dial}
         </Pressable>
       ) : (

@@ -4,23 +4,19 @@
  * in; the shapes here are what the scoring engine expects from real data.
  */
 
+import { strings } from '@/strings';
+
 export type ActivityKey = 'classic' | 'skate' | 'snowshoe' | 'downhill';
 
 export type Activity = { key: ActivityKey; label: string; short: string };
 
-export const ACTS: Activity[] = [
-  { key: 'classic', label: 'Classic', short: 'Classic' },
-  { key: 'skate', label: 'Skate', short: 'Skate' },
-  { key: 'snowshoe', label: 'Snowshoe', short: 'Snowshoe' },
-  { key: 'downhill', label: 'Downhill', short: 'Downhill' },
-];
+export const ACTS: Activity[] = (['classic', 'skate', 'snowshoe', 'downhill'] as const).map((key) => ({
+  key,
+  label: strings.activities[key],
+  short: strings.activities[key],
+}));
 
-export const ACT_NOTES: Record<ActivityKey, string> = {
-  classic: 'Groomed trackset',
-  skate: 'Groomed skate lane',
-  snowshoe: 'Groomed and natural trails',
-  downhill: 'Lift-served skiing and snowboarding',
-};
+export const ACT_NOTES: Record<ActivityKey, string> = strings.activityNotes;
 
 export type DayWx = { t: number; snow: number; wind: number; cloud: number; precip: number };
 

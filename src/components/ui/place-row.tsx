@@ -6,6 +6,7 @@ import { ScoreDial } from './score-dial';
 import { band } from '@/lib/scoring';
 import { radius } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
+import { strings } from '@/strings';
 
 type Props = {
   name: string;
@@ -51,7 +52,7 @@ export function PlaceRow({ name, meta, score, report, reportStale, homeTag, band
           </AppText>
         )}
         <AppText size={15} muted>
-          ›
+          {strings.common.chevron}
         </AppText>
       </View>
     </Pressable>
@@ -64,7 +65,7 @@ export function HomeTag() {
   return (
     <View style={[styles.tag, { backgroundColor: theme.tagAccent.bg }]}>
       <AppText size={9} upper tracking={0.08} color={theme.tagAccent.fg}>
-        Home
+        {strings.common.home}
       </AppText>
     </View>
   );

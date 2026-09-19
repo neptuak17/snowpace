@@ -6,6 +6,7 @@ import { AppText } from './app-text';
 import { band } from '@/lib/scoring';
 import { bandColors } from '@/theme/band-colors';
 import { useTheme } from '@/theme/use-theme';
+import { strings } from '@/strings';
 
 type Props = {
   score: number | null;
@@ -52,7 +53,7 @@ export function ScoreDial({ score, size, word, line }: Props) {
           big && theme.shadowSm,
         ]}>
         <AppText heading size={big ? 40 : Math.round(size * 0.35)} color={c.ring} lh={1}>
-          {score === null ? '—' : score}
+          {score === null ? strings.common.dash : score}
         </AppText>
         {word && (
           <AppText size={8} upper tracking={0.08} muted lh={1.2}>

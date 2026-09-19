@@ -18,6 +18,7 @@ import { useAppState } from '@/state/app-state';
 import { bandColors } from '@/theme/band-colors';
 import { gutter, radius } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
+import { strings } from '@/strings';
 
 export default function TodayScreen() {
   const s = useAppState();
@@ -33,7 +34,7 @@ export default function TodayScreen() {
   const hb = band(hs);
   const metrics = dialMetrics(home, 0, act, hs, s.prefs, s.units, hd);
   const factors = breakdown(home, 0, act, s.selHour, s.prefs, s.units, hd);
-  const window = bestWindow(home, 0, act, s.selHour, s.prefs);
+  const window = bestWindow(home, 0, act, s.prefs);
   const activityLabel = ACTS.find((a) => a.key === act)?.label ?? act;
 
   const alternatives = ALL_PLACES.filter((l) => s.saved.includes(l.id) && l.id !== s.home)
@@ -49,19 +50,19 @@ export default function TodayScreen() {
           {home.shortName}
         </AppText>
         <AppText size={11} muted>
-          {fmtDrive(home.drive)} away
+          {strings.common.away(fmtDrive(home.drive))}
         </AppText>
       </View>
 
       {!offers && (
         <View style={styles.pad16}>
           <Card style={styles.startCard}>
-            <Kicker>{'No ' + activityLabel + ' here'}</Kicker>
+            <Kicker>{strings.today.noActivityKicker(activityLabel)}</Kicker>
             <AppText size={14} lh={1.45}>
-              {verdict(home, 0, act, s.prefs, s.units)} The places below do — or switch activity to see how it is looking at your home hill.
+              {strings.today.noActivityBody(verdict(home, 0, act, s.prefs, s.units))}
             </AppText>
             <AppButton size={12.5} onPress={() => router.navigate('/places')}>
-              Where can I go?
+              {strings.today.whereCanIGo}
             </AppButton>
           </Card>
         </View>
@@ -70,18 +71,18 @@ export default function TodayScreen() {
       {offers && window && (
         <>
           <View style={styles.pad16}>
-            <DialCard score={hs} line={hourLabel(s.selHour) + ' · ' + hb.word} metrics={metrics} onPressDial={s.toggleBreakdown} />
+            <DialCard score={hs} line={strings.today.dialLine(hourLabel(s.selHour), hb.word)} metrics={metrics} onPressDial={s.toggleBreakdown} />
           </View>
           <View style={styles.breakdownToggle}>
             <AppButton variant="ghost" size={12.5} onPress={s.toggleBreakdown}>
-              {s.showBreakdown ? 'Hide the breakdown ›' : 'Breakdown for ' + hourLabel(s.selHour) + ' ›'}
+              {s.showBreakdown ? strings.today.hideBreakdown : strings.today.showBreakdown(hourLabel(s.selHour))}
             </AppButton>
           </View>
 
           {s.showBreakdown && (
             <View style={styles.pad10}>
               <Card style={styles.breakdownCard}>
-                <Kicker>{'Breakdown for ' + hourLabel(s.selHour)}</Kicker>
+                <Kicker>{strings.today.breakdownKicker(hourLabel(s.selHour))}</Kicker>
                 {factors.map((f) => (
                   <View key={f.label} style={styles.factor}>
                     <View style={styles.factorHead}>
@@ -106,9 +107,9 @@ export default function TodayScreen() {
                   </View>
                 ))}
                 <AppText size={10.5} muted style={[styles.reportLine, { borderTopColor: theme.divider }]}>
-                  Conditions {fmtAge(home.reportMin)}
+                  {strings.common.conditionsAge(fmtAge(home.reportMin))}
                 </AppText>
-                <LinkButton href={home.url}>{home.shortName + ' web site ↗'}</LinkButton>
+                <LinkButton href={home.url}>{strings.common.siteLink(home.shortName)}</LinkButton>
               </Card>
             </View>
           )}
@@ -120,29 +121,29 @@ export default function TodayScreen() {
       )}
 
       <View style={[styles.pad18, styles.gap7]}>
-        <SectionLabel>{'Other activities at ' + home.shortName}</SectionLabel>
+        <SectionLabel>{strings.today.otherActivitiesAt(home.shortName)}</SectionLabel>
         <ActivityChips only={home.acts} small={false} scores={(k) => score(home, 0, k, s.prefs)} />
       </View>
 
       <View style={[styles.pad20, styles.gap9]}>
         <View style={styles.nearbyHead}>
-          <SectionLabel>Other options nearby</SectionLabel>
+          <SectionLabel>{strings.today.otherNearby}</SectionLabel>
           <AppButton variant="ghost" size={11.5} style={styles.seeAll} onPress={() => router.navigate('/places')}>
-            See all
+            {strings.today.seeAll}
           </AppButton>
         </View>
         {alternatives.map((o) => (
           <PlaceRow
             key={o.l.id}
             name={o.l.shortName}
-            meta={o.l.area + ' · ' + o.l.elev + ' · ' + fmtDrive(o.l.drive)}
+            meta={strings.common.placeMeta(o.l.area, o.l.elev, fmtDrive(o.l.drive))}
             score={o.sc}
-            onPress={() => router.push({ pathname: '/place/[id]', params: { id: o.l.id, from: 'Today' } })}
+            onPress={() => router.push({ pathname: '/place/[id]', params: { id: o.l.id, from: strings.tabs.today } })}
           />
         ))}
         {alternatives.length === 0 && (
           <AppText size={12.5} muted>
-            None of your other places offer {actLabel(act)} within {fmtDrive(s.maxDrive)}.
+            {strings.today.noAlternatives(actLabel(act), fmtDrive(s.maxDrive))}
           </AppText>
         )}
       </View>

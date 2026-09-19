@@ -8,6 +8,7 @@ import { band, type BestWindow } from '@/lib/scoring';
 import { bandColors } from '@/theme/band-colors';
 import { mix } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
+import { strings } from '@/strings';
 
 type Props = { window: BestWindow; selHour: number; onPick: (h: number) => void };
 
@@ -17,7 +18,7 @@ export function WindowChart({ window, selHour, onPick }: Props) {
   return (
     <View style={styles.wrap}>
       <View style={styles.head}>
-        <SectionLabel>Best window today</SectionLabel>
+        <SectionLabel>{strings.today.bestWindow}</SectionLabel>
         <AppText size={12.5} weight={700} color={theme.accent}>
           {window.label}
         </AppText>
@@ -30,7 +31,7 @@ export function WindowChart({ window, selHour, onPick }: Props) {
             <Pressable
               key={b.h}
               accessibilityRole="button"
-              accessibilityLabel={hourLabel(b.h) + ', score ' + b.s}
+              accessibilityLabel={strings.today.barLabel(hourLabel(b.h), b.s)}
               onPress={() => onPick(b.h)}
               style={styles.barHit}>
               <View

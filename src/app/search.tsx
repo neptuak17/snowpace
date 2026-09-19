@@ -11,6 +11,7 @@ import { fmtDrive } from '@/lib/format';
 import { useAppState } from '@/state/app-state';
 import { bodyFont, gutter, radius } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
+import { strings } from '@/strings';
 
 export default function SearchScreen() {
   const s = useAppState();
@@ -26,15 +27,15 @@ export default function SearchScreen() {
 
   return (
     <Screen contentStyle={styles.content}>
-      <BackButton label="My places" onPress={() => router.back()} />
-      <ScreenTitle size={24}>Add a place</ScreenTitle>
+      <BackButton label={strings.search.backLabel} onPress={() => router.back()} />
+      <ScreenTitle size={24}>{strings.search.title}</ScreenTitle>
       <AppText size={11.5} muted style={styles.intro}>
-        Add the places you visit, and pick which one is your home hill — that is the one Today opens on.
+        {strings.search.intro}
       </AppText>
       <TextInput
         value={search}
         onChangeText={setSearch}
-        placeholder="Search centres and resorts"
+        placeholder={strings.search.placeholder}
         placeholderTextColor={theme.muted}
         autoCorrect={false}
         clearButtonMode="while-editing"
@@ -58,7 +59,7 @@ export default function SearchScreen() {
                     {isHome && <HomeTag />}
                   </View>
                   <AppText size={11} muted>
-                    {i.area + ' · ' + fmtDrive(i.drive) + ' · ' + mine + ' of your activities'}
+                    {strings.search.meta(i.area, fmtDrive(i.drive), mine)}
                   </AppText>
                 </View>
                 {!isHome && (
@@ -68,7 +69,7 @@ export default function SearchScreen() {
                       onPress={() => s.setHome(i.id)}
                       style={({ pressed }) => [styles.pill, styles.homeBtn, pressed && styles.pressed]}>
                       <AppText size={11.5} weight={700} color={theme.accent}>
-                        Set home
+                        {strings.search.setHome}
                       </AppText>
                     </Pressable>
                     <Pressable
@@ -81,7 +82,7 @@ export default function SearchScreen() {
                         pressed && styles.pressed,
                       ]}>
                       <AppText size={11.5} weight={700} color={on ? theme.tagAccent.fg : '#fff'}>
-                        {on ? 'Saved' : 'Add'}
+                        {on ? strings.search.saved : strings.search.add}
                       </AppText>
                     </Pressable>
                   </View>
@@ -93,7 +94,7 @@ export default function SearchScreen() {
       ))}
       {regions.length === 0 && (
         <AppText size={12.5} muted>
-          Nothing by that name yet — try "nordic", "Whistler" or "Big".
+          {strings.search.noResults}
         </AppText>
       )}
     </Screen>

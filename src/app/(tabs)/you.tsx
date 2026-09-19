@@ -14,21 +14,23 @@ import { actLabel, fallCopy, fallLabel, snowHint, snowLabel } from '@/lib/scorin
 import { useAppState } from '@/state/app-state';
 import { gutter } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
+import { strings } from '@/strings';
 
 export default function YouScreen() {
   const s = useAppState();
   const theme = useTheme();
   const act = s.activity;
   const p = s.prefs[act];
+  const y = strings.you;
 
   return (
     <Screen help contentStyle={styles.content}>
       <View style={styles.head}>
-        <ScreenTitle>Your activities and preferences</ScreenTitle>
+        <ScreenTitle>{y.title}</ScreenTitle>
       </View>
 
       <Card>
-        <Kicker>Your activities</Kicker>
+        <Kicker>{y.activitiesKicker}</Kicker>
         {ACTS.map((a) => {
           const on = s.myActs.includes(a.key);
           const last = on && s.myActs.length === 1;
@@ -47,71 +49,71 @@ export default function YouScreen() {
           );
         })}
         <AppText size={10.5} muted>
-          Only the activities you enable appear across the app
+          {y.activitiesNote}
         </AppText>
       </Card>
 
       <View style={styles.gap7}>
         <AppText size={11.5} muted>
-          Set these preferences per activity
+          {y.perActivity}
         </AppText>
         <ActivityChips />
       </View>
 
       <Card style={styles.gap15}>
-        <Kicker>{'Your preferences for ' + actLabel(act)}</Kicker>
+        <Kicker>{y.prefsKicker(actLabel(act))}</Kicker>
         <PrefSlider
-          label="Ideal temperature" value={fmtT(p.temp, s.units)} raw={p.temp} min={-20} max={2} step={1}
-          hint="Scores fall off either side of this." onChange={(v) => s.setPref('temp', v)}
+          label={y.idealTemp} value={fmtT(p.temp, s.units)} raw={p.temp} min={-20} max={2} step={1}
+          hint={y.idealTempHint} onChange={(v) => s.setPref('temp', v)}
         />
         <PrefSlider
-          label="Wind speed limit" value={fmtW(p.wind, s.units)} raw={p.wind} min={5} max={45} step={1}
-          hint="Above this the score drops away fast." onChange={(v) => s.setPref('wind', v)}
+          label={y.windLimit} value={fmtW(p.wind, s.units)} raw={p.wind} min={5} max={45} step={1}
+          hint={y.windLimitHint} onChange={(v) => s.setPref('wind', v)}
         />
         <PrefSlider
           label={snowLabel(act)} value={fmtS(p.snow, s.units)} raw={p.snow} min={0} max={30} step={1}
           hint={snowHint(act, p.snow, s.units)} onChange={(v) => s.setPref('snow', v)}
         />
         <PrefSlider
-          label={fallLabel(act)} value={p.precipTol + '%'} raw={p.precipTol} min={0} max={100} step={5}
+          label={fallLabel(act)} value={y.percent(p.precipTol)} raw={p.precipTol} min={0} max={100} step={5}
           hint={fallCopy(act, p.precipTol)} onChange={(v) => s.setPref('precipTol', v)}
         />
       </Card>
 
       <Card style={styles.gap15}>
-        <Kicker>Getting there</Kicker>
+        <Kicker>{y.gettingThere}</Kicker>
         <PrefSlider
-          label="Furthest you'd drive" value={fmtDrive(s.maxDrive)} raw={s.maxDrive} min={20} max={180} step={10}
-          hint="Places beyond this drop out of the ranking." onChange={s.setMaxDrive}
+          label={y.maxDrive} value={fmtDrive(s.maxDrive)} raw={s.maxDrive} min={20} max={180} step={10}
+          hint={y.maxDriveHint} onChange={s.setMaxDrive}
         />
       </Card>
 
       <Card style={styles.gap13}>
-        <Kicker>Display</Kicker>
+        <Kicker>{y.display}</Kicker>
         <View style={styles.dispRow}>
           <AppText size={13} weight={600}>
-            Units
+            {y.units}
           </AppText>
           <Segmented
             value={s.units}
-            options={[{ value: 'metric', label: '°C · cm' }, { value: 'imperial', label: '°F · in' }]}
+            options={[{ value: 'metric', label: y.metric }, { value: 'imperial', label: y.imperial }]}
             onChange={s.setUnits}
           />
         </View>
         <View style={styles.dispRow}>
           <AppText size={13} weight={600}>
-            Appearance
+            {y.appearance}
           </AppText>
           <Segmented
             value={s.theme}
-            options={[{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]}
+            options={[{ value: 'light', label: y.light }, { value: 'dark', label: y.dark }]}
             onChange={s.setTheme}
           />
         </View>
       </Card>
 
       <AppButton variant="ghost" size={12.5} style={styles.reset} onPress={s.resetPrefs}>
-        Reset to defaults
+        {y.reset}
       </AppButton>
     </Screen>
   );

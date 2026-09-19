@@ -5,6 +5,7 @@ import { AppText } from './ui/app-text';
 
 import { radius } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
+import { strings } from '@/strings';
 
 // Web-only tab bar. iOS is the shipping target; this keeps the web target
 // (a possible marketing site later) rendering the same routes.
@@ -15,16 +16,16 @@ export default function AppTabs() {
       <TabList asChild>
         <CustomTabList>
           <TabTrigger name="index" href="/" asChild>
-            <TabButton>Today</TabButton>
+            <TabButton>{strings.tabs.today}</TabButton>
           </TabTrigger>
           <TabTrigger name="forecast" href="/forecast" asChild>
-            <TabButton>Forecast</TabButton>
+            <TabButton>{strings.tabs.forecast}</TabButton>
           </TabTrigger>
           <TabTrigger name="places" href="/places" asChild>
-            <TabButton>My places</TabButton>
+            <TabButton>{strings.tabs.places}</TabButton>
           </TabTrigger>
           <TabTrigger name="you" href="/you" asChild>
-            <TabButton>You</TabButton>
+            <TabButton>{strings.tabs.you}</TabButton>
           </TabTrigger>
         </CustomTabList>
       </TabList>

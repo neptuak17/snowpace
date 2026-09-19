@@ -5,6 +5,7 @@ import { AppText } from './app-text';
 import { band } from '@/lib/scoring';
 import { bandColors } from '@/theme/band-colors';
 import { useTheme } from '@/theme/use-theme';
+import { strings } from '@/strings';
 
 type Props = {
   score: number | null;
@@ -28,7 +29,7 @@ export function ScorePill({ score, selected, onPress, style }: Props) {
         style,
       ]}>
       <AppText heading size={15} color={c.fg}>
-        {score === null ? '—' : score}
+        {score === null ? strings.common.dash : score}
       </AppText>
     </View>
   );

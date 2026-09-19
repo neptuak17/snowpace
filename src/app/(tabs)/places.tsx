@@ -12,6 +12,7 @@ import { fmtAge, fmtDrive } from '@/lib/format';
 import { actLabel, score } from '@/lib/scoring';
 import { useAppState } from '@/state/app-state';
 import { gutter } from '@/theme/tokens';
+import { strings } from '@/strings';
 
 export default function PlacesScreen() {
   const s = useAppState();
@@ -27,38 +28,38 @@ export default function PlacesScreen() {
   return (
     <Screen help contentStyle={styles.content}>
       <View style={styles.head}>
-        <ScreenTitle>My places</ScreenTitle>
+        <ScreenTitle>{strings.places.title}</ScreenTitle>
         <AppButton variant="ghost" size={12.5} style={styles.add} onPress={() => router.push('/search')}>
-          + Add
+          {strings.places.add}
         </AppButton>
       </View>
       <ActivityChips />
       <AppText size={11.5} muted style={styles.note}>
-        Your places that offer {actLabel(act)}, best right now first.
+        {strings.places.note(actLabel(act))}
       </AppText>
       <View style={styles.list}>
         {ranked.map((o, i) => (
           <PlaceRow
             key={o.l.id}
-            name={i + 1 + '. ' + o.l.shortName}
-            meta={o.l.area + ' · ' + o.l.elev + ' · ' + fmtDrive(o.l.drive)}
+            name={strings.places.rank(i + 1, o.l.shortName)}
+            meta={strings.common.placeMeta(o.l.area, o.l.elev, fmtDrive(o.l.drive))}
             score={o.sc}
             report={fmtAge(o.l.reportMin)}
             reportStale={o.l.reportMin > 240}
             homeTag={o.l.id === s.home}
             bandWord
-            onPress={() => router.push({ pathname: '/place/[id]', params: { id: o.l.id, from: 'My places' } })}
+            onPress={() => router.push({ pathname: '/place/[id]', params: { id: o.l.id, from: strings.tabs.places } })}
           />
         ))}
       </View>
       {ranked.length === 0 && (
         <Card style={styles.empty}>
-          <Kicker>{'Nothing here for ' + activityLabel}</Kicker>
+          <Kicker>{strings.places.emptyKicker(activityLabel)}</Kicker>
           <AppText size={13} lh={1.45}>
-            None of your places offer {activityLabel} within {fmtDrive(s.maxDrive)} — pick another activity above, or add somewhere that does.
+            {strings.places.emptyBody(activityLabel, fmtDrive(s.maxDrive))}
           </AppText>
           <AppButton size={12.5} onPress={() => router.push('/search')}>
-            Add a place
+            {strings.places.addPlace}
           </AppButton>
         </Card>
       )}

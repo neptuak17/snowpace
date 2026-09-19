@@ -4,6 +4,7 @@
  */
 import { ACTS, type ActivityKey, type DayWx, type Place } from '@/data/places';
 import { fmtS, fmtT, fmtW, hourLabel, type Units } from '@/lib/format';
+import { strings } from '@/strings';
 
 export type Prefs = { temp: number; wind: number; snow: number; precipTol: number };
 export type PrefsByAct = Record<ActivityKey, Prefs>;
@@ -188,9 +189,9 @@ export function hourly(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct
 
 export type WindowBar = { h: number; s: number; hour: string; inWindow: boolean; heightPct: number };
 
-export type BestWindow = { label: string; note: string; bars: WindowBar[] };
+export type BestWindow = { label: string; bars: WindowBar[] };
 
-export function bestWindow(l: Place, di: number, act: ActivityKey, selH: number, prefs: PrefsByAct): BestWindow | null {
+export function bestWindow(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct): BestWindow | null {
   const hrs = hourly(l, di, act, prefs);
   if (!hrs) return null;
   let bi = 0, best = -1;
@@ -207,8 +208,7 @@ export function bestWindow(l: Place, di: number, act: ActivityKey, selH: number,
   const startH = hrs[bi].h, endH = hrs[bi + 2].h + 1;
   const sameHalf = startH < 12 === endH < 12;
   return {
-    label: 'Best ' + (sameHalf ? startH + '–' + hourLabel(endH) : hourLabel(startH) + '–' + hourLabel(endH)),
-    note: 'Showing ' + hourLabel(selH) + ' · peaks at ' + peak.s + ' around ' + hourLabel(peak.h) + '.',
+    label: strings.today.bestLabel(sameHalf ? startH + '–' + hourLabel(endH) : hourLabel(startH) + '–' + hourLabel(endH)),
     bars: hrs.map((o, i) => ({
       h: o.h,
       s: o.s,
@@ -223,12 +223,8 @@ export type BandKey = 'hi' | 'go' | 'fair' | 'poor' | 'skip' | 'none';
 export type Band = { key: BandKey; word: string };
 
 export function band(s: number | null): Band {
-  if (s === null) return { key: 'none', word: '—' };
-  if (s >= 80) return { key: 'hi', word: 'Excellent' };
-  if (s >= 70) return { key: 'go', word: 'Good' };
-  if (s >= 55) return { key: 'fair', word: 'Fair' };
-  if (s >= 40) return { key: 'poor', word: 'Poor' };
-  return { key: 'skip', word: 'Skip it' };
+  const key: BandKey = s === null ? 'none' : s >= 80 ? 'hi' : s >= 70 ? 'go' : s >= 55 ? 'fair' : s >= 40 ? 'poor' : 'skip';
+  return { key, word: strings.bands[key] };
 }
 
 // Ranked problem factors. Absolute thresholds, so a good day with one flaw
@@ -253,23 +249,24 @@ export type Metric = { key: FactorKey; k: string; v: string; rank: number };
 
 export function fmtRain(r: Rain): string {
   return r.nowMm > 0
-    ? r.nowMm + ' mm'
+    ? strings.format.mm(r.nowMm)
     : r.prior.mm > 0.05
-      ? r.prior.mm.toFixed(1) + ' mm, 3 d'
+      ? strings.format.mm3d(r.prior.mm.toFixed(1))
       : r.laterMm > 0
-        ? 'Later'
-        : 'None';
+        ? strings.format.mmLater
+        : strings.format.mmNone;
 }
 
 function metricFor(l: Place, di: number, d: DayWx, k: FactorKey, units: Units): Omit<Metric, 'rank'> {
-  if (k === 't') return { key: 't', k: 'Temp', v: fmtT(d.t, units) };
-  if (k === 's') return { key: 's', k: 'New', v: fmtS(d.snow, units) };
-  if (k === 'w') return { key: 'w', k: 'Wind', v: fmtW(d.wind, units) };
-  if (k === 'c') return { key: 'c', k: 'Cloud', v: d.cloud + '%' };
-  if (k === 'pr') return { key: 'pr', k: 'Rain', v: fmtRain(rainSub(l, di, d)) };
-  if (k === 'fall') return { key: 'fall', k: 'Snowing', v: (d.t > 0 ? 0 : d.precip || 0) + ' mm' };
-  if (k === 'base') return { key: 'base', k: '3-day', v: fmtS(snow72(l, di), units) };
-  return { key: 'ft', k: 'Thaw', v: fmtT(freezeThaw(l, di).maxHi, units) };
+  const label = strings.metrics[k];
+  if (k === 't') return { key: k, k: label, v: fmtT(d.t, units) };
+  if (k === 's') return { key: k, k: label, v: fmtS(d.snow, units) };
+  if (k === 'w') return { key: k, k: label, v: fmtW(d.wind, units) };
+  if (k === 'c') return { key: k, k: label, v: d.cloud + '%' };
+  if (k === 'pr') return { key: k, k: label, v: fmtRain(rainSub(l, di, d)) };
+  if (k === 'fall') return { key: k, k: label, v: strings.format.mm(d.t > 0 ? 0 : d.precip || 0) };
+  if (k === 'base') return { key: k, k: label, v: fmtS(snow72(l, di), units) };
+  return { key: k, k: label, v: fmtT(freezeThaw(l, di).maxHi, units) };
 }
 
 /** The four metric boxes beside a big dial; the limiting factors swap in. */
@@ -294,96 +291,85 @@ export function actLabel(k: ActivityKey): string {
 }
 
 export function baseNote(total: number, units: Units): string {
-  if (total < 3) return 'the last three days have been dry';
-  if (total < 10) return 'only ' + fmtS(total, units) + ' has fallen in three days';
-  return 'the base is thinner than ideal at ' + fmtS(total, units) + ' in three days';
+  if (total < 3) return strings.base.dry;
+  if (total < 10) return strings.base.only(fmtS(total, units));
+  return strings.base.thin(fmtS(total, units));
 }
 
 export function rainNote(l: Place, di: number, day?: DayWx): string {
   const r = rainSub(l, di, day);
-  if (r.nowMm > 0) return 'it is raining';
-  if (r.prior.iced) return 'it rained and then refroze — expect ice';
-  if (r.prior.mm > 0.05) return 'rain in the last three days has hurt the surface';
-  if (r.laterMm > 0) return 'rain is in the forecast for later today';
-  return 'there is weather moving in';
+  if (r.nowMm > 0) return strings.rain.raining;
+  if (r.prior.iced) return strings.rain.refroze;
+  if (r.prior.mm > 0.05) return strings.rain.recent;
+  if (r.laterMm > 0) return strings.rain.later;
+  return strings.rain.movingIn;
 }
 
 function weakest(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units, day?: DayWx) {
   const d = day || l.days[di], p = prefs[act];
   const x = subsFor(l, di, act, prefs, d);
-  const snowNote =
-    act === 'downhill' || act === 'snowshoe'
-      ? 'there is not much fresh to play in'
-      : d.snow < p.snow
-        ? 'nothing much new has fallen'
-        : 'there is more unpacked snow than you want to push through';
+  const w = strings.weakest;
+  const onHill = act === 'downhill' || act === 'snowshoe';
+  const snowNote = onHill ? w.notMuchFresh : d.snow < p.snow ? w.nothingNew : w.tooMuchUnpacked;
   const items = [
-    { k: 't', v: x.t, note: d.t < p.temp ? 'it is colder than your sweet spot' : 'it is warmer than you like' },
+    { k: 't', v: x.t, note: d.t < p.temp ? w.colder : w.warmer },
     { k: 's', v: x.s, note: snowNote },
     { k: 'base', v: x.base, note: baseNote(snow72(l, di), units) },
-    { k: 'ft', v: x.ft, note: 'it thawed and refroze — expect crust' },
-    { k: 'w', v: x.w, note: 'the wind is the one knock' },
+    { k: 'ft', v: x.ft, note: w.crust },
+    { k: 'w', v: x.w, note: w.wind },
     { k: 'pr', v: x.pr, note: rainNote(l, di, d) },
-    { k: 'fall', v: x.fall, note: act === 'downhill' || act === 'snowshoe'
-      ? 'nothing is falling — no fresh to play in'
-      : 'it is snowing on the track while you are in it' },
-    { k: 'c', v: x.c, note: 'the light will be flat' },
+    { k: 'fall', v: x.fall, note: onHill ? w.nothingFalling : w.snowingOnTrack },
+    { k: 'c', v: x.c, note: w.flatLight },
   ];
   return items.sort((a, b) => a.v - b.v)[0];
 }
 
 export function verdict(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units): string {
   const s = score(l, di, act, prefs);
-  if (s === null) return l.shortName + ' does not do ' + actLabel(act) + '.';
+  const v = strings.verdict;
+  if (s === null) return v.doesNotDo(l.shortName, actLabel(act));
   const lim = limiters(l, di, act, prefs);
-  if (lim.severeCount >= 3) {
-    const words = ['', '', '', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
-    return words[Math.min(8, lim.severeCount)] + ' things are working against it today — see the breakdown.';
-  }
+  if (lim.severeCount >= 3) return v.manyThings(v.countWords[Math.min(8, lim.severeCount)]);
   const w = weakest(l, di, act, prefs, units).note;
-  if (s >= 90) return 'Everything lines up — go now, and go early.';
-  if (s >= 80) return 'A really good one. The only note: ' + w + '.';
-  if (s >= 70) return 'A good one. ' + w.charAt(0).toUpperCase() + w.slice(1) + ', but nothing that should keep you home.';
-  if (s >= 55) return 'Worth it if you are keen — ' + w + '.';
-  if (s >= 40) return 'Soft call today: ' + w + '.';
-  return 'Probably one to skip — ' + w + '.';
+  if (s >= 90) return v.excellent;
+  if (s >= 80) return v.great(w);
+  if (s >= 70) return v.good(w.charAt(0).toUpperCase() + w.slice(1));
+  if (s >= 55) return v.fair(w);
+  if (s >= 40) return v.poor(w);
+  return v.skip(w);
 }
 
 export function rainCopy(r: Rain): string {
   const parts: string[] = [];
-  if (r.nowMm > 0) parts.push('It is above freezing, so this is falling as rain.');
-  else if (r.laterMm > 0) parts.push('Dry now, but rain is forecast later today.');
-  else parts.push('Nothing falling as rain.');
-  if (r.prior.mm > 0.05)
-    parts.push(
-      r.prior.iced
-        ? r.prior.mm.toFixed(1) + ' mm fell in the last three days and refroze — expect ice.'
-        : r.prior.mm.toFixed(1) + ' mm of rain in the last three days has taken the edge off the surface.',
-    );
+  const c = strings.rain;
+  if (r.nowMm > 0) parts.push(c.copyNow);
+  else if (r.laterMm > 0) parts.push(c.copyLater);
+  else parts.push(c.copyNone);
+  if (r.prior.mm > 0.05) parts.push(r.prior.iced ? c.copyIced(r.prior.mm.toFixed(1)) : c.copyRecent(r.prior.mm.toFixed(1)));
   return parts.join(' ');
 }
 
 export function fallCopy(act: ActivityKey, tol: number): string {
-  if (act === 'downhill') return 'Snow coming down is a bonus on the hill — your appetite is set to ' + tol + '%.';
-  if (act === 'snowshoe') return 'Snowing while you are out is fine, even nice — set to ' + tol + '%.';
-  return 'Snow filling the track while you are in it is slow going — your tolerance is ' + tol + '%.';
+  if (act === 'downhill') return strings.fall.downhill(tol);
+  if (act === 'snowshoe') return strings.fall.snowshoe(tol);
+  return strings.fall.nordic(tol);
 }
 
 export function fallLabel(act: ActivityKey): string {
-  if (act === 'downhill' || act === 'snowshoe') return 'Snow while you are out';
-  return 'Tolerance for snowing';
+  if (act === 'downhill' || act === 'snowshoe') return strings.fall.labelOut;
+  return strings.fall.labelTolerance;
 }
 
 export function snowLabel(act: ActivityKey): string {
-  if (act === 'downhill') return 'Powder appetite';
-  if (act === 'snowshoe') return 'Fresh snow wanted';
-  return 'New snow tolerance';
+  if (act === 'downhill') return strings.snowPref.labelDownhill;
+  if (act === 'snowshoe') return strings.snowPref.labelSnowshoe;
+  return strings.snowPref.labelNordic;
 }
 
 export function snowHint(act: ActivityKey, want: number, units: Units): string {
-  if (act === 'downhill') return 'A great day needs about ' + fmtS(want, units) + ' of fresh — more is always better.';
-  if (act === 'snowshoe') return 'About ' + fmtS(want, units) + ' is your ideal; more is still fine.';
-  return 'Past about ' + fmtS(want, units) + ' of unpacked snow it stops being fun.';
+  if (act === 'downhill') return strings.snowPref.hintDownhill(fmtS(want, units));
+  if (act === 'snowshoe') return strings.snowPref.hintSnowshoe(fmtS(want, units));
+  return strings.snowPref.hintNordic(fmtS(want, units));
 }
 
 export type Factor = { label: string; value: string; v: number; note: string };
@@ -396,17 +382,16 @@ export function breakdown(
   const ft = freezeThaw(l, di);
   const rain = rainSub(l, di, day);
   const p = prefs[act];
+  const b = strings.breakdown;
   return [
-    { label: 'Temperature', value: fmtT(day.t, units), v: x.t,
-      note: 'At ' + hourLabel(selHour) + '. You like it around ' + fmtT(p.temp, units) + ' for ' + actLabel(act) + '.' },
-    { label: 'New snow, 24 h', value: fmtS(day.snow, units), v: x.s, note: snowHint(act, p.snow, units) },
-    { label: 'Snowfall, 3 days', value: fmtS(snow72(l, di), units), v: x.base,
-      note: 'How much has fallen recently — a proxy for coverage and how fresh the surface is.' },
-    { label: 'Freeze–thaw', value: ft.hit ? 'Yes, to ' + fmtT(ft.maxHi, units) : 'None', v: x.ft,
-      note: ft.hit ? 'It got above freezing and refroze — expect crust in places.' : 'It has stayed below freezing throughout.' },
-    { label: 'Wind', value: fmtW(day.wind, units), v: x.w, note: 'You call it off past ' + fmtW(p.wind, units) + '.' },
-    { label: 'Rain', value: fmtRain(rain), v: x.pr, note: rainCopy(rain) },
-    { label: 'Snow falling now', value: (day.t > 0 ? 0 : day.precip || 0) + ' mm', v: x.fall, note: fallCopy(act, p.precipTol) },
-    { label: 'Cloud cover', value: day.cloud + '%', v: x.c, note: 'Light quality, weighted lightly.' },
+    { label: b.temp, value: fmtT(day.t, units), v: x.t, note: b.tempNote(hourLabel(selHour), fmtT(p.temp, units), actLabel(act)) },
+    { label: b.newSnow, value: fmtS(day.snow, units), v: x.s, note: snowHint(act, p.snow, units) },
+    { label: b.threeDay, value: fmtS(snow72(l, di), units), v: x.base, note: b.threeDayNote },
+    { label: b.freezeThaw, value: ft.hit ? b.freezeThawYes(fmtT(ft.maxHi, units)) : b.freezeThawNone, v: x.ft,
+      note: ft.hit ? b.freezeThawHitNote : b.freezeThawNoneNote },
+    { label: b.wind, value: fmtW(day.wind, units), v: x.w, note: b.windNote(fmtW(p.wind, units)) },
+    { label: b.rain, value: fmtRain(rain), v: x.pr, note: rainCopy(rain) },
+    { label: b.snowFalling, value: strings.format.mm(day.t > 0 ? 0 : day.precip || 0), v: x.fall, note: fallCopy(act, p.precipTol) },
+    { label: b.cloud, value: day.cloud + '%', v: x.c, note: b.cloudNote },
   ];
 }

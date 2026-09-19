@@ -7,6 +7,7 @@ import { AppText } from './app-text';
 
 import { radius } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
+import { strings } from '@/strings';
 
 type Props = {
   children: React.ReactNode;
@@ -38,7 +39,7 @@ function HelpButton({ top }: { top: number }) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Help"
+      accessibilityLabel={strings.common.help}
       onPress={() => router.push('/help')}
       style={[styles.helpHit, { top }]}>
       <View style={[styles.helpCircle, { backgroundColor: theme.ramps.accent[200] }, theme.shadowSm]}>
@@ -64,7 +65,7 @@ export function BackButton({ label, onPress }: { label: string; onPress: () => v
   return (
     <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.back, pressed && styles.pressed]}>
       <AppText size={13} weight={700} color={theme.accent}>
-        ‹ {label}
+        {strings.common.backTo(label)}
       </AppText>
     </Pressable>
   );

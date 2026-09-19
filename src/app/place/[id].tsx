@@ -13,6 +13,7 @@ import { actLabel, band, dialMetrics, freezeThaw, score, snow72 } from '@/lib/sc
 import { useAppState } from '@/state/app-state';
 import { gutter } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
+import { strings } from '@/strings';
 
 export default function PlaceDetailScreen() {
   const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
@@ -30,37 +31,38 @@ export default function PlaceDetailScreen() {
   const metrics = dialMetrics(l, 0, act, sc, s.prefs, s.units);
   const mine = ACTS.filter((a) => l.acts.includes(a.key) && s.myActs.includes(a.key));
 
+  const dt = strings.detail;
   const rows = [
-    { k: 'Temperature', v: fmtT(d.t, s.units) },
-    { k: 'New snow, 24 h', v: fmtS(d.snow, s.units) },
-    { k: 'Snowfall, 3 days', v: fmtS(snow72(l, 0), s.units) },
-    { k: 'Freeze–thaw', v: ft.hit ? 'Yes, to ' + fmtT(ft.maxHi, s.units) : 'None' },
-    { k: 'Wind', v: fmtW(d.wind, s.units) },
-    { k: 'Cloud cover', v: d.cloud + '%' },
-    { k: 'Rain', v: d.t > 0 && d.precip ? d.precip + ' mm' : 'None' },
-    { k: 'Snow falling', v: d.t > 0 ? 'None' : (d.precip || 0) + ' mm' },
-    { k: 'Your activities here', v: mine.map((a) => a.label.toLowerCase()).join(', ') || 'None of yours' },
+    { k: dt.rows.temp, v: fmtT(d.t, s.units) },
+    { k: dt.rows.newSnow, v: fmtS(d.snow, s.units) },
+    { k: dt.rows.threeDay, v: fmtS(snow72(l, 0), s.units) },
+    { k: dt.rows.freezeThaw, v: ft.hit ? dt.yesTo(fmtT(ft.maxHi, s.units)) : dt.none },
+    { k: dt.rows.wind, v: fmtW(d.wind, s.units) },
+    { k: dt.rows.cloud, v: d.cloud + '%' },
+    { k: dt.rows.rain, v: d.t > 0 && d.precip ? strings.format.mm(d.precip) : dt.none },
+    { k: dt.rows.snowFalling, v: d.t > 0 ? dt.none : strings.format.mm(d.precip || 0) },
+    { k: dt.rows.yourActivities, v: mine.map((a) => a.label.toLowerCase()).join(dt.listSep) || dt.noneOfYours },
   ];
 
   return (
     <Screen>
       <View style={styles.gutter}>
-        <BackButton label={from || 'Back'} onPress={() => router.back()} />
+        <BackButton label={from || strings.common.back} onPress={() => router.back()} />
       </View>
       <View style={[styles.gutter, styles.title]}>
         <AppText heading size={26} lh={1.15}>
           {l.name}
         </AppText>
         <AppText size={11.5} muted>
-          {l.area + ' · ' + l.elev + ' · ' + fmtDrive(l.drive) + ' away'}
+          {strings.common.placeMetaAway(l.area, l.elev, fmtDrive(l.drive))}
         </AppText>
         <AppText size={11.5} muted>
-          Conditions {fmtAge(l.reportMin)}
+          {strings.common.conditionsAge(fmtAge(l.reportMin))}
         </AppText>
       </View>
 
       <View style={[styles.gutter, styles.pad14]}>
-        <DialCard score={sc} line={actLabel(act) + ' · ' + b.word} metrics={metrics} />
+        <DialCard score={sc} line={dt.dialLine(actLabel(act), b.word)} metrics={metrics} />
       </View>
 
       <View style={[styles.gutter, styles.pad16]}>
@@ -95,7 +97,7 @@ export default function PlaceDetailScreen() {
       </View>
 
       <View style={[styles.gutter, styles.pad18]}>
-        <LinkButton href={l.url}>{l.shortName + ' web site ↗'}</LinkButton>
+        <LinkButton href={l.url}>{strings.common.siteLink(l.shortName)}</LinkButton>
       </View>
     </Screen>
   );

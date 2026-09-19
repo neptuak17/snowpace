@@ -13,6 +13,7 @@ import { fmtAge, fmtDrive, fmtS, fmtT, fmtW } from '@/lib/format';
 import { actLabel, freezeThaw, limiters, rainSub, score, snow72, type FactorKey } from '@/lib/scoring';
 import { useAppState } from '@/state/app-state';
 import { useTheme } from '@/theme/use-theme';
+import { strings } from '@/strings';
 
 const NAME_COL = 96;
 
@@ -35,15 +36,16 @@ export default function ForecastScreen() {
   const keys = selScore === null ? [] : limiters(selLoc, selDay, act, s.prefs).keys;
   const selFt = freezeThaw(selLoc, selDay);
   const selRain = rainSub(selLoc, selDay);
+  const f = strings.forecast;
   const rows: { key: FactorKey | 'pr3'; k: string; v: string }[] = [
-    { key: 't', k: 'Temp', v: fmtT(sd.t, s.units) },
-    { key: 's', k: 'New snow', v: fmtS(sd.snow, s.units) },
-    { key: 'base', k: '3-day', v: fmtS(snow72(selLoc, selDay), s.units) },
-    { key: 'w', k: 'Wind', v: fmtW(sd.wind, s.units) },
-    { key: 'pr', k: 'Rain', v: selRain.nowMm > 0 ? selRain.nowMm + ' mm' : selRain.laterMm > 0 ? 'Later today' : 'None' },
-    { key: 'pr3', k: 'Rain, 3 days', v: selRain.prior.mm > 0.05 ? selRain.prior.mm.toFixed(1) + ' mm' + (selRain.prior.iced ? ', iced' : '') : 'None' },
-    { key: 'fall', k: 'Snowing', v: (sd.t > 0 ? 0 : sd.precip || 0) + ' mm' },
-    { key: 'ft', k: 'Freeze–thaw', v: selFt.hit ? 'To ' + fmtT(selFt.maxHi, s.units) : 'None' },
+    { key: 't', k: f.metrics.temp, v: fmtT(sd.t, s.units) },
+    { key: 's', k: f.metrics.newSnow, v: fmtS(sd.snow, s.units) },
+    { key: 'base', k: f.metrics.threeDay, v: fmtS(snow72(selLoc, selDay), s.units) },
+    { key: 'w', k: f.metrics.wind, v: fmtW(sd.wind, s.units) },
+    { key: 'pr', k: f.metrics.rain, v: selRain.nowMm > 0 ? strings.format.mm(selRain.nowMm) : selRain.laterMm > 0 ? f.rainLater : f.none },
+    { key: 'pr3', k: f.metrics.rain3, v: selRain.prior.mm > 0.05 ? strings.format.mm(selRain.prior.mm.toFixed(1)) + (selRain.prior.iced ? f.iced : '') : f.none },
+    { key: 'fall', k: f.metrics.snowing, v: strings.format.mm(sd.t > 0 ? 0 : sd.precip || 0) },
+    { key: 'ft', k: f.metrics.freezeThaw, v: selFt.hit ? f.thawTo(fmtT(selFt.maxHi, s.units)) : f.none },
   ];
   const metrics = rows.map((r) => ({ k: r.k, v: r.v, rank: keys.indexOf(r.key as FactorKey) }));
 
@@ -53,21 +55,19 @@ export default function ForecastScreen() {
   const todayScore = score(selLoc, 0, act, s.prefs);
   let vs = '';
   if (selScore !== null && bestDay) {
-    if (bestDay.i === selDay) vs = 'The best of the five days here.';
-    else if (selDay === 0) vs = DAYS[bestDay.i].label + ' looks better — ' + bestDay.sc + ' against today’s ' + todayScore + '.';
-    else vs = bestDay.sc - selScore > 4 ? DAYS[bestDay.i].label + ' is the better bet at ' + bestDay.sc + '.' : 'Within a few points of the best day here.';
+    if (bestDay.i === selDay) vs = f.bestOfFive;
+    else if (selDay === 0) vs = f.looksBetter(DAYS[bestDay.i].label, bestDay.sc, todayScore ?? 0);
+    else vs = bestDay.sc - selScore > 4 ? f.betterBet(DAYS[bestDay.i].label, bestDay.sc) : f.withinFew;
   }
 
-  const legend = [
-    { key: 'hi', text: '80+' }, { key: 'go', text: '70–79 go' }, { key: 'fair', text: '55–69' }, { key: 'poor', text: 'under 55' },
-  ] as const;
+  const legend = (['hi', 'go', 'fair', 'poor'] as const).map((key) => ({ key, text: f.legend[key] }));
 
   return (
     <Screen help contentStyle={styles.content}>
       <View style={styles.head}>
-        <ScreenTitle>Next five days</ScreenTitle>
+        <ScreenTitle>{f.title}</ScreenTitle>
         <AppText size={11.5} muted>
-          Your {actLabel(act)} places. Tap a square for the detail.
+          {f.subtitle(actLabel(act))}
         </AppText>
       </View>
       <View style={styles.inset}>
@@ -118,12 +118,12 @@ export default function ForecastScreen() {
         <Card style={styles.selCard}>
           <View style={styles.selHead}>
             <View style={styles.selTitle}>
-              <Kicker>{DAYS[selDay].label + ' · ' + DAYS[selDay].date + ' · ' + actLabel(act)}</Kicker>
+              <Kicker>{f.selKicker(DAYS[selDay].label, DAYS[selDay].date, actLabel(act))}</Kicker>
               <AppText heading size={20} lh={1.15}>
                 {selLoc.shortName}
               </AppText>
               <AppText size={11} muted>
-                {selLoc.area + ' · ' + selLoc.elev + ' · ' + fmtDrive(selLoc.drive) + ' away'}
+                {strings.common.placeMetaAway(selLoc.area, selLoc.elev, fmtDrive(selLoc.drive))}
               </AppText>
             </View>
             <ScoreDial score={selScore} size={78} word />
@@ -134,10 +134,10 @@ export default function ForecastScreen() {
               {vs}
             </AppText>
             <AppText size={10.5} muted>
-              {selDay === 0 ? fmtAge(selLoc.reportMin) : 'Forecast'}
+              {selDay === 0 ? fmtAge(selLoc.reportMin) : f.forecastLabel}
             </AppText>
           </View>
-          <LinkButton href={selLoc.url}>{selLoc.shortName + ' web site ↗'}</LinkButton>
+          <LinkButton href={selLoc.url}>{strings.common.siteLink(selLoc.shortName)}</LinkButton>
         </Card>
       </View>
     </Screen>
