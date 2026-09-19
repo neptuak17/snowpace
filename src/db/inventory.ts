@@ -76,6 +76,11 @@ export async function replaceInventory(areas: SkiArea[], prov: Provenance): Prom
   return { ok: true };
 }
 
+/** A 304: upstream has not changed, so the cached data counts as fetched now. */
+export async function confirmCurrent(): Promise<void> {
+  await setMeta(META.fetchedAt, new Date().toISOString());
+}
+
 /** Note that a fetch was attempted; `error` is null when it succeeded or was a 304. */
 export async function recordAttempt(error: string | null): Promise<void> {
   await setMeta(META.attemptedAt, new Date().toISOString());

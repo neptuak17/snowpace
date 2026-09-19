@@ -67,8 +67,8 @@ conservative:
   more often.
 - **Never fetch on every launch, on foreground, or on pull-to-refresh of a conditions screen.** The
   inventory refresh is independent of the weather refresh.
-- **Prefer an unmetered connection.** If the cache is stale but the device is on cellular, defer
-  unless the cache is older than 90 days.
+- **Connection type is not checked.** 4.6 MB once a month is acceptable on cellular, and checking
+  would need another native module (`expo-network`). Decided Sep 2026; revisit if users object.
 - **Refresh during the app's loading screen, when due.** When a refresh is due at launch, run it
   as part of the initial load (alongside the weather fetch) and say so on the loading screen. The
   20 MB parse stalls the JS thread for a second or two, so it belongs where the user is already

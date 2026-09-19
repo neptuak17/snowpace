@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 
+import { refreshInventoryIfDue } from '@/data/inventory-refresh';
 import { listFavourites, type Favourite } from '@/db/favourites';
 import { ensureSeeded } from '@/db/inventory';
 import { getSetting } from '@/db/settings';
@@ -46,6 +47,10 @@ export default function RootLayout() {
       let favourites: Favourite[] = [];
       try {
         await ensureSeeded();
+        // Due at most once a month; a no-op otherwise. Runs here, behind the
+        // splash, because the 20 MB parse would stall a live screen.
+        const refresh = await refreshInventoryIfDue();
+        if (refresh.kind !== 'skipped') console.log('inventory refresh:', refresh);
         [initial, favourites] = await Promise.all([getSetting<Partial<PersistedState>>(PERSIST_KEY), listFavourites()]);
       } catch (e) {
         // A broken database must not brick the app; fall back to defaults.
