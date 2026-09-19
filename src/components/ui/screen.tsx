@@ -1,6 +1,6 @@
 import { SymbolView } from 'expo-symbols';
 import { useRouter } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppText } from './app-text';
@@ -20,12 +20,15 @@ type Props = {
 export function Screen({ children, help, contentStyle }: Props) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  // On iOS the scroll view insets itself for the status bar and tab bar
+  // (contentInsetAdjustmentBehavior); adding the safe area again doubles it.
+  const top = Platform.OS === 'ios' ? 8 : insets.top + 8;
   return (
     <View style={[styles.root, { backgroundColor: theme.bg }]}>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         keyboardDismissMode="on-drag"
-        contentContainerStyle={[{ paddingTop: insets.top + 8, paddingBottom: 40 }, contentStyle]}>
+        contentContainerStyle={[{ paddingTop: top, paddingBottom: 40 }, contentStyle]}>
         {children}
       </ScrollView>
       {help && <HelpButton top={insets.top + 4} />}
