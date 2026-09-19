@@ -10,6 +10,7 @@ import { Screen, ScreenTitle } from '@/components/ui/screen';
 import { ACTS, ALL_PLACES } from '@/data/places';
 import { fmtAge, fmtDrive } from '@/lib/format';
 import { actLabel, score } from '@/lib/scoring';
+import { TUNING } from '@/lib/tuning';
 import { useAppState } from '@/state/app-state';
 import { gutter } from '@/theme/tokens';
 import { strings } from '@/strings';
@@ -45,7 +46,7 @@ export default function PlacesScreen() {
             meta={strings.common.placeMeta(o.l.area, o.l.elev, fmtDrive(o.l.drive))}
             score={o.sc}
             report={fmtAge(o.l.reportMin)}
-            reportStale={o.l.reportMin > 240}
+            reportStale={o.l.reportMin > TUNING.staleReportMin}
             homeTag={o.l.id === s.home}
             bandWord
             onPress={() => router.push({ pathname: '/place/[id]', params: { id: o.l.id, from: strings.tabs.places } })}

@@ -9,7 +9,7 @@ import { ScorePill } from '@/components/ui/score-pill';
 import { BackButton, Screen } from '@/components/ui/screen';
 import { ACTS, DAYS, placeById } from '@/data/places';
 import { fmtAge, fmtDrive, fmtS, fmtT, fmtW } from '@/lib/format';
-import { actLabel, band, dialMetrics, freezeThaw, score, snow72 } from '@/lib/scoring';
+import { actLabel, band, dialMetrics, freezeThaw, isRain, score, snow72 } from '@/lib/scoring';
 import { useAppState } from '@/state/app-state';
 import { gutter } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
@@ -39,8 +39,8 @@ export default function PlaceDetailScreen() {
     { k: dt.rows.freezeThaw, v: ft.hit ? dt.yesTo(fmtT(ft.maxHi, s.units)) : dt.none },
     { k: dt.rows.wind, v: fmtW(d.wind, s.units) },
     { k: dt.rows.cloud, v: d.cloud + '%' },
-    { k: dt.rows.rain, v: d.t > 0 && d.precip ? strings.format.mm(d.precip) : dt.none },
-    { k: dt.rows.snowFalling, v: d.t > 0 ? dt.none : strings.format.mm(d.precip || 0) },
+    { k: dt.rows.rain, v: isRain(d.t) && d.precip ? strings.format.mm(d.precip) : dt.none },
+    { k: dt.rows.snowFalling, v: isRain(d.t) ? dt.none : strings.format.mm(d.precip || 0) },
     { k: dt.rows.yourActivities, v: mine.map((a) => a.label.toLowerCase()).join(dt.listSep) || dt.noneOfYours },
   ];
 

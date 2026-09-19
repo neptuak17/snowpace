@@ -10,7 +10,8 @@ import { ScorePill } from '@/components/ui/score-pill';
 import { Screen, ScreenTitle } from '@/components/ui/screen';
 import { DAYS, placeById } from '@/data/places';
 import { fmtAge, fmtDrive, fmtS, fmtT, fmtW } from '@/lib/format';
-import { actLabel, freezeThaw, limiters, rainSub, score, snow72, type FactorKey } from '@/lib/scoring';
+import { actLabel, freezeThaw, limiters, rainSub, score, snow72, snowFallingMm, type FactorKey } from '@/lib/scoring';
+import { TUNING } from '@/lib/tuning';
 import { useAppState } from '@/state/app-state';
 import { useTheme } from '@/theme/use-theme';
 import { strings } from '@/strings';
@@ -43,8 +44,8 @@ export default function ForecastScreen() {
     { key: 'base', k: f.metrics.threeDay, v: fmtS(snow72(selLoc, selDay), s.units) },
     { key: 'w', k: f.metrics.wind, v: fmtW(sd.wind, s.units) },
     { key: 'pr', k: f.metrics.rain, v: selRain.nowMm > 0 ? strings.format.mm(selRain.nowMm) : selRain.laterMm > 0 ? f.rainLater : f.none },
-    { key: 'pr3', k: f.metrics.rain3, v: selRain.prior.mm > 0.05 ? strings.format.mm(selRain.prior.mm.toFixed(1)) + (selRain.prior.iced ? f.iced : '') : f.none },
-    { key: 'fall', k: f.metrics.snowing, v: strings.format.mm(sd.t > 0 ? 0 : sd.precip || 0) },
+    { key: 'pr3', k: f.metrics.rain3, v: selRain.prior.mm > TUNING.rain.floorMm ? strings.format.mm(selRain.prior.mm.toFixed(1)) + (selRain.prior.iced ? f.iced : '') : f.none },
+    { key: 'fall', k: f.metrics.snowing, v: strings.format.mm(snowFallingMm(sd)) },
     { key: 'ft', k: f.metrics.freezeThaw, v: selFt.hit ? f.thawTo(fmtT(selFt.maxHi, s.units)) : f.none },
   ];
   const metrics = rows.map((r) => ({ k: r.k, v: r.v, rank: keys.indexOf(r.key as FactorKey) }));
