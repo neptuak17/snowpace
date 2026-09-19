@@ -9,24 +9,53 @@ import { Card, Kicker, SectionLabel } from '@/components/ui/card';
 import { PlaceRow } from '@/components/ui/place-row';
 import { Screen } from '@/components/ui/screen';
 import { WindowChart } from '@/components/window-chart';
-import { ACTS, ALL_PLACES, placeById } from '@/data/places';
-import { fmtAge, fmtDrive, hourLabel } from '@/lib/format';
-import {
-  actLabel, band, bestWindow, breakdown, dialMetrics, hourDay, hourScore, score, verdict,
-} from '@/lib/scoring';
+import type { Place } from '@/data/places';
+import { fmtDistance, fmtForecastAge, hourLabel } from '@/lib/format';
+import { toRouteId } from '@/lib/geo';
+import { placeMeta, withinLimit } from '@/lib/place-text';
+import { actLabel, band, bestWindow, breakdown, dialMetrics, hourDay, hourScore, score, verdict } from '@/lib/scoring';
 import { useAppState } from '@/state/app-state';
+import { strings } from '@/strings';
 import { bandColors } from '@/theme/band-colors';
 import { gutter, radius } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
-import { strings } from '@/strings';
 
 export default function TodayScreen() {
+  const s = useAppState();
+  const router = useRouter();
+  const home = s.home;
+
+  if (!home) {
+    return (
+      <Screen help>
+        <View style={styles.header}>
+          <AppText heading size={26} lh={1.12} style={styles.flex}>
+            {strings.tabs.today}
+          </AppText>
+        </View>
+        <View style={styles.pad16}>
+          <Card style={styles.startCard}>
+            <Kicker>{strings.today.noHomeKicker}</Kicker>
+            <AppText size={14} lh={1.45}>
+              {strings.today.noHomeBody}
+            </AppText>
+            <AppButton size={12.5} onPress={() => router.push('/search')}>
+              {strings.today.addPlaces}
+            </AppButton>
+          </Card>
+        </View>
+      </Screen>
+    );
+  }
+
+  return <HomeToday home={home} />;
+}
+
+function HomeToday({ home }: { home: Place }) {
   const s = useAppState();
   const theme = useTheme();
   const router = useRouter();
   const act = s.activity;
-  const home = placeById(s.home);
-  if (!home) return null;
 
   const offers = home.acts.includes(act);
   const hd = offers ? hourDay(home, 0, s.selHour) : home.days[0];
@@ -35,11 +64,12 @@ export default function TodayScreen() {
   const metrics = dialMetrics(home, 0, act, hs, s.prefs, s.units, hd);
   const factors = breakdown(home, 0, act, s.selHour, s.prefs, s.units, hd);
   const window = bestWindow(home, 0, act, s.prefs);
-  const activityLabel = ACTS.find((a) => a.key === act)?.label ?? act;
+  const activityLabel = actLabel(act);
 
-  const alternatives = ALL_PLACES.filter((l) => s.saved.includes(l.id) && l.id !== s.home)
+  const alternatives = s.places
+    .filter((l) => l.listed && l.key !== home.key)
     .map((l) => ({ l, sc: score(l, 0, act, s.prefs) }))
-    .filter((o): o is { l: typeof o.l; sc: number } => o.sc !== null && o.l.drive <= s.maxDrive)
+    .filter((o): o is { l: Place; sc: number } => o.sc !== null && withinLimit(o.l, s.maxDistanceKm))
     .sort((a, b) => b.sc - a.sc)
     .slice(0, 2);
 
@@ -49,9 +79,11 @@ export default function TodayScreen() {
         <AppText heading size={26} lh={1.12} style={styles.flex}>
           {home.shortName}
         </AppText>
-        <AppText size={11} muted>
-          {strings.common.away(fmtDrive(home.drive))}
-        </AppText>
+        {home.distanceKm !== null && (
+          <AppText size={11} muted>
+            {strings.common.away(fmtDistance(home.distanceKm, s.units))}
+          </AppText>
+        )}
       </View>
 
       {!offers && (
@@ -107,9 +139,9 @@ export default function TodayScreen() {
                   </View>
                 ))}
                 <AppText size={10.5} muted style={[styles.reportLine, { borderTopColor: theme.divider }]}>
-                  {strings.common.conditionsAge(fmtAge(home.reportMin))}
+                  {strings.common.forecastAge(fmtForecastAge(home.forecastAt))}
                 </AppText>
-                <LinkButton href={home.url}>{strings.common.siteLink(home.shortName)}</LinkButton>
+                {home.website && <LinkButton href={home.website}>{strings.common.siteLink(home.shortName)}</LinkButton>}
               </Card>
             </View>
           )}
@@ -134,16 +166,16 @@ export default function TodayScreen() {
         </View>
         {alternatives.map((o) => (
           <PlaceRow
-            key={o.l.id}
+            key={o.l.key}
             name={o.l.shortName}
-            meta={strings.common.placeMeta(o.l.area, o.l.elev, fmtDrive(o.l.drive))}
+            meta={placeMeta(o.l, s.units)}
             score={o.sc}
-            onPress={() => router.push({ pathname: '/place/[id]', params: { id: o.l.id, from: strings.tabs.today } })}
+            onPress={() => router.push({ pathname: '/place/[id]', params: { id: toRouteId(o.l.key), from: strings.tabs.today } })}
           />
         ))}
         {alternatives.length === 0 && (
           <AppText size={12.5} muted>
-            {strings.today.noAlternatives(actLabel(act), fmtDrive(s.maxDrive))}
+            {strings.today.noAlternatives(actLabel(act), fmtDistance(s.maxDistanceKm, s.units))}
           </AppText>
         )}
       </View>

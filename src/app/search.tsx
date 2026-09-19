@@ -1,29 +1,51 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { AppText } from '@/components/ui/app-text';
+import { SectionLabel } from '@/components/ui/card';
 import { HomeTag } from '@/components/ui/place-row';
 import { BackButton, Screen, ScreenTitle } from '@/components/ui/screen';
-import { SectionLabel } from '@/components/ui/card';
-import { REGIONS } from '@/data/places';
-import { fmtDrive } from '@/lib/format';
+import type { SkiArea } from '@/data/openskidata';
+import { activitiesOf, shortNameOf } from '@/data/places';
+import { searchAreas } from '@/db/inventory';
+import { fmtDistance } from '@/lib/format';
+import { distanceKm } from '@/lib/geo';
 import { useAppState } from '@/state/app-state';
+import { strings } from '@/strings';
 import { bodyFont, gutter, radius } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
-import { strings } from '@/strings';
+
+const NEARBY_LIMIT = 30;
+const SEARCH_LIMIT = 50;
 
 export default function SearchScreen() {
   const s = useAppState();
   const theme = useTheme();
   const router = useRouter();
-  const [search, setSearch] = useState('');
-  const q = search.trim().toLowerCase();
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SkiArea[] | null>(null);
+  const [searching, setSearching] = useState(false);
+  const q = query.trim();
 
-  const regions = REGIONS.map((g) => ({
-    name: g.name,
-    items: g.items.filter((i) => !q || (i.name + ' ' + i.area).toLowerCase().includes(q)),
-  })).filter((g) => g.items.length);
+  // Debounced query against SQLite. With no text and a location, show the
+  // nearest places; with no text and no location, wait for the user to type.
+  useEffect(() => {
+    if (!q && !s.location) { setResults(null); return; }
+    let cancelled = false;
+    setSearching(true);
+    const timer = setTimeout(async () => {
+      try {
+        const rows = await searchAreas(q, s.location, q ? SEARCH_LIMIT : NEARBY_LIMIT);
+        if (!cancelled) setResults(rows);
+      } catch {
+        if (!cancelled) setResults([]);
+      } finally {
+        if (!cancelled) setSearching(false);
+      }
+    }, q ? 250 : 0);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [q, s.location]);
 
   return (
     <Screen contentStyle={styles.content}>
@@ -33,40 +55,53 @@ export default function SearchScreen() {
         {strings.search.intro}
       </AppText>
       <TextInput
-        value={search}
-        onChangeText={setSearch}
+        value={query}
+        onChangeText={setQuery}
         placeholder={strings.search.placeholder}
         placeholderTextColor={theme.muted}
         autoCorrect={false}
+        autoCapitalize="words"
         clearButtonMode="while-editing"
+        returnKeyType="search"
         style={[styles.input, bodyFont(), { color: theme.text, backgroundColor: theme.surface, borderColor: theme.divider }]}
       />
 
-      {regions.map((g) => (
-        <View key={g.name} style={styles.region}>
-          <SectionLabel>{g.name}</SectionLabel>
-          {g.items.map((i) => {
-            const on = s.saved.includes(i.id);
-            const isHome = i.id === s.home;
-            const mine = i.acts.filter((k) => s.myActs.includes(k)).length;
+      {results === null && !searching && (
+        <AppText size={12.5} muted>
+          {strings.search.typeToSearch}
+        </AppText>
+      )}
+      {searching && results === null && (
+        <AppText size={12.5} muted>
+          {strings.search.searching}
+        </AppText>
+      )}
+      {results !== null && (
+        <View style={styles.list}>
+          {!q && <SectionLabel>{strings.search.nearby}</SectionLabel>}
+          {results.map((a) => {
+            const saved = s.savedKeys.has(a.key);
+            const isHome = s.home?.key === a.key;
+            const mine = activitiesOf(a).filter((k) => s.myActs.includes(k)).length;
+            const dist = s.location ? fmtDistance(distanceKm(s.location, a), s.units) : null;
             return (
-              <View key={i.id} style={[styles.item, { backgroundColor: theme.surface }, theme.shadowSm]}>
+              <View key={a.key} style={[styles.item, { backgroundColor: theme.surface }, theme.shadowSm]}>
                 <View style={styles.itemText}>
                   <View style={styles.nameRow}>
-                    <AppText size={13.5} weight={700}>
-                      {i.shortName}
+                    <AppText size={13.5} weight={700} style={styles.name}>
+                      {shortNameOf(a.name)}
                     </AppText>
                     {isHome && <HomeTag />}
                   </View>
                   <AppText size={11} muted>
-                    {strings.search.meta(i.area, fmtDrive(i.drive), mine)}
+                    {strings.search.meta([a.locality ?? a.regionName, dist], mine)}
                   </AppText>
                 </View>
                 {!isHome && (
                   <View style={styles.actions}>
                     <Pressable
                       accessibilityRole="button"
-                      onPress={() => s.setHome(i.id)}
+                      onPress={() => s.setHome(a.key)}
                       style={({ pressed }) => [styles.pill, styles.homeBtn, pressed && styles.pressed]}>
                       <AppText size={11.5} weight={700} color={theme.accent}>
                         {strings.search.setHome}
@@ -74,15 +109,15 @@ export default function SearchScreen() {
                     </Pressable>
                     <Pressable
                       accessibilityRole="button"
-                      accessibilityState={{ selected: on }}
-                      onPress={() => s.togglePin(i.id)}
+                      accessibilityState={{ selected: saved }}
+                      onPress={() => (saved ? s.removeFavourite(a.key) : s.addFavourite(a.key))}
                       style={({ pressed }) => [
                         styles.pill,
-                        { backgroundColor: on ? theme.tagAccent.bg : theme.accent },
+                        { backgroundColor: saved ? theme.tagAccent.bg : theme.accent },
                         pressed && styles.pressed,
                       ]}>
-                      <AppText size={11.5} weight={700} color={on ? theme.tagAccent.fg : '#fff'}>
-                        {on ? strings.search.saved : strings.search.add}
+                      <AppText size={11.5} weight={700} color={saved ? theme.tagAccent.fg : '#fff'}>
+                        {saved ? strings.search.saved : strings.search.add}
                       </AppText>
                     </Pressable>
                   </View>
@@ -90,12 +125,12 @@ export default function SearchScreen() {
               </View>
             );
           })}
+          {results.length === 0 && (
+            <AppText size={12.5} muted>
+              {strings.search.noResults}
+            </AppText>
+          )}
         </View>
-      ))}
-      {regions.length === 0 && (
-        <AppText size={12.5} muted>
-          {strings.search.noResults}
-        </AppText>
       )}
     </Screen>
   );
@@ -112,7 +147,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: radius.pill,
   },
-  region: { gap: 7 },
+  list: { gap: 7 },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -123,6 +158,7 @@ const styles = StyleSheet.create({
   },
   itemText: { flex: 1, gap: 2 },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
+  name: { flexShrink: 1 },
   actions: { flexDirection: 'row', gap: 6, alignItems: 'center' },
   pill: {
     minHeight: 44,

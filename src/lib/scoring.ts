@@ -19,7 +19,6 @@ export const DEFAULT_PREFS: PrefsByAct = {
   downhill: { temp: -8, wind: 24, snow: 18, precipTol: 60 },
 };
 
-export const DEFAULT_MAX_DRIVE = 130;
 
 export type { FactorKey };
 export type Subs = Record<FactorKey, number>;

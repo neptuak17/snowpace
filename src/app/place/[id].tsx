@@ -1,4 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { ActivityChips } from '@/components/activity-chips';
@@ -7,8 +8,11 @@ import { LinkButton } from '@/components/ui/app-button';
 import { AppText } from '@/components/ui/app-text';
 import { ScorePill } from '@/components/ui/score-pill';
 import { BackButton, Screen } from '@/components/ui/screen';
-import { ACTS, DAYS, placeById } from '@/data/places';
-import { fmtAge, fmtDrive, fmtS, fmtT, fmtW } from '@/lib/format';
+import { ACTS, DAYS, placeFromArea, type Place } from '@/data/places';
+import { getArea } from '@/db/inventory';
+import { fmtForecastAge, fmtS, fmtT, fmtW } from '@/lib/format';
+import { fromRouteId } from '@/lib/geo';
+import { placeMetaAway } from '@/lib/place-text';
 import { actLabel, band, dialMetrics, freezeThaw, isRain, score, snow72 } from '@/lib/scoring';
 import { useAppState } from '@/state/app-state';
 import { gutter } from '@/theme/tokens';
@@ -18,11 +22,26 @@ import { strings } from '@/strings';
 export default function PlaceDetailScreen() {
   const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const s = useAppState();
+  const key = fromRouteId(id);
+  // Usually one of the user's places; fall back to the inventory for anything else.
+  const saved = s.places.find((p) => p.key === key && p.listed) ?? null;
+  const [loaded, setLoaded] = useState<Place | null>(null);
+  useEffect(() => {
+    if (saved) return;
+    let cancelled = false;
+    getArea(key).then((a) => { if (a && !cancelled) setLoaded(placeFromArea(a, s.location)); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [key, saved, s.location]);
+  const l = saved ?? loaded;
+  if (!l) return null;
+  return <PlaceDetail l={l} from={from} />;
+}
+
+function PlaceDetail({ l, from }: { l: Place; from?: string }) {
+  const s = useAppState();
   const theme = useTheme();
   const router = useRouter();
-  const l = placeById(id);
   const act = s.activity;
-  if (!l) return null;
 
   const sc = score(l, 0, act, s.prefs);
   const b = band(sc);
@@ -54,10 +73,10 @@ export default function PlaceDetailScreen() {
           {l.name}
         </AppText>
         <AppText size={11.5} muted>
-          {strings.common.placeMetaAway(l.area, l.elev, fmtDrive(l.drive))}
+          {placeMetaAway(l, s.units)}
         </AppText>
         <AppText size={11.5} muted>
-          {strings.common.conditionsAge(fmtAge(l.reportMin))}
+          {strings.common.forecastAge(fmtForecastAge(l.forecastAt))}
         </AppText>
       </View>
 
@@ -97,7 +116,7 @@ export default function PlaceDetailScreen() {
       </View>
 
       <View style={[styles.gutter, styles.pad18]}>
-        <LinkButton href={l.url}>{strings.common.siteLink(l.shortName)}</LinkButton>
+        {l.website && <LinkButton href={l.website}>{strings.common.siteLink(l.shortName)}</LinkButton>}
       </View>
     </Screen>
   );

@@ -14,16 +14,24 @@ export function fmtW(kmh: number, units: Units): string {
   return units === 'imperial' ? Math.round(kmh * 0.621) + ' mph' : kmh + ' km/h';
 }
 
-export function fmtDrive(min: number): string {
-  if (min < 60) return min + ' min';
-  const rest = min % 60;
-  return (Math.floor(min / 60) + ' h ' + (rest ? rest + ' min' : '')).trim();
+/** "45 km" / "28 mi". Null distance (no location yet) renders as a dash. */
+export function fmtDistance(km: number | null, units: Units): string {
+  if (km === null) return strings.common.dash;
+  return units === 'imperial' ? Math.round(km * 0.621) + ' mi' : Math.round(km) + ' km';
 }
 
-export function fmtAge(min: number): string {
-  if (min < 90) return strings.format.reportedMinAgo(min);
+/** How old a forecast is. Null means the placeholder data. */
+export function fmtForecastAge(forecastAt: string | null, now = Date.now()): string {
+  if (!forecastAt) return strings.format.placeholderForecast;
+  const min = Math.max(0, Math.round((now - Date.parse(forecastAt)) / 60000));
+  if (min < 90) return strings.format.forecastMinAgo(min);
   const h = Math.round(min / 60);
-  return h < 24 ? strings.format.reportedHoursAgo(h) : strings.format.reportedDaysAgo(Math.round(h / 24));
+  return h < 24 ? strings.format.forecastHoursAgo(h) : strings.format.forecastDaysAgo(Math.round(h / 24));
+}
+
+/** Minutes since a forecast was fetched; Infinity for the placeholder. */
+export function forecastAgeMin(forecastAt: string | null, now = Date.now()): number {
+  return forecastAt ? Math.max(0, (now - Date.parse(forecastAt)) / 60000) : Infinity;
 }
 
 export function hourLabel(h: number): string {

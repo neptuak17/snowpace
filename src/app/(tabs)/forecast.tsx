@@ -1,15 +1,17 @@
+import { useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { ActivityChips } from '@/components/activity-chips';
-import { LinkButton } from '@/components/ui/app-button';
+import { AppButton, LinkButton } from '@/components/ui/app-button';
 import { AppText } from '@/components/ui/app-text';
 import { Card, Kicker } from '@/components/ui/card';
 import { MetricGrid } from '@/components/ui/metric-grid';
 import { ScoreDial } from '@/components/ui/score-dial';
 import { ScorePill } from '@/components/ui/score-pill';
 import { Screen, ScreenTitle } from '@/components/ui/screen';
-import { DAYS, placeById } from '@/data/places';
-import { fmtAge, fmtDrive, fmtS, fmtT, fmtW } from '@/lib/format';
+import { DAYS } from '@/data/places';
+import { fmtDistance, fmtForecastAge, fmtS, fmtT, fmtW } from '@/lib/format';
+import { placeMetaAway } from '@/lib/place-text';
 import { actLabel, freezeThaw, limiters, rainSub, score, snow72, snowFallingMm, type FactorKey } from '@/lib/scoring';
 import { TUNING } from '@/lib/tuning';
 import { useAppState } from '@/state/app-state';
@@ -22,14 +24,14 @@ export default function ForecastScreen() {
   const s = useAppState();
   const theme = useTheme();
   const act = s.activity;
-  const home = placeById(s.home);
+  const home = s.home;
 
-  const gridLocs = s.saved.map(placeById).filter((l) => !!l).filter((l) => l.acts.includes(act));
+  const gridLocs = s.places.filter((l) => l.listed && l.acts.includes(act));
   // until a square is tapped: home hill (or best grid row), today
-  const fallback = gridLocs.some((l) => l.id === s.home) ? s.home : (gridLocs[0] ?? home)?.id;
+  const fallback = home && gridLocs.some((l) => l.key === home.key) ? home.key : (gridLocs[0] ?? home)?.key;
   const cell = s.selCell ?? { loc: fallback ?? '', day: 0 };
-  const selLoc = (gridLocs.some((l) => l.id === cell.loc) ? placeById(cell.loc) : gridLocs[0]) ?? home;
-  if (!selLoc) return null;
+  const selLoc = gridLocs.find((l) => l.key === cell.loc) ?? gridLocs[0] ?? home;
+  if (!selLoc) return <EmptyForecast />;
 
   const selDay = cell.day;
   const selScore = score(selLoc, selDay, act, s.prefs);
@@ -88,7 +90,7 @@ export default function ForecastScreen() {
           ))}
         </View>
         {gridLocs.map((l) => (
-          <View key={l.id} style={styles.gridRow}>
+          <View key={l.key} style={styles.gridRow}>
             <AppText size={11} weight={600} lh={1.2} style={styles.nameCol}>
               {l.shortName}
             </AppText>
@@ -96,8 +98,8 @@ export default function ForecastScreen() {
               <ScorePill
                 key={di}
                 score={score(l, di, act, s.prefs)}
-                selected={cell.loc === l.id && cell.day === di}
-                onPress={() => s.setSelCell({ loc: l.id, day: di })}
+                selected={cell.loc === l.key && cell.day === di}
+                onPress={() => s.setSelCell({ loc: l.key, day: di })}
               />
             ))}
           </View>
@@ -124,7 +126,7 @@ export default function ForecastScreen() {
                 {selLoc.shortName}
               </AppText>
               <AppText size={11} muted>
-                {strings.common.placeMetaAway(selLoc.area, selLoc.elev, fmtDrive(selLoc.drive))}
+                {placeMetaAway(selLoc, s.units)}
               </AppText>
             </View>
             <ScoreDial score={selScore} size={78} word />
@@ -135,10 +137,38 @@ export default function ForecastScreen() {
               {vs}
             </AppText>
             <AppText size={10.5} muted>
-              {selDay === 0 ? fmtAge(selLoc.reportMin) : f.forecastLabel}
+              {selDay === 0 ? strings.common.forecastAge(fmtForecastAge(selLoc.forecastAt)) : f.forecastLabel}
             </AppText>
           </View>
-          <LinkButton href={selLoc.url}>{strings.common.siteLink(selLoc.shortName)}</LinkButton>
+          {selLoc.website && <LinkButton href={selLoc.website}>{strings.common.siteLink(selLoc.shortName)}</LinkButton>}
+        </Card>
+      </View>
+    </Screen>
+  );
+}
+
+/** No saved place offers the chosen activity (or nothing is saved yet). */
+function EmptyForecast() {
+  const s = useAppState();
+  const router = useRouter();
+  const activityLabel = actLabel(s.activity);
+  return (
+    <Screen help contentStyle={styles.content}>
+      <View style={styles.head}>
+        <ScreenTitle>{strings.forecast.title}</ScreenTitle>
+      </View>
+      <View style={styles.inset}>
+        <ActivityChips />
+      </View>
+      <View style={styles.inset}>
+        <Card style={styles.empty}>
+          <Kicker>{strings.places.emptyKicker(activityLabel)}</Kicker>
+          <AppText size={13} lh={1.45}>
+            {strings.places.emptyBody(activityLabel, fmtDistance(s.maxDistanceKm, s.units))}
+          </AppText>
+          <AppButton size={12.5} onPress={() => router.push('/search')}>
+            {strings.places.addPlace}
+          </AppButton>
         </Card>
       </View>
     </Screen>
@@ -158,6 +188,7 @@ const styles = StyleSheet.create({
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   swatch: { width: 11, height: 11, borderRadius: 4 },
   selCard: { gap: 11 },
+  empty: { alignItems: 'flex-start' },
   selHead: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 },
   selTitle: { flex: 1, gap: 3 },
   selFoot: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, borderTopWidth: 1, paddingTop: 10 },

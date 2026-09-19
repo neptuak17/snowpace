@@ -41,10 +41,13 @@ export const strings = {
     chevron: '›',
     dash: '—',
     siteLink: (name: string) => `${name} web site ↗`,
-    away: (drive: string) => `${drive} away`,
-    conditionsAge: (age: string) => `Conditions ${age}`,
-    placeMeta: (area: string, elev: string, drive: string) => `${area} · ${elev} · ${drive}`,
-    placeMetaAway: (area: string, elev: string, drive: string) => `${area} · ${elev} · ${drive} away`,
+    away: (distance: string) => `${distance} away`,
+    forecastAge: (age: string) => `Forecast ${age}`,
+    placeMeta: (parts: (string | null)[]) => parts.filter(Boolean).join(' · '),
+    placeMetaAway: (parts: (string | null)[], distance: string) => [...parts.filter(Boolean), `${distance} away`].join(' · '),
+    elevation: (lo: string, hi: string) => `${lo}–${hi}`,
+    unlisted: 'No longer listed',
+    remove: 'Remove',
     chipWithScore: (label: string, score: string) => `${label} ${score}`,
     toggleBreakdown: 'Toggle breakdown',
   },
@@ -64,8 +67,11 @@ export const strings = {
     otherActivitiesAt: (name: string) => `Other activities at ${name}`,
     otherNearby: 'Other options nearby',
     seeAll: 'See all',
-    noAlternatives: (activity: string, drive: string) =>
-      `None of your other places offer ${activity} within ${drive}.`,
+    noAlternatives: (activity: string, distance: string) =>
+      `None of your other places offer ${activity} within ${distance}.`,
+    noHomeKicker: 'No home hill yet',
+    noHomeBody: 'Add the places you go to and pick one as your home hill — that is the one this screen opens on.',
+    addPlaces: 'Add your places',
   },
 
   forecast: {
@@ -95,8 +101,9 @@ export const strings = {
     note: (activity: string) => `Your places that offer ${activity}, best right now first.`,
     rank: (n: number, name: string) => `${n}. ${name}`,
     emptyKicker: (activity: string) => `Nothing here for ${activity}`,
-    emptyBody: (activity: string, drive: string) =>
-      `None of your places offer ${activity} within ${drive} — pick another activity above, or add somewhere that does.`,
+    emptyBody: (activity: string, distance: string) =>
+      `None of your places offer ${activity} within ${distance} — pick another activity above, or add somewhere that does.`,
+    unlistedNote: 'This place has dropped out of the ski-area listing. You can keep it or remove it.',
     addPlace: 'Add a place',
   },
 
@@ -111,8 +118,8 @@ export const strings = {
     windLimit: 'Wind speed limit',
     windLimitHint: 'Above this the score drops away fast.',
     gettingThere: 'Getting there',
-    maxDrive: "Furthest you'd drive",
-    maxDriveHint: 'Places beyond this drop out of the ranking.',
+    maxDistance: 'How far you will go',
+    maxDistanceHint: 'Straight-line distance from where you are. Places beyond this drop out of the ranking.',
     display: 'Display',
     units: 'Units',
     metric: '°C · cm',
@@ -128,12 +135,15 @@ export const strings = {
     backLabel: 'My places',
     title: 'Add a place',
     intro: 'Add the places you visit, and pick which one is your home hill — that is the one Today opens on.',
-    placeholder: 'Search centres and resorts',
-    meta: (area: string, drive: string, count: number) => `${area} · ${drive} · ${count} of your activities`,
+    placeholder: 'Search by name or town',
+    nearby: 'Nearest to you',
+    typeToSearch: 'Type a name or a town to search all of North America.',
+    meta: (parts: (string | null)[], count: number) => [...parts.filter(Boolean), `${count} of your activities`].join(' · '),
     setHome: 'Set home',
     saved: 'Saved',
     add: 'Add',
-    noResults: 'Nothing by that name yet — try "nordic", "Whistler" or "Big".',
+    noResults: 'Nothing by that name. Try the town, or a shorter word.',
+    searching: 'Searching…',
   },
 
   detail: {
@@ -177,7 +187,7 @@ export const strings = {
     useKicker: 'How to use it',
     steps: [
       { t: 'Turn on your activities', d: 'On the You tab, switch on the ones you actually do. Everything else in the app filters to those.' },
-      { t: 'Set what good feels like', d: 'Still on You: your ideal temperature, how much wind you will put up with, how much fresh snow you want, and how far you will drive.' },
+      { t: 'Set what good feels like', d: 'Still on You: your ideal temperature, how much wind you will put up with, how much fresh snow you want, and how far you will go.' },
       { t: 'Add your places', d: 'My places → Add. Pick the centres and hills you go to, and set one as your home hill — that is the one Today opens on.' },
       { t: 'Check Today', d: 'The big dial is your home hill right now. Tap an hour on the chart to see how the score moves through the day, then tap the breakdown to see why.' },
       { t: 'Look ahead', d: 'Forecast lays out every saved place against the next five days. Tap any square for the detail on that day.' },
@@ -188,9 +198,10 @@ export const strings = {
 
   // ── Formatting phrases (lib/format.ts) ──────────────────────────────────
   format: {
-    reportedMinAgo: (min: number) => `reported ${min} min ago`,
-    reportedHoursAgo: (h: number) => `reported ${h} h ago`,
-    reportedDaysAgo: (d: number) => `reported ${d} day ago`,
+    forecastMinAgo: (min: number) => `from ${min} min ago`,
+    forecastHoursAgo: (h: number) => `from ${h} h ago`,
+    forecastDaysAgo: (d: number) => `from ${d} day ago`,
+    placeholderForecast: 'sample data',
     noon: 'noon',
     am: (h: number) => `${h} AM`,
     pm: (h: number) => `${h} PM`,

@@ -129,6 +129,9 @@ export const TUNING = {
     pluralFrom: 3,
   },
 
-  // ── A conditions report older than this (minutes) is shown in gold.
-  staleReportMin: 240,
+  // ── A forecast older than this (minutes) is shown in gold as a nudge to refresh.
+  staleForecastMin: 360,
+
+  // ── "How far will you go" — straight-line km from the phone.
+  distance: { defaultKm: 150, minKm: 20, maxKm: 400, stepKm: 10 },
 } as const;

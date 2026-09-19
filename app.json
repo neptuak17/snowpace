@@ -33,7 +33,13 @@
           "imageWidth": 76
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Snowpace uses your location to show how far away each place is and to sort search results nearest-first."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

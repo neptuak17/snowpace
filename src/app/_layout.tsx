@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 
+import { listFavourites, type Favourite } from '@/db/favourites';
 import { ensureSeeded } from '@/db/inventory';
 import { getSetting } from '@/db/settings';
 import { AppStateProvider, PERSIST_KEY, type PersistedState } from '@/state/app-state';
@@ -35,21 +36,22 @@ export default function RootLayout() {
   // Open the database, load the bundled inventory on first run, and read the
   // saved settings — all behind the splash so the first frame is the user's
   // own state. Web has no SQLite; it runs on in-memory defaults.
-  const [boot, setBoot] = useState<{ done: boolean; initial: Partial<PersistedState> | null }>({
-    done: Platform.OS === 'web', initial: null,
+  const [boot, setBoot] = useState<{ done: boolean; initial: Partial<PersistedState> | null; favourites: Favourite[] }>({
+    done: Platform.OS === 'web', initial: null, favourites: [],
   });
   useEffect(() => {
     if (Platform.OS === 'web') return;
     (async () => {
       let initial: Partial<PersistedState> | null = null;
+      let favourites: Favourite[] = [];
       try {
         await ensureSeeded();
-        initial = await getSetting<Partial<PersistedState>>(PERSIST_KEY);
+        [initial, favourites] = await Promise.all([getSetting<Partial<PersistedState>>(PERSIST_KEY), listFavourites()]);
       } catch (e) {
         // A broken database must not brick the app; fall back to defaults.
         console.warn('database init failed', e);
       }
-      setBoot({ done: true, initial });
+      setBoot({ done: true, initial, favourites });
     })();
   }, []);
 
@@ -61,7 +63,7 @@ export default function RootLayout() {
   if (!ready) return null;
 
   return (
-    <AppStateProvider initial={boot.initial}>
+    <AppStateProvider initial={boot.initial} initialFavourites={boot.favourites}>
       <RootNavigator />
     </AppStateProvider>
   );

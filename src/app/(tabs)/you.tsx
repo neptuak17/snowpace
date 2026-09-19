@@ -9,8 +9,9 @@ import { Screen, ScreenTitle } from '@/components/ui/screen';
 import { Segmented } from '@/components/ui/segmented';
 import { ToggleSwitch } from '@/components/ui/toggle-switch';
 import { ACT_NOTES, ACTS } from '@/data/places';
-import { fmtDrive, fmtS, fmtT, fmtW } from '@/lib/format';
+import { fmtDistance, fmtS, fmtT, fmtW } from '@/lib/format';
 import { actLabel, fallCopy, fallLabel, snowHint, snowLabel } from '@/lib/scoring';
+import { TUNING } from '@/lib/tuning';
 import { useAppState } from '@/state/app-state';
 import { gutter } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
@@ -83,8 +84,9 @@ export default function YouScreen() {
       <Card style={styles.gap15}>
         <Kicker>{y.gettingThere}</Kicker>
         <PrefSlider
-          label={y.maxDrive} value={fmtDrive(s.maxDrive)} raw={s.maxDrive} min={20} max={180} step={10}
-          hint={y.maxDriveHint} onChange={s.setMaxDrive}
+          label={y.maxDistance} value={fmtDistance(s.maxDistanceKm, s.units)} raw={s.maxDistanceKm}
+          min={TUNING.distance.minKm} max={TUNING.distance.maxKm} step={TUNING.distance.stepKm}
+          hint={y.maxDistanceHint} onChange={s.setMaxDistance}
         />
       </Card>
 
