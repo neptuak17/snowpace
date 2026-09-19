@@ -52,16 +52,25 @@ export function ScoreDial({ score, size, word, line }: Props) {
           { width: inner, height: inner, top: stroke, left: stroke, borderRadius: inner / 2, backgroundColor: theme.surface },
           big && theme.shadowSm,
         ]}>
-        <AppText heading size={big ? 40 : Math.round(size * 0.35)} color={c.ring} lh={1}>
+        {/* Fixed-size text inside a fixed circle: no Dynamic Type scaling, and a
+            line height a little above 1 — iOS shifts glyphs upward when the
+            line height is tighter than the font's natural one. */}
+        <AppText heading size={big ? 40 : Math.round(size * 0.33)} color={c.ring} lh={1.1} allowFontScaling={false}>
           {score === null ? strings.common.dash : score}
         </AppText>
         {word && (
-          <AppText size={8} upper tracking={0.08} muted lh={1.2}>
+          <AppText
+            size={8} upper tracking={0.06} muted lh={1.2} center
+            numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} allowFontScaling={false}
+            style={{ width: inner - 10 }}>
             {b.word}
           </AppText>
         )}
         {line && (
-          <AppText size={8.5} upper tracking={0.09} muted lh={1.25} center>
+          <AppText
+            size={8.5} upper tracking={0.09} muted lh={1.25} center
+            numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8} allowFontScaling={false}
+            style={{ width: inner - 16 }}>
             {line}
           </AppText>
         )}
