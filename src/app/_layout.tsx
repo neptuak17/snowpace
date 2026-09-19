@@ -10,9 +10,12 @@ import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 
-import { AppStateProvider } from '@/state/app-state';
+import { ensureSeeded } from '@/db/inventory';
+import { getSetting } from '@/db/settings';
+import { AppStateProvider, PERSIST_KEY, type PersistedState } from '@/state/app-state';
 import { useTheme } from '@/theme/use-theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -29,14 +32,36 @@ export default function RootLayout() {
     Figtree_800ExtraBold,
   });
 
+  // Open the database, load the bundled inventory on first run, and read the
+  // saved settings — all behind the splash so the first frame is the user's
+  // own state. Web has no SQLite; it runs on in-memory defaults.
+  const [boot, setBoot] = useState<{ done: boolean; initial: Partial<PersistedState> | null }>({
+    done: Platform.OS === 'web', initial: null,
+  });
   useEffect(() => {
-    if (loaded) SplashScreen.hideAsync();
-  }, [loaded]);
+    if (Platform.OS === 'web') return;
+    (async () => {
+      let initial: Partial<PersistedState> | null = null;
+      try {
+        await ensureSeeded();
+        initial = await getSetting<Partial<PersistedState>>(PERSIST_KEY);
+      } catch (e) {
+        // A broken database must not brick the app; fall back to defaults.
+        console.warn('database init failed', e);
+      }
+      setBoot({ done: true, initial });
+    })();
+  }, []);
 
-  if (!loaded) return null;
+  const ready = loaded && boot.done;
+  useEffect(() => {
+    if (ready) SplashScreen.hideAsync();
+  }, [ready]);
+
+  if (!ready) return null;
 
   return (
-    <AppStateProvider>
+    <AppStateProvider initial={boot.initial}>
       <RootNavigator />
     </AppStateProvider>
   );

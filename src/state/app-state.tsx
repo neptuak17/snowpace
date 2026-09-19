@@ -1,12 +1,14 @@
 /**
  * App-wide state, held in React context. This is the design's `state` object
- * lifted out of the prototype. It is in-memory only for now: persisting it
- * (favourites, prefs) is a later step and will need a storage dependency.
+ * lifted out of the prototype. Settings persist to SQLite (see PersistedState);
+ * saved places and the home hill still use placeholder IDs in memory until
+ * the screens move to the inventory keys.
  */
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
-import { useColorScheme } from 'react-native';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Platform, useColorScheme } from 'react-native';
 
 import { ACTS, type ActivityKey } from '@/data/places';
+import { setSetting } from '@/db/settings';
 import type { Units } from '@/lib/format';
 import { DEFAULT_MAX_DRIVE, DEFAULT_PREFS, type Prefs, type PrefsByAct } from '@/lib/scoring';
 import type { Scheme } from '@/theme/tokens';
@@ -44,7 +46,12 @@ type Actions = {
 
 const Ctx = createContext<(State & Actions) | null>(null);
 
-export function AppStateProvider({ children }: { children: ReactNode }) {
+/** The slice of state that survives a relaunch. Stored as one JSON blob. */
+export type PersistedState = Pick<State, 'activity' | 'myActs' | 'prefs' | 'units' | 'theme' | 'maxDrive'>;
+export const PERSIST_KEY = 'state';
+const PERSISTED: (keyof PersistedState)[] = ['activity', 'myActs', 'prefs', 'units', 'theme', 'maxDrive'];
+
+export function AppStateProvider({ children, initial }: { children: ReactNode; initial?: Partial<PersistedState> | null }) {
   const system = useColorScheme();
   const [state, setState] = useState<State>(() => ({
     activity: 'classic',
@@ -58,7 +65,22 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     selHour: Math.max(7, Math.min(17, new Date().getHours())),
     selCell: null,
     showBreakdown: false,
+    ...(initial ?? {}),
   }));
+
+  // Write the persisted slice back whenever it changes. Debounced, because a
+  // slider fires many changes a second. Skips the very first render (that is
+  // what we just loaded) and web, which has no database.
+  const persisted = PERSISTED.map((k) => state[k]);
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) { first.current = false; return; }
+    if (Platform.OS === 'web') return;
+    const slice = Object.fromEntries(PERSISTED.map((k) => [k, state[k]])) as PersistedState;
+    const timer = setTimeout(() => { setSetting(PERSIST_KEY, slice).catch(() => {}); }, 300);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, persisted);
 
   const patch = useCallback((p: Partial<State> | ((s: State) => Partial<State>)) => {
     setState((s) => ({ ...s, ...(typeof p === 'function' ? p(s) : p) }));
