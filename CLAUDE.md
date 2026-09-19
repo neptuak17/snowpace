@@ -45,12 +45,16 @@ and cannot be cached centrally.
 
 ### Ski area inventory — OpenSkiData (direct fetch, long cache)
 
-**Replaces the earlier "bundled snapshot" section.** There is no import script and no build-time
-processing step. The app fetches the published OpenSkiData ski areas file directly and filters it on
-device.
+The app fetches the published OpenSkiData ski areas file directly and filters it on device. The
+same parser (`src/data/openskidata.ts`) builds the bundled seed via `scripts/build-seed.ts`, so the
+seed and the on-device refresh cannot drift apart.
 
-**Source:** `https://tiles.openskimap.org/geojson/ski_areas.geojson` — approximately 4.6 MB, global,
-regenerated daily by OpenSkiData from OpenStreetMap and Skimap.org.
+**Source:** `https://tiles.openskimap.org/geojson/ski_areas.geojson` — about 4.6 MB gzipped on the
+wire, **~21 MB decompressed**, global (~12,000 areas), regenerated daily by OpenSkiData from
+OpenStreetMap and Skimap.org. Serves `ETag` and `Last-Modified`, so conditional requests work.
+
+**Measured Sep 2026:** 2,803 areas in the North America bounding box; 2,139 operating; 1,341 of
+those named. The slim records for those 1,341 are ~225 KB of JSON.
 
 #### Fetch policy
 
@@ -65,8 +69,10 @@ conservative:
   inventory refresh is independent of the weather refresh.
 - **Prefer an unmetered connection.** If the cache is stale but the device is on cellular, defer
   unless the cache is older than 90 days.
-- **Fetch in the background. Never block the UI.** The app must be fully usable on the existing
-  cached inventory while a refresh runs.
+- **Refresh during the app's loading screen, when due.** When a refresh is due at launch, run it
+  as part of the initial load (alongside the weather fetch) and say so on the loading screen. The
+  20 MB parse stalls the JS thread for a second or two, so it belongs where the user is already
+  waiting, not behind a live screen. Once loaded, the app never refreshes the inventory mid-session.
 - **On failure, keep the existing data and do not retry for 24 hours.** One attempt per cycle, no
   retry loops, no exponential-backoff storms.
 - **Send a User-Agent that identifies the app** and includes a contact URL, so the maintainer can
@@ -86,13 +92,20 @@ fetch.
 
 #### Parsing and storage
 
-- Parse off the main thread where possible, and **reduce to slim records immediately**. Never retain
-  or persist the raw GeoJSON.
+- **Reduce to slim records immediately.** Never retain or persist the raw GeoJSON.
 - Retain only the information needed to drive the calculations and formulas.
-- Filter to North America by bounding box, and drop entries without a name or coordinates.
-- Persist the slim records in SQLite (or equivalent). Peak memory during parse is the risk here — a
-  4.6 MB JSON document expands substantially once parsed, so discard the parsed structure as soon as
-  the slim records are written.
+- Filter to North America by bounding box; keep only `status: "operating"`; drop entries without a
+  name or coordinates. (Every nameless entry in the file has no source either — they are
+  auto-generated from untagged OSM pistes.)
+- Coordinates come from `viewportHint.center` (`[lon, lat]`), which is present on every feature
+  regardless of whether its geometry is a Point or a Polygon.
+- Elevation comes from `statistics.minElevation` / `maxElevation` (present on ~91%); both may be
+  null, and downstream code must cope.
+- Activities: OpenSkiData knows only `downhill` and `nordic`. `nordic` maps to **classic and
+  skate**; **snowshoe is assumed available everywhere** for now.
+- Persist the slim records in SQLite (`expo-sqlite`). Peak memory during parse is the risk — the
+  21 MB document expands substantially once parsed, so discard the parsed structure as soon as the
+  slim records are written.
 
 #### Safety rules for replacing cached data
 
@@ -110,10 +123,12 @@ data. A refresh must be **all-or-nothing**:
 
 #### Identity
 
-Key all user data (favourites, settings, notification subscriptions) on the **OpenStreetMap ID or
-Wikidata ID**, never on OpenSkiData's own feature ID, which changes whenever a feature changes.
-Records that disappear between refreshes must not silently delete a user's favourite — retain
-orphaned favourites with a "no longer listed" state.
+Key all user data (favourites, settings, notification subscriptions) on the **OpenStreetMap ID**
+(`osm:way/123` or `osm:relation/123`), falling back to the **Skimap.org ID** (`skimap:123`) for the
+~30% of named North American areas that have no OSM source. Never key on OpenSkiData's own feature
+ID, which changes whenever a feature changes. (Wikidata IDs exist on only ~10% of areas and are not
+used as keys.) Records that disappear between refreshes must not silently delete a user's
+favourite — retain orphaned favourites with a "no longer listed" state.
 
 #### User-facing
 
@@ -129,10 +144,19 @@ the traffic, the fallback is to publish a pre-filtered file from the project's o
 a scheduled GitHub Action) and point the app at that instead. That change is confined to the fetch
 URL and the parser.
 
-**Licensing:** ODbL. The filtered file is a derivative database, so (a) attribution is required in
-the app, and (b) the filtered file is published publicly under the ODbL alongside the project.
+**Licensing:** ODbL. The bundled seed is a filtered copy of the database and is committed to the
+public repo, so attribution is required in the app and the seed carries its ODbL provenance.
 
-**Refresh:** re-run the import script before each season and ship with an app update. If that becomes a burden, the fallback plan is a scheduled GitHub Action that commits the filtered file to a public repo, which the app downloads when newer — still no server to operate. The bundled copy remains the first-launch and offline fallback.
+#### Distance, not drive time
+
+There is no routing service, so the app shows **straight-line distance from the phone's location**
+("~45 km away") and the "how far will you go" preference is a distance limit in km. Drive times are
+never estimated.
+
+#### Report age
+
+There is no operator conditions feed. Where the design showed "reported 32 min ago", the app shows
+the **age of the cached forecast** for that place instead.
 
 ### Weather — Open-Meteo
 
