@@ -259,6 +259,8 @@ export type BestWindow = { label: string; bars: WindowBar[] };
 export function bestWindow(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct): BestWindow | null {
   const hrs = hourly(l, di, act, prefs);
   if (!hrs) return null;
+  // A day with no hour above zero has no best window; showing one would be advice.
+  if (hrs.every((o) => o.s <= 0)) return null;
   const n = T.hourly.windowHours;
   let bi = 0, best = -1;
   for (let i = 0; i + n <= hrs.length; i++) {

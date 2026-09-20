@@ -116,7 +116,7 @@ function HomeToday({ home }: { home: Place }) {
         </View>
       )}
 
-      {hasToday && offers && window && (
+      {hasToday && offers && (
         <>
           <View style={styles.pad16}>
             <DialCard score={hs} line={strings.today.dialLine(hourLabel(s.selHour), hb.word)} metrics={metrics} onPressDial={s.toggleBreakdown} />
@@ -162,9 +162,11 @@ function HomeToday({ home }: { home: Place }) {
             </View>
           )}
 
-          <View style={styles.pad18}>
-            <WindowChart window={window} selHour={s.selHour} onPick={s.setSelHour} />
-          </View>
+          {window && (
+            <View style={styles.pad18}>
+              <WindowChart window={window} selHour={s.selHour} onPick={s.setSelHour} />
+            </View>
+          )}
         </>
       )}
 
