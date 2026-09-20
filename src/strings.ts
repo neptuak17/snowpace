@@ -158,6 +158,18 @@ export const strings = {
     listSep: ', ',
   },
 
+  loading: {
+    heading: 'Updating your conditions',
+    steps: {
+      listing: 'Ski area listing',
+      location: 'Your location',
+      forecast: 'Mountain forecasts',
+    },
+    working: 'Scoring your places',
+    ready: 'Ready',
+    disclaimer: "Snowpace only scores the weather, so always check the location's web site for hours, grooming and lift status before you drive.",
+  },
+
   help: {
     title: 'How Snowpace works',
     warning: "Snowpace only scores the weather, so always check the location's web site for hours, grooming and lift status before you drive.",

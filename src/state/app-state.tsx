@@ -22,7 +22,6 @@ import type { Units } from '@/lib/format';
 import type { LatLon } from '@/lib/geo';
 import { DEFAULT_PREFS, type Prefs, type PrefsByAct } from '@/lib/scoring';
 import { TUNING } from '@/lib/tuning';
-import { requestLocation } from '@/state/location';
 import type { Scheme } from '@/theme/tokens';
 
 export type SelCell = { loc: string; day: number };
@@ -111,16 +110,6 @@ export function AppStateProvider({ children, initial, initialFavourites }: Provi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, persisted);
 
-  // One location fix per launch. Denied or unavailable → distances stay null
-  // (or at the last persisted position) and the distance limit stops filtering.
-  useEffect(() => {
-    let cancelled = false;
-    requestLocation().then((loc) => {
-      if (loc && !cancelled) setState((s) => ({ ...s, location: loc }));
-    });
-    return () => { cancelled = true; };
-  }, []);
-
   const patch = useCallback((p: Partial<State> | ((s: State) => Partial<State>)) => {
     setState((s) => ({ ...s, ...(typeof p === 'function' ? p(s) : p) }));
   }, []);
@@ -184,4 +173,9 @@ export function useAppState() {
   const v = useContext(Ctx);
   if (!v) throw new Error('useAppState must be used inside AppStateProvider');
   return v;
+}
+
+/** Null outside the provider — for the few things drawn before it exists (the loading screen). */
+export function useOptionalAppState() {
+  return useContext(Ctx);
 }

@@ -10,22 +10,20 @@ import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
+import { useEffect } from 'react';
+import { useColorScheme } from 'react-native';
 
-import { refreshInventoryIfDue } from '@/data/inventory-refresh';
-import { listFavourites, type Favourite } from '@/db/favourites';
-import { ensureSeeded } from '@/db/inventory';
-import { getSetting } from '@/db/settings';
-import { AppStateProvider, PERSIST_KEY, type PersistedState } from '@/state/app-state';
-import { useTheme } from '@/theme/use-theme';
+import { LoadingScreen } from '@/components/loading-screen';
+import { AppStateProvider } from '@/state/app-state';
+import { useBoot } from '@/state/boot';
+import { SchemeContext, useTheme } from '@/theme/use-theme';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   // Fonts are bundled TTFs; the splash stays up until they are registered so
   // the first frame is never drawn in the fallback face.
-  const [loaded] = useFonts({
+  const [fontsLoaded] = useFonts({
     Caprasimo_400Regular,
     Figtree_400Regular,
     Figtree_500Medium,
@@ -33,39 +31,28 @@ export default function RootLayout() {
     Figtree_700Bold,
     Figtree_800ExtraBold,
   });
+  const boot = useBoot();
+  const system = useColorScheme();
 
-  // Open the database, load the bundled inventory on first run, and read the
-  // saved settings — all behind the splash so the first frame is the user's
-  // own state. Web has no SQLite; it runs on in-memory defaults.
-  const [boot, setBoot] = useState<{ done: boolean; initial: Partial<PersistedState> | null; favourites: Favourite[] }>({
-    done: Platform.OS === 'web', initial: null, favourites: [],
-  });
+  // The native splash hides once we can draw the loading screen in the right
+  // fonts and the user's own theme (read from the database in phase A).
+  const showLoading = fontsLoaded && boot.phase === 'loading';
+  const ready = fontsLoaded && boot.phase === 'ready';
   useEffect(() => {
-    if (Platform.OS === 'web') return;
-    (async () => {
-      let initial: Partial<PersistedState> | null = null;
-      let favourites: Favourite[] = [];
-      try {
-        await ensureSeeded();
-        // Due at most once a month; a no-op otherwise. Runs here, behind the
-        // splash, because the 20 MB parse would stall a live screen.
-        const refresh = await refreshInventoryIfDue();
-        if (refresh.kind !== 'skipped') console.log('inventory refresh:', refresh);
-        [initial, favourites] = await Promise.all([getSetting<Partial<PersistedState>>(PERSIST_KEY), listFavourites()]);
-      } catch (e) {
-        // A broken database must not brick the app; fall back to defaults.
-        console.warn('database init failed', e);
-      }
-      setBoot({ done: true, initial, favourites });
-    })();
-  }, []);
+    if (showLoading || ready) SplashScreen.hideAsync();
+  }, [showLoading, ready]);
 
-  const ready = loaded && boot.done;
-  useEffect(() => {
-    if (ready) SplashScreen.hideAsync();
-  }, [ready]);
+  if (!fontsLoaded || boot.phase === 'splash') return null;
 
-  if (!ready) return null;
+  if (boot.phase === 'loading') {
+    const scheme = boot.initial?.theme ?? (system === 'dark' ? 'dark' : 'light');
+    return (
+      <SchemeContext.Provider value={scheme}>
+        <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+        <LoadingScreen steps={boot.steps} />
+      </SchemeContext.Provider>
+    );
+  }
 
   return (
     <AppStateProvider initial={boot.initial} initialFavourites={boot.favourites}>
