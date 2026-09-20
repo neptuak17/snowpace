@@ -76,7 +76,8 @@ conservative:
 - **On failure, keep the existing data and do not retry for 24 hours.** One attempt per cycle, no
   retry loops, no exponential-backoff storms.
 - **Send a User-Agent that identifies the app** and includes a contact URL, so the maintainer can
-  reach out rather than block, e.g. `Snowpace/1.0 (+https://<project-site>)`.
+  reach out rather than block: `Snowpace/1.0 (+https://github.com/neptuak17/snowpace)`, defined once in
+  `src/data/user-agent.ts` and sent by every fetcher.
 - **Request gzip** (`Accept-Encoding`) and honour HTTP caching headers. Use a conditional request
   (`If-Modified-Since` / `If-None-Match`) so an unchanged file costs a 304 rather than 4.6 MB.
 

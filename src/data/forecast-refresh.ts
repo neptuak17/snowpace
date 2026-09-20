@@ -10,13 +10,13 @@
  */
 import type { SkiArea } from '@/data/openskidata';
 import { buildUrl, coordinatesFor, modelFor, parseForecasts, type Coordinate, type Forecast, type Model } from '@/data/open-meteo';
+import { USER_AGENT } from '@/data/user-agent';
 import { setMeta } from '@/db/database';
 import { getForecasts, putForecasts } from '@/db/forecasts';
 
 export const STALE_AFTER_MS = 3 * 60 * 60 * 1000;
 // Keep URLs comfortably short; Open-Meteo has no documented cap but 20 × 2 levels is plenty.
 const MAX_COORDS_PER_REQUEST = 40;
-const USER_AGENT = 'Snowpace/1.0 (+https://github.com/cliffsmith/snowpace)';
 
 export const FORECAST_META = { lastError: 'forecast.lastError', lastAttemptAt: 'forecast.lastAttemptAt' } as const;
 
