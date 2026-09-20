@@ -58,4 +58,5 @@ ski-area seed from the live OpenSkiData file.
 
 ## Licence
 
-MIT for the code (see `LICENSE`). The bundled ski-area seed is ODbL, as noted there.
+The code is published for reference; no licence to reuse it is granted. The bundled
+ski-area seed is ODbL — see `NOTICE`.
