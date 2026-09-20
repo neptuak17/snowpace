@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { StyleSheet, View, type LayoutChangeEvent, type TextLayoutEvent } from 'react-native';
+import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 
 import { AppText } from './app-text';
 
@@ -18,7 +18,8 @@ const MIN_SCALE = 0.7;
 /**
  * Two-column grid of value/label boxes. The limiting factor (rank 0) gets
  * the gold "drag" fill, the runner-up a paler one. The highlight pads
- * outward with a negative margin so the grid does not shift.
+ * outward with a negative margin so the grid does not shift; sideways it
+ * pads by less than half the column gap so two highlights never touch.
  * CSS grid has no RN equivalent, so this is rows of two flex:1 cells.
  *
  * Values shrink together: each one reports its natural width, the widest
@@ -27,17 +28,19 @@ const MIN_SCALE = 0.7;
  */
 export function MetricGrid({ metrics, compact }: Props) {
   const theme = useTheme();
-  const padV = compact ? 5 : 6, padH = compact ? 8 : 9;
+  const columnGap = compact ? 14 : 12;
+  const padV = compact ? 5 : 6;
+  const padH = Math.floor(columnGap / 2) - 1;
   const rows: Props['metrics'][] = [];
   for (let i = 0; i < metrics.length; i += 2) rows.push(metrics.slice(i, i + 2));
 
-  const { scale, onCellLayout, onValueLayout } = useSharedShrink(metrics.map((m) => m.v));
-  const valueSize = (compact ? 14 : 16) * scale;
+  const baseSize = compact ? 14 : 16;
+  const { scale, onCellLayout, onNaturalLayout } = useSharedShrink(metrics.map((m) => m.v));
 
   return (
     <View style={[styles.grid, { rowGap: compact ? 8 : 10 }]}>
       {rows.map((row, ri) => (
-        <View key={ri} style={[styles.row, { columnGap: compact ? 14 : 12 }]}>
+        <View key={ri} style={[styles.row, { columnGap }]}>
           {row.map((m) => {
             const hi =
               m.rank === 0 ? theme.drag
@@ -55,13 +58,19 @@ export function MetricGrid({ metrics, compact }: Props) {
                     marginVertical: -padV, marginHorizontal: -padH,
                   },
                 ]}>
-                <AppText
-                  heading size={valueSize} lh={1.1} color={hi ? hi.fg : theme.text}
-                  numberOfLines={1}
-                  onLayout={onCellLayout}
-                  onTextLayout={(e) => onValueLayout(m.v, e)}>
-                  {m.v}
-                </AppText>
+                <View onLayout={onCellLayout}>
+                  <AppText heading size={baseSize * scale} lh={1.1} color={hi ? hi.fg : theme.text} numberOfLines={1}>
+                    {m.v}
+                  </AppText>
+                  {/* Invisible full-size twin inside a very wide absolute box, so the
+                      text shrink-wraps to its natural width — which the visible,
+                      truncated line would never report. */}
+                  <View style={styles.measure} pointerEvents="none">
+                    <AppText heading size={baseSize} lh={1.1} numberOfLines={1} onLayout={(e) => onNaturalLayout(m.v, e)}>
+                      {m.v}
+                    </AppText>
+                  </View>
+                </View>
                 <AppText
                   size={compact ? 9 : 9.5}
                   upper
@@ -82,10 +91,9 @@ export function MetricGrid({ metrics, compact }: Props) {
 }
 
 /**
- * Measures a set of single-line texts and returns the one scale (≤ 1) at
- * which the widest fits its box. Natural widths are recovered by dividing
- * the rendered width by the scale it was rendered at, so re-measuring after
- * a shrink does not shrink again.
+ * Measures each value's natural width (from its hidden full-size twin) and
+ * the box it must fit in, and returns the one scale (≤ 1) that fits the
+ * widest. Both measurements are scale-independent, so there is no feedback.
  */
 function useSharedShrink(values: string[]) {
   const [scale, setScale] = useState(1);
@@ -110,18 +118,17 @@ function useSharedShrink(values: string[]) {
     recompute();
   }, [recompute]);
 
-  const onValueLayout = useCallback((value: string, e: TextLayoutEvent) => {
-    const line = e.nativeEvent.lines[0];
-    if (!line) return;
-    natural.current.set(value, line.width / scaleRef.current);
+  const onNaturalLayout = useCallback((value: string, e: LayoutChangeEvent) => {
+    natural.current.set(value, e.nativeEvent.layout.width);
     recompute();
   }, [recompute]);
 
-  return { scale, onCellLayout, onValueLayout };
+  return { scale, onCellLayout, onNaturalLayout };
 }
 
 const styles = StyleSheet.create({
   grid: { flex: 1 },
   row: { flexDirection: 'row' },
   cell: { flex: 1, minWidth: 0, gap: 1 },
+  measure: { position: 'absolute', opacity: 0, left: 0, top: 0, width: 2000, alignItems: 'flex-start' },
 });
