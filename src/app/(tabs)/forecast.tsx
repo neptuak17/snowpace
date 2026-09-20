@@ -91,7 +91,7 @@ export default function ForecastScreen() {
         </View>
         {gridLocs.map((l) => (
           <View key={l.key} style={styles.gridRow}>
-            <AppText size={11} weight={600} lh={1.2} style={styles.nameCol}>
+            <AppText size={11} weight={600} lh={1.2} style={styles.nameCol} numberOfLines={2}>
               {l.shortName}
             </AppText>
             {DAYS.map((_, di) => (

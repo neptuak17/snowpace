@@ -69,19 +69,26 @@ export function activitiesOf(a: Pick<SkiArea, 'downhill' | 'nordic'>): ActivityK
 }
 
 // Generic suffixes OSM names carry that add nothing on a small screen.
+// Applied repeatedly, so "Ski & Snowboard Area" then "Resort" both go.
 const SUFFIXES = [
-  /\s+cross[- ]country ski (trails|area)( recreation site)?$/i,
-  /\s+nordic (ski )?(club|centre|center|society|area|trails)$/i,
-  /\s+recreation site$/i,
-  /\s+(ski|mountain|alpine) resort$/i,
-  /\s+ski (area|hill|club|trails|centre|center)$/i,
-  /\s+trails$/i,
+  /\s+ski\s*(&|and)\s*(snowboard|board)\s*(area|resort|park|hill)?$/i,
+  /\s+cross[- ]country\s+ski\s+(trails?|area|centre|center|club)(\s+recreation\s+site)?$/i,
+  /\s+nordic\s+(ski\s+)?(club|centre|center|society|area|trails?|park)$/i,
+  /\s+recreation\s+(site|area)$/i,
+  /\s+(ski|mountain|alpine|golf)?\s*resort(\s+and\s+spa)?$/i,
+  /\s+ski\s+(area|hill|club|trails?|centre|center|bowl|basin|park)$/i,
+  /\s+(mountain|mtn\.?)\s+(ski\s+)?(area|park)$/i,
+  /\s+trails?$/i,
 ];
 
 export function shortNameOf(name: string): string {
   let s = name;
-  for (const re of SUFFIXES) s = s.replace(re, '');
-  s = s.trim();
+  for (let pass = 0; pass < 3; pass++) {
+    const before = s;
+    for (const re of SUFFIXES) s = s.replace(re, '');
+    s = s.trim();
+    if (s === before) break;
+  }
   return s.length >= 3 ? s : name;
 }
 

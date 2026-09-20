@@ -17,9 +17,10 @@ const MIN_SCALE = 0.7;
 
 /**
  * Two-column grid of value/label boxes. The limiting factor (rank 0) gets
- * the gold "drag" fill, the runner-up a paler one. The highlight pads
- * outward with a negative margin so the grid does not shift, by just under
- * half of each gap so two highlights never touch in either direction.
+ * the gold "drag" fill, the runner-up a paler one. The highlight is an
+ * absolutely positioned backdrop that bleeds just under half of each gap
+ * beyond the cell, so it never affects the flex layout (negative margins
+ * did, on iOS) and two highlights never touch.
  * CSS grid has no RN equivalent, so this is rows of two flex:1 cells.
  *
  * Values shrink together: each one reports its natural width, the widest
@@ -48,17 +49,16 @@ export function MetricGrid({ metrics, compact }: Props) {
                 : m.rank === 1 ? { bg: theme.ramps.accent2[100], fg: theme.ramps.accent2[900] }
                   : null;
             return (
-              <View
-                key={m.k}
-                style={[
-                  styles.cell,
-                  { borderRadius: compact ? 10 : 12 },
-                  hi && {
-                    backgroundColor: hi.bg,
-                    paddingVertical: padV, paddingHorizontal: padH,
-                    marginVertical: -padV, marginHorizontal: -padH,
-                  },
-                ]}>
+              <View key={m.k} style={styles.cell}>
+                {hi && (
+                  <View
+                    pointerEvents="none"
+                    style={[
+                      styles.highlight,
+                      { backgroundColor: hi.bg, borderRadius: compact ? 10 : 12, top: -padV, bottom: -padV, left: -padH, right: -padH },
+                    ]}
+                  />
+                )}
                 <View onLayout={onCellLayout}>
                   <AppText heading size={baseSize * scale} lh={1.1} color={hi ? hi.fg : theme.text} numberOfLines={1}>
                     {m.v}
@@ -131,5 +131,6 @@ const styles = StyleSheet.create({
   grid: { flex: 1 },
   row: { flexDirection: 'row' },
   cell: { flex: 1, minWidth: 0, gap: 1 },
+  highlight: { position: 'absolute' },
   measure: { position: 'absolute', opacity: 0, left: 0, top: 0, width: 2000, alignItems: 'flex-start' },
 });
