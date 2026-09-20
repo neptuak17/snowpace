@@ -1,56 +1,61 @@
-# Welcome to your Expo app 👋
+# Snowpace
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+An iOS app that answers one question: **is the weather good for skiing here today?**
 
-## Get started
+Pick your places — downhill hills, nordic centres, snowshoe trails — say what a good
+day feels like to you (temperature, wind, fresh snow), and Snowpace scores each place
+for today and the next four days. It says what is holding a day back, and when the
+best hours are.
 
-1. Install dependencies
+It does not tell you whether a hill is open or groomed. For that it hands you off to
+the operator's own website.
 
-   ```bash
-   npm install
-   ```
+Snowpace is a hobby project, not monetised, and not on the App Store yet.
 
-2. Start the app
+## How it works
 
-   ```bash
-   npx expo start
-   ```
+Snowpace is a standalone app with **no backend**. The phone talks directly to two
+public services and caches what it gets:
 
-In the output, you'll find options to open the app in a
+- **[OpenSkiData](https://openskimap.org)** for the list of ski areas in North America
+  (names, locations, elevations, what each one offers). Fetched at most once every
+  30 days per device; a bundled seed covers first launch and offline use.
+- **[Open-Meteo](https://open-meteo.com)** for hourly forecasts at each saved place,
+  at base and summit elevation for downhill areas. Refreshed when older than three
+  hours.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Every score is computed on the phone from those two sources. Your location never
+leaves the device; the forecast requests carry ski-area coordinates only.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Contact
 
-## Get a fresh project
+Cliff Smith — clifford.smith@gmail.com
 
-When you're ready, run:
+If you run one of the services above and have any concern about Snowpace's traffic,
+please get in touch; the fetch policy is documented in `CLAUDE.md` and is easy to change.
+
+## Data credits
+
+- Ski areas: [OpenSkiData](https://openskimap.org), built from
+  [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors and
+  [Skimap.org](https://skimap.org). Open Database License (ODbL).
+- Weather: [Open-Meteo.com](https://open-meteo.com), CC BY 4.0.
+
+## Development
+
+Expo (managed workflow) with expo-router, React Native and TypeScript. Built on
+Windows; iOS builds run on EAS.
 
 ```bash
-npm run reset-project
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Then open it in Expo Go on a phone. `npm run build-seed` regenerates the bundled
+ski-area seed from the live OpenSkiData file.
 
-### Other setup steps
+`CLAUDE.md` holds the project's constraints and data-source decisions.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Licence
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+MIT for the code (see `LICENSE`). The bundled ski-area seed is ODbL, as noted there.
