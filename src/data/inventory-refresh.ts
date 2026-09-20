@@ -9,7 +9,7 @@
  *   - on any failure keep what we have and record why.
  */
 import { parseSkiAreas } from '@/data/openskidata';
-import { USER_AGENT } from '@/data/user-agent';
+import { USER_AGENT } from '@/data/project';
 import { confirmCurrent, inventoryStatus, recordAttempt, replaceInventory } from '@/db/inventory';
 
 export const SOURCE_URL = 'https://tiles.openskimap.org/geojson/ski_areas.geojson';

@@ -39,7 +39,8 @@
         {
           "locationWhenInUsePermission": "Snowpace uses your location to show how far away each place is and to sort search results nearest-first."
         }
-      ]
+      ],
+      "expo-mail-composer"
     ],
     "experiments": {
       "typedRoutes": true,

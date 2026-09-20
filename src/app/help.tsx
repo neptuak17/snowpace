@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
+import { AppButton } from '@/components/ui/app-button';
 import { AppText } from '@/components/ui/app-text';
 import { Card, Kicker } from '@/components/ui/card';
 import { BackButton, Screen, ScreenTitle } from '@/components/ui/screen';
@@ -97,6 +98,16 @@ export default function HelpScreen() {
         <AppText size={11.5} lh={1.45} muted>
           {h.attribution}
         </AppText>
+      </Card>
+
+      <Card style={styles.gap11}>
+        <Kicker>{h.feedbackKicker}</Kicker>
+        <AppText size={13.5} lh={1.5}>
+          {h.feedbackBody}
+        </AppText>
+        <AppButton variant="primary" onPress={() => router.push('/feedback')}>
+          {h.feedbackButton}
+        </AppButton>
       </Card>
     </Screen>
   );

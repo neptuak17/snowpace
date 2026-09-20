@@ -10,7 +10,7 @@
  */
 import type { SkiArea } from '@/data/openskidata';
 import { buildUrl, coordinatesFor, modelFor, parseForecasts, type Coordinate, type Forecast, type Model } from '@/data/open-meteo';
-import { USER_AGENT } from '@/data/user-agent';
+import { USER_AGENT } from '@/data/project';
 import { setMeta } from '@/db/database';
 import { getForecasts, putForecasts } from '@/db/forecasts';
 

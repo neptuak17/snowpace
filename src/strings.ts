@@ -210,6 +210,31 @@ export const strings = {
     dataKicker: 'A word on the data',
     attribution: 'Weather data by Open-Meteo.com (CC BY 4.0). Ski areas from OpenSkiData, © OpenStreetMap contributors and Skimap.org (ODbL).',
     data: "Scores come from mountain forecasts, not from someone standing on the trail. Each place shows how old its conditions report is — if it says a few hours, treat the number as a good guess rather than a promise, and check the operator's own snow report before a long drive.",
+    feedbackKicker: 'Something to tell me?',
+    feedbackBody: 'A score that looked wrong, something broken, or an idea — feedback goes straight to the person who built this.',
+    feedbackButton: 'Send feedback',
+  },
+
+  feedback: {
+    title: 'Send feedback',
+    kindKicker: 'What is it about?',
+    kinds: { bug: "Something's wrong", score: 'A score looks off', idea: 'An idea', other: 'Something else' },
+    placeKicker: 'Which place?',
+    placeHint: 'So the forecast behind the score can come along.',
+    noPlaces: 'No saved places yet — describe the place in the email instead.',
+    diagnosticsLabel: 'Include diagnostics',
+    diagnosticsHint: 'App and iOS versions, your activities and settings, when data was last fetched, and — if you picked a place — its forecast and score. Never your location or your other places.',
+    howItSends: 'Tapping Send opens Mail with a draft addressed to me. Write what happened, then send it from your own account.',
+    send: 'Send',
+    unavailableKicker: 'Mail is not set up on this phone',
+    unavailable: (email: string) => `Email me directly at ${email} instead.`,
+    thanks: 'Thanks — it is on its way.',
+    saved: 'Saved as a draft in Mail.',
+    // The email itself.
+    subject: (kind: string, place: string | null) => `Snowpace feedback: ${kind}${place ? ` — ${place}` : ''}`,
+    bodyPrompt: (kind: 'bug' | 'score' | 'idea' | 'other') =>
+      kind === 'idea' || kind === 'other' ? '(What is on your mind?)' : '(What happened? What did you expect, and what did you see?)',
+    divider: '—————— Diagnostics (delete this block if you would rather not send it) ——————',
   },
 
   // ── Formatting phrases (lib/format.ts) ──────────────────────────────────
