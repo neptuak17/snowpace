@@ -23,9 +23,10 @@ export function ScorePill({ score, selected, onPress, style }: Props) {
     <View
       style={[
         styles.pill,
-        { backgroundColor: c.bg },
-        // CSS `outline` has no RN equivalent; a border inside the box reads the same.
-        selected && { borderWidth: 2.5, borderColor: theme.accent },
+        // CSS `outline` has no RN equivalent; a border inside the box reads the
+        // same. It is always present (transparent when unselected) so selecting
+        // a pill never changes its size and shifts the row.
+        { backgroundColor: c.bg, borderColor: selected ? theme.accent : 'transparent' },
         style,
       ]}>
       <AppText heading size={15} color={c.fg}>
@@ -47,8 +48,9 @@ const styles = StyleSheet.create({
   pill: {
     minHeight: 42,
     borderRadius: 11,
+    borderWidth: 2.5,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 11,
+    paddingVertical: 8.5,
   },
 });
