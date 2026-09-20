@@ -8,7 +8,7 @@ import { ACTS, type ActivityKey, type DayWx, type Place } from '@/data/places';
 export type Wx = Pick<DayWx, 't' | 'snow' | 'wind' | 'cloud' | 'precip' | 'rain'>;
 import { fmtS, fmtT, fmtW, hourLabel, type Units } from '@/lib/format';
 import { strings } from '@/strings';
-import { TUNING, type FactorKey } from '@/lib/tuning';
+import { TUNING, type BlendKey, type FactorKey } from '@/lib/tuning';
 
 const T = TUNING;
 
@@ -26,7 +26,8 @@ export const DEFAULT_PREFS: PrefsByAct = {
 export type { FactorKey };
 export type Subs = Record<FactorKey, number>;
 
-const FACTOR_KEYS: FactorKey[] = ['t', 's', 'base', 'ft', 'w', 'pr', 'fall', 'c'];
+const BLEND_KEYS: BlendKey[] = ['t', 's', 'base', 'ft', 'w', 'pr', 'fall', 'c'];
+const FACTOR_KEYS: FactorKey[] = [...BLEND_KEYS, 'cov'];
 
 export function clamp(x: number): number {
   return Math.max(0, Math.min(100, x));
@@ -79,7 +80,8 @@ export function snow72(l: Place, di: number): number {
 }
 
 // Any thaw in the last 48 h followed by a refreeze wrecks a set track.
-export function freezeThaw(l: Place, di: number): { hit: boolean; severity: number; maxHi: number } {
+// `thawed` without `hit` is the third state: above freezing and never refroze.
+export function freezeThaw(l: Place, di: number): { hit: boolean; thawed: boolean; severity: number; maxHi: number } {
   const f = T.freezeThaw;
   let maxHi = -99, minLo = 99;
   for (let k = 0; k <= 2; k++) {
@@ -96,7 +98,7 @@ export function freezeThaw(l: Place, di: number): { hit: boolean; severity: numb
     }
   }
   const thawed = maxHi > f.thawAbove, refroze = minLo < f.refreezeBelow;
-  return { hit: thawed && refroze, severity: thawed ? Math.min(f.maxSeverityDeg, maxHi) : 0, maxHi };
+  return { hit: thawed && refroze, thawed, severity: thawed ? Math.min(f.maxSeverityDeg, maxHi) : 0, maxHi };
 }
 
 // Rain that fell in the previous three days, weighted by age; a refreeze after
@@ -153,6 +155,29 @@ function snowSub(cm: number, act: ActivityKey, want: number): number {
   return clamp(100 - (cm > w ? (cm - w) * over : (w - cm) * n.nordicUnderPerCm));
 }
 
+/**
+ * Coverage, 0–100, from the modelled snow depth: 0 below the activity's
+ * "nothing to ski on" depth, 100 from "plenty" up. With no depth in the
+ * forecast there is nothing to say, so 100 — no penalty for no information.
+ */
+export function coverageSub(l: Place, di: number, act: ActivityKey): number {
+  const depth = dayAt(l, di).depth;
+  if (depth === null) return 100;
+  const c = T.coverage[act];
+  return clamp((100 * (depth - c.noneM)) / (c.fullM - c.noneM));
+}
+
+/** Whether the forecast has a snow depth for the day, i.e. whether coverage says anything. */
+export function hasDepth(l: Place, di: number): boolean {
+  return dayAt(l, di).depth !== null;
+}
+
+/** "Bare" / "Thin" / "Enough" for a coverage sub-score. */
+export function coverageWord(cov: number): string {
+  const c = strings.coverage;
+  return cov <= 0 ? c.bare : cov < 100 ? c.thin : c.enough;
+}
+
 export function subs(day: Wx, p: Prefs, l: Place, di: number, act: ActivityKey): Subs {
   const base = snow72(l, di);
   const halfLife = act === 'downhill' ? T.baseHalfLifeCm.downhill : T.baseHalfLifeCm.nordic;
@@ -168,6 +193,7 @@ export function subs(day: Wx, p: Prefs, l: Place, di: number, act: ActivityKey):
     pr: rainSub(l, di, day).v,
     fall: fallSub(day, p, act),
     c: clamp(100 - day.cloud * T.cloudPenaltyPerPct),
+    cov: coverageSub(l, di, act),
   };
 }
 
@@ -175,9 +201,11 @@ export function subsFor(l: Place, di: number, act: ActivityKey, prefs: PrefsByAc
   return subs(day || dayAt(l, di), prefs[act], l, di, act);
 }
 
+/** The weighted blend of the eight factors, capped by coverage. */
 export function blend(x: Subs, act: ActivityKey): number {
   const g = T.weights[act];
-  return Math.round(FACTOR_KEYS.reduce((sum, k) => sum + g[k] * x[k], 0));
+  const weighted = BLEND_KEYS.reduce((sum, k) => sum + g[k] * x[k], 0);
+  return Math.round((weighted * x.cov) / 100);
 }
 
 export function score(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct): number | null {
@@ -298,7 +326,7 @@ export function fmtRain(r: Rain): string {
         : strings.format.mmNone;
 }
 
-function metricFor(l: Place, di: number, d: Wx, k: FactorKey, units: Units): Omit<Metric, 'rank'> {
+function metricFor(l: Place, di: number, act: ActivityKey, d: Wx, k: FactorKey, units: Units): Omit<Metric, 'rank'> {
   const label = strings.metrics[k];
   if (k === 't') return { key: k, k: label, v: fmtT(d.t, units) };
   if (k === 's') return { key: k, k: label, v: fmtS(d.snow, units) };
@@ -307,6 +335,7 @@ function metricFor(l: Place, di: number, d: Wx, k: FactorKey, units: Units): Omi
   if (k === 'pr') return { key: k, k: label, v: fmtRain(rainSub(l, di, d)) };
   if (k === 'fall') return { key: k, k: label, v: strings.format.mm(snowFallingMm(d).toFixed(1)) };
   if (k === 'base') return { key: k, k: label, v: fmtS(snow72(l, di), units) };
+  if (k === 'cov') return { key: k, k: label, v: coverageWord(coverageSub(l, di, act)) };
   return { key: k, k: label, v: fmtT(freezeThaw(l, di).maxHi, units) };
 }
 
@@ -317,11 +346,11 @@ export function dialMetrics(
   const d = day || dayAt(l, di);
   const keys = s === null ? [] : limiters(l, di, act, prefs, d).keys;
   const shown: FactorKey[] = ['t', 's', 'w', 'c'];
-  const boxes = shown.map((k) => metricFor(l, di, d, k, units));
+  const boxes = shown.map((k) => metricFor(l, di, act, d, k, units));
   // room for two swaps only: Cloud goes first, then Temp
   const slots = [3, 0];
   keys.filter((k) => !shown.includes(k)).forEach((k, i) => {
-    if (slots[i] !== undefined) boxes[slots[i]] = metricFor(l, di, d, k, units);
+    if (slots[i] !== undefined) boxes[slots[i]] = metricFor(l, di, act, d, k, units);
   });
   return boxes.map((m) => ({ ...m, rank: keys.indexOf(m.key) }));
 }
@@ -361,6 +390,7 @@ function weakest(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, unit
     { k: 'pr', v: x.pr, note: rainNote(l, di, d) },
     { k: 'fall', v: x.fall, note: onHill ? w.nothingFalling : w.snowingOnTrack },
     { k: 'c', v: x.c, note: w.flatLight },
+    { k: 'cov', v: x.cov, note: x.cov <= 0 ? w.bareGround : w.thinSnowpack },
   ];
   return items.sort((a, b) => a.v - b.v)[0];
 }
@@ -370,6 +400,8 @@ export function verdict(l: Place, di: number, act: ActivityKey, prefs: PrefsByAc
   const v = strings.verdict;
   if (!l.acts.includes(act)) return v.doesNotDo(l.shortName, actLabel(act));
   if (s === null) return v.noForecast;
+  // Bare ground makes every other factor moot, so say that rather than counting them.
+  if (coverageSub(l, di, act) <= 0) return v.bareGround;
   const lim = limiters(l, di, act, prefs);
   if (lim.severeCount >= T.limiters.pluralFrom) return v.manyThings(v.countWords[Math.min(8, lim.severeCount)]);
   const w = weakest(l, di, act, prefs, units).note;
@@ -418,7 +450,11 @@ export function snowHint(act: ActivityKey, want: number, units: Units): string {
 
 export type Factor = { label: string; value: string; v: number; note: string };
 
-/** The eight-row breakdown card on Today. */
+/**
+ * The breakdown card on Today: eight rows, plus snowpack when the forecast
+ * models a depth. Snowpack leads when it is what is holding the score down,
+ * so the reader is not scrolling past seven green bars to find the reason.
+ */
 export function breakdown(
   l: Place, di: number, act: ActivityKey, selHour: number, prefs: PrefsByAct, units: Units, day: Wx,
 ): Factor[] {
@@ -427,15 +463,19 @@ export function breakdown(
   const rain = rainSub(l, di, day);
   const p = prefs[act];
   const b = strings.breakdown;
+  const snowpack: Factor[] = hasDepth(l, di) ? [{ label: b.snowpack, value: coverageWord(x.cov), v: x.cov, note: b.snowpackNote }] : [];
+  const leads = x.cov < T.limiters.severeBelow;
   return [
+    ...(leads ? snowpack : []),
     { label: b.temp, value: fmtT(day.t, units), v: x.t, note: b.tempNote(hourLabel(selHour), fmtT(p.temp, units), actLabel(act)) },
     { label: b.newSnow, value: fmtS(day.snow, units), v: x.s, note: snowHint(act, p.snow, units) },
     { label: b.threeDay, value: fmtS(snow72(l, di), units), v: x.base, note: b.threeDayNote },
     { label: b.freezeThaw, value: ft.hit ? b.freezeThawYes(fmtT(ft.maxHi, units)) : b.freezeThawNone, v: x.ft,
-      note: ft.hit ? b.freezeThawHitNote : b.freezeThawNoneNote },
+      note: ft.hit ? b.freezeThawHitNote : ft.thawed ? b.freezeThawThawedNote : b.freezeThawNoneNote },
     { label: b.wind, value: fmtW(day.wind, units), v: x.w, note: b.windNote(fmtW(p.wind, units)) },
     { label: b.rain, value: fmtRain(rain), v: x.pr, note: rainCopy(rain) },
     { label: b.snowFalling, value: strings.format.mm(snowFallingMm(day).toFixed(1)), v: x.fall, note: fallCopy(act, p.precipTol) },
     { label: b.cloud, value: day.cloud + '%', v: x.c, note: b.cloudNote },
+    ...(leads ? [] : snowpack),
   ];
 }

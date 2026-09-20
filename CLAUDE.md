@@ -208,6 +208,14 @@ snow" on a powder day. A day with a missing required value is unscoreable and sh
 **Baseline:** Open-Meteo's modelled `snow\_depth`, already in the forecast call. It is a model
 estimate, not a measurement, and is interpolated to the requested coordinates.
 
+**How it is used (Sep 2026):** as a **coverage ceiling** on the score, not a factor in the blend.
+The weighted blend of the eight factors is multiplied by a 0–1 coverage figure from the day's
+modelled depth (`TUNING.coverage`: zero below 15 cm / full from 60 cm for downhill, 5 cm / 30 cm
+for nordic and snowshoe), so a bluebird day on bare ground scores 0 rather than "Fair". A day with
+no modelled depth gets no ceiling. The depth itself is **not shown** — the UI says only Bare /
+Thin / Enough — because the model does not know about snowmaking or grooming. Thresholds are
+guesses pending winter data.
+
 
 ### Deliberately excluded
 

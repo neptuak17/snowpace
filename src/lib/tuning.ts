@@ -10,7 +10,9 @@
  */
 import type { ActivityKey } from '@/data/places';
 
-export type FactorKey = 't' | 's' | 'base' | 'ft' | 'w' | 'pr' | 'fall' | 'c';
+export type FactorKey = 't' | 's' | 'base' | 'ft' | 'w' | 'pr' | 'fall' | 'c' | 'cov';
+/** The factors that go into the weighted blend; coverage multiplies the result instead. */
+export type BlendKey = Exclude<FactorKey, 'cov'>;
 
 export const TUNING = {
   // ── Score bands — the dial colour and word. Verdict adds one tier above.
@@ -80,6 +82,18 @@ export const TUNING = {
   // ── Cloud: points off per % cover. Light quality, weighted lightly.
   cloudPenaltyPerPct: 0.35,
 
+  // ── Coverage: modelled snow depth (m) is a ceiling on the whole score, not a
+  // factor in the blend — a bluebird day cannot make up for bare ground. Below
+  // `noneM` the day scores 0; from `fullM` up the depth stops mattering. A
+  // groomed track needs far less than a downhill run. No depth in the forecast
+  // means no ceiling. Guesses until winter data flows.
+  coverage: {
+    downhill: { noneM: 0.15, fullM: 0.6 },
+    snowshoe: { noneM: 0.05, fullM: 0.3 },
+    classic: { noneM: 0.05, fullM: 0.3 },
+    skate: { noneM: 0.05, fullM: 0.3 },
+  } as Record<ActivityKey, { noneM: number; fullM: number }>,
+
   // ── Blend weights per activity. Skate leans on surface quality (freeze–thaw)
   // and wind because a skate lane is usually open and exposed; classic keeps
   // the balanced set. Each row sums to 1.
@@ -88,7 +102,7 @@ export const TUNING = {
     downhill: { t: 0.15, s: 0.22, base: 0.1,  ft: 0.06, w: 0.14, pr: 0.14, fall: 0.14, c: 0.05 },
     snowshoe: { t: 0.17, s: 0.18, base: 0.1,  ft: 0.05, w: 0.14, pr: 0.14, fall: 0.12, c: 0.1 },
     classic:  { t: 0.17, s: 0.2,  base: 0.09, ft: 0.11, w: 0.15, pr: 0.14, fall: 0.09, c: 0.05 },
-  } as Record<ActivityKey, Record<FactorKey, number>>,
+  } as Record<ActivityKey, Record<BlendKey, number>>,
 
   // ── Hourly fallback when the forecast has no hourly series for a day:
   // temperature follows a half-sine between the day's lo and hi from `sunrise`

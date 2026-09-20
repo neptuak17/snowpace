@@ -83,7 +83,7 @@ export const strings = {
     selKicker: (day: string, date: string, activity: string) => `${day} · ${date} · ${activity}`,
     metrics: {
       temp: 'Temp', newSnow: 'New snow', threeDay: '3-day', wind: 'Wind',
-      rain: 'Rain', rain3: 'Rain, 3 days', snowing: 'Snowing', freezeThaw: 'Freeze–thaw',
+      rain: 'Rain', rain3: 'Rain, 3 days', snowing: 'Snowing', freezeThaw: 'Freeze–thaw', snowpack: 'Snowpack',
     },
     rainLater: 'Later today',
     none: 'None',
@@ -198,7 +198,7 @@ export const strings = {
       { k: 'Cloud cover', v: 'flat light versus a bluebird day' },
     ],
     factorSep: ' — ',
-    decidesOutro: 'Whichever of those is holding the day back gets highlighted in gold on the breakdown, so you can see at a glance what the catch is.',
+    decidesOutro: 'Whichever of those is holding the day back gets highlighted in gold on the breakdown, so you can see at a glance what the catch is. On top of all that, the modelled snowpack caps the score: bare ground is a zero however nice the weather.',
     useKicker: 'How to use it',
     steps: [
       { t: 'Turn on your activities', d: 'On the You tab, switch on the ones you actually do. Everything else in the app filters to those.' },
@@ -242,10 +242,13 @@ export const strings = {
 
   // Short labels for the metric boxes beside a dial.
   metrics: {
-    t: 'Temp', s: 'New', w: 'Wind', c: 'Cloud', pr: 'Rain', fall: 'Snowing', base: '3-day', ft: 'Thaw',
+    t: 'Temp', s: 'New', w: 'Wind', c: 'Cloud', pr: 'Rain', fall: 'Snowing', base: '3-day', ft: 'Thaw', cov: 'Snowpack',
   },
 
-  // The eight rows of the Today breakdown card.
+  // Coverage, from the modelled snow depth. The depth itself is never shown.
+  coverage: { bare: 'Bare', thin: 'Thin', enough: 'Enough' },
+
+  // The rows of the Today breakdown card.
   breakdown: {
     temp: 'Temperature',
     tempNote: (hour: string, temp: string, activity: string) =>
@@ -258,17 +261,21 @@ export const strings = {
     freezeThawNone: 'None',
     freezeThawHitNote: 'It got above freezing and refroze — expect crust in places.',
     freezeThawNoneNote: 'It has stayed below freezing throughout.',
+    freezeThawThawedNote: 'It has been above freezing throughout — no crust, but nothing has firmed up either.',
     wind: 'Wind',
     windNote: (limit: string) => `You call it off past ${limit}.`,
     rain: 'Rain',
     snowFalling: 'Snow falling now',
     cloud: 'Cloud cover',
     cloudNote: 'Light quality, weighted lightly.',
+    snowpack: 'Snowpack',
+    snowpackNote: 'Modelled depth, not a measurement — it caps the whole score, and it does not know about snowmaking.',
   },
 
   verdict: {
     doesNotDo: (name: string, activity: string) => `${name} does not do ${activity}.`,
     noForecast: 'No forecast for this day yet.',
+    bareGround: 'No snow on the ground to speak of — the weather does not come into it.',
     manyThings: (count: string) => `${count} things are working against it today — see the breakdown.`,
     countWords: ['', '', '', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'],
     excellent: 'Everything lines up — go now, and go early.',
@@ -291,6 +298,8 @@ export const strings = {
     nothingFalling: 'nothing is falling — no fresh to play in',
     snowingOnTrack: 'it is snowing on the track while you are in it',
     flatLight: 'the light will be flat',
+    bareGround: 'there is no snow on the ground',
+    thinSnowpack: 'the snowpack is thin',
   },
 
   base: {
