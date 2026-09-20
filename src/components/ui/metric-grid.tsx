@@ -18,8 +18,8 @@ const MIN_SCALE = 0.7;
 /**
  * Two-column grid of value/label boxes. The limiting factor (rank 0) gets
  * the gold "drag" fill, the runner-up a paler one. The highlight pads
- * outward with a negative margin so the grid does not shift; sideways it
- * pads by less than half the column gap so two highlights never touch.
+ * outward with a negative margin so the grid does not shift, by just under
+ * half of each gap so two highlights never touch in either direction.
  * CSS grid has no RN equivalent, so this is rows of two flex:1 cells.
  *
  * Values shrink together: each one reports its natural width, the widest
@@ -29,8 +29,9 @@ const MIN_SCALE = 0.7;
 export function MetricGrid({ metrics, compact }: Props) {
   const theme = useTheme();
   const columnGap = compact ? 14 : 12;
-  const padV = compact ? 5 : 6;
+  const rowGap = compact ? 12 : 14;
   const padH = Math.floor(columnGap / 2) - 1;
+  const padV = Math.floor(rowGap / 2) - 1;
   const rows: Props['metrics'][] = [];
   for (let i = 0; i < metrics.length; i += 2) rows.push(metrics.slice(i, i + 2));
 
@@ -38,7 +39,7 @@ export function MetricGrid({ metrics, compact }: Props) {
   const { scale, onCellLayout, onNaturalLayout } = useSharedShrink(metrics.map((m) => m.v));
 
   return (
-    <View style={[styles.grid, { rowGap: compact ? 8 : 10 }]}>
+    <View style={[styles.grid, { rowGap }]}>
       {rows.map((row, ri) => (
         <View key={ri} style={[styles.row, { columnGap }]}>
           {row.map((m) => {
