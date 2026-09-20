@@ -10,13 +10,16 @@
  *    — memory only.
  *
  * `places` is the derived list the screens consume: each favourite joined
- * with its distance from the phone and (for now) placeholder weather.
+ * with its distance from the phone and its cached forecast.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Platform, useColorScheme } from 'react-native';
+import { AppState as RNAppState, Platform, useColorScheme } from 'react-native';
 
+import { refreshForecasts } from '@/data/forecast-refresh';
+import type { Forecast } from '@/data/open-meteo';
 import { ACTS, placeFromArea, type ActivityKey, type Place } from '@/data/places';
 import * as fav from '@/db/favourites';
+import { pruneForecasts } from '@/db/forecasts';
 import { setSetting } from '@/db/settings';
 import type { Units } from '@/lib/format';
 import type { LatLon } from '@/lib/geo';
@@ -59,6 +62,8 @@ type Actions = {
 type Derived = {
   /** Favourites as scoreable places, home hill first. Unlisted ones have `listed: false`. */
   places: Place[];
+  /** True while a forecast refresh is in flight (foreground or after a save). */
+  refreshing: boolean;
   /** The home hill, or null when the user has not picked one yet. */
   home: Place | null;
   /** The set of favourite keys, for quick "is this saved?" checks. */
@@ -77,9 +82,11 @@ type ProviderProps = {
   initial?: Partial<PersistedState> | null;
   /** Favourites loaded before first render, so the first frame is not empty. */
   initialFavourites?: fav.Favourite[];
+  /** Cached forecasts by place key, loaded (and refreshed) during boot. */
+  initialForecasts?: Map<string, Forecast[]>;
 };
 
-export function AppStateProvider({ children, initial, initialFavourites }: ProviderProps) {
+export function AppStateProvider({ children, initial, initialFavourites, initialForecasts }: ProviderProps) {
   const system = useColorScheme();
   const [state, setState] = useState<State>(() => ({
     activity: 'classic',
@@ -95,6 +102,8 @@ export function AppStateProvider({ children, initial, initialFavourites }: Provi
     ...(initial ?? {}),
   }));
   const [favourites, setFavourites] = useState<fav.Favourite[]>(initialFavourites ?? []);
+  const [forecasts, setForecasts] = useState<Map<string, Forecast[]>>(initialForecasts ?? new Map());
+  const [refreshing, setRefreshing] = useState(false);
 
   // Write the persisted slice back whenever it changes. Debounced, because a
   // slider fires many changes a second. Skips the very first render (that is
@@ -119,6 +128,30 @@ export function AppStateProvider({ children, initial, initialFavourites }: Provi
     setFavourites(await fav.listFavourites());
   }, []);
 
+  // Fetch forecasts for the given favourites (stale ones only, unless forced),
+  // then drop cached rows for places no longer saved.
+  const refresh = useCallback(async (favs: fav.Favourite[], force = false) => {
+    if (Platform.OS === 'web') return;
+    const areas = favs.map((f) => f.area).filter((a): a is NonNullable<typeof a> => !!a);
+    setRefreshing(true);
+    try {
+      const { forecasts: next } = await refreshForecasts(areas, { force });
+      setForecasts(next);
+      await pruneForecasts(areas.map((a) => a.key));
+    } catch {
+      // Keep whatever we had; the age shown on screen says how old it is.
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
+
+  // Coming back to the foreground: refresh anything stale. refreshForecasts
+  // itself decides what is stale, so this is cheap when nothing is.
+  useEffect(() => {
+    const sub = RNAppState.addEventListener('change', (st) => { if (st === 'active') refresh(favourites); });
+    return () => sub.remove();
+  }, [favourites, refresh]);
+
   const actions = useMemo<Actions>(
     () => ({
       setActivity: (activity) => patch({ activity }),
@@ -131,9 +164,20 @@ export function AppStateProvider({ children, initial, initialFavourites }: Provi
             : ACTS.map((a) => a.key).filter((x) => x === k || s.myActs.includes(x));
           return { myActs: next, activity: next.includes(s.activity) ? s.activity : next[0] };
         }),
-      addFavourite: async (key) => { await fav.addFavourite(key); await reloadFavourites(); },
+      addFavourite: async (key) => {
+        await fav.addFavourite(key);
+        const favs = await fav.listFavourites();
+        setFavourites(favs);
+        // A new place gets its forecast straight away rather than at the next launch.
+        void refresh(favs.filter((f) => f.key === key));
+      },
       removeFavourite: async (key) => { await fav.removeFavourite(key); await reloadFavourites(); },
-      setHome: async (key) => { await fav.setHome(key); await reloadFavourites(); },
+      setHome: async (key) => {
+        await fav.setHome(key);
+        const favs = await fav.listFavourites();
+        setFavourites(favs);
+        if (!forecasts.has(key)) void refresh(favs.filter((f) => f.key === key));
+      },
       setPref: (key, v) =>
         patch((s) => ({
           prefs: { ...s.prefs, [s.activity]: { ...s.prefs[s.activity], [key]: v } },
@@ -146,15 +190,17 @@ export function AppStateProvider({ children, initial, initialFavourites }: Provi
       setSelCell: (selCell) => patch({ selCell }),
       toggleBreakdown: () => patch((s) => ({ showBreakdown: !s.showBreakdown })),
     }),
-    [patch, reloadFavourites],
+    [patch, reloadFavourites, refresh, forecasts],
   );
 
   const derived = useMemo<Derived>(() => {
-    const places = favourites.map((f) => (f.area ? placeFromArea(f.area, state.location, true) : unlistedPlace(f.key)));
+    const places = favourites.map((f) =>
+      f.area ? placeFromArea(f.area, state.location, forecasts.get(f.key) ?? [], true) : unlistedPlace(f.key),
+    );
     const homeIndex = favourites.findIndex((f) => f.isHome);
     const home = homeIndex >= 0 && places[homeIndex].listed ? places[homeIndex] : null;
-    return { places, home, savedKeys: new Set(favourites.map((f) => f.key)) };
-  }, [favourites, state.location]);
+    return { places, home, refreshing, savedKeys: new Set(favourites.map((f) => f.key)) };
+  }, [favourites, forecasts, refreshing, state.location]);
 
   const value = useMemo(() => ({ ...state, ...actions, ...derived }), [state, actions, derived]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
@@ -164,8 +210,8 @@ export function AppStateProvider({ children, initial, initialFavourites }: Provi
 function unlistedPlace(key: string): Place {
   return {
     key, name: key, shortName: key, lat: 0, lon: 0, minElev: null, maxElev: null, area: null,
-    acts: [], website: null, distanceKm: null, listed: false, forecastAt: null,
-    prior: { snow72: 0, temps: [0, 0] }, days: [],
+    acts: [], website: null, country: null, distanceKm: null, listed: false,
+    forecastAt: null, days: [], prior: null, hours: null,
   };
 }
 

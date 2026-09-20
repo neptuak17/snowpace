@@ -94,6 +94,9 @@ export default function HelpScreen() {
         <AppText size={13.5} lh={1.5}>
           {h.data}
         </AppText>
+        <AppText size={11.5} lh={1.45} muted>
+          {h.attribution}
+        </AppText>
       </Card>
     </Screen>
   );

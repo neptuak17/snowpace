@@ -13,7 +13,7 @@ import type { Place } from '@/data/places';
 import { fmtDistance, fmtForecastAge, hourLabel } from '@/lib/format';
 import { toRouteId } from '@/lib/geo';
 import { placeMeta, withinLimit } from '@/lib/place-text';
-import { actLabel, band, bestWindow, breakdown, dialMetrics, hourDay, hourScore, score, verdict } from '@/lib/scoring';
+import { actLabel, band, bestWindow, breakdown, canScore, dialMetrics, hourDay, hourScore, score, verdict } from '@/lib/scoring';
 import { useAppState } from '@/state/app-state';
 import { strings } from '@/strings';
 import { bandColors } from '@/theme/band-colors';
@@ -58,12 +58,14 @@ function HomeToday({ home }: { home: Place }) {
   const act = s.activity;
 
   const offers = home.acts.includes(act);
-  const hd = offers ? hourDay(home, 0, s.selHour) : home.days[0];
-  const hs = offers ? hourScore(home, 0, act, s.selHour, s.prefs) : null;
+  // No forecast (yet, or too old to cover today): nothing to score, say so.
+  const hasToday = canScore(home, 0);
+  const hd = hasToday ? hourDay(home, 0, s.selHour) : null;
+  const hs = offers && hd ? hourScore(home, 0, act, s.selHour, s.prefs) : null;
   const hb = band(hs);
-  const metrics = dialMetrics(home, 0, act, hs, s.prefs, s.units, hd);
-  const factors = breakdown(home, 0, act, s.selHour, s.prefs, s.units, hd);
-  const window = bestWindow(home, 0, act, s.prefs);
+  const metrics = hd ? dialMetrics(home, 0, act, hs, s.prefs, s.units, hd) : [];
+  const factors = hd ? breakdown(home, 0, act, s.selHour, s.prefs, s.units, hd) : [];
+  const window = hasToday ? bestWindow(home, 0, act, s.prefs) : null;
   const activityLabel = actLabel(act);
 
   const alternatives = s.places
@@ -86,7 +88,21 @@ function HomeToday({ home }: { home: Place }) {
         )}
       </View>
 
-      {!offers && (
+      {!hasToday && (
+        <View style={styles.pad16}>
+          <Card style={styles.startCard}>
+            <Kicker>{strings.today.noForecastKicker}</Kicker>
+            <AppText size={14} lh={1.45}>
+              {strings.today.noForecastBody}
+            </AppText>
+            <AppText size={10.5} muted>
+              {strings.common.forecastAge(fmtForecastAge(home.forecastAt))}
+            </AppText>
+          </Card>
+        </View>
+      )}
+
+      {hasToday && !offers && (
         <View style={styles.pad16}>
           <Card style={styles.startCard}>
             <Kicker>{strings.today.noActivityKicker(activityLabel)}</Kicker>
@@ -100,7 +116,7 @@ function HomeToday({ home }: { home: Place }) {
         </View>
       )}
 
-      {offers && window && (
+      {hasToday && offers && window && (
         <>
           <View style={styles.pad16}>
             <DialCard score={hs} line={strings.today.dialLine(hourLabel(s.selHour), hb.word)} metrics={metrics} onPressDial={s.toggleBreakdown} />

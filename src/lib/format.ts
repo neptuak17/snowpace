@@ -22,7 +22,7 @@ export function fmtDistance(km: number | null, units: Units): string {
 
 /** How old a forecast is. Null means the placeholder data. */
 export function fmtForecastAge(forecastAt: string | null, now = Date.now()): string {
-  if (!forecastAt) return strings.format.placeholderForecast;
+  if (!forecastAt) return strings.format.noForecast;
   const min = Math.max(0, Math.round((now - Date.parse(forecastAt)) / 60000));
   if (min < 90) return strings.format.forecastMinAgo(min);
   const h = Math.round(min / 60);

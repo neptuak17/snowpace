@@ -5,13 +5,14 @@
  *   ski_areas          the live inventory (slim OpenSkiData records)
  *   ski_areas_staging  where a refresh is written before the all-or-nothing swap
  *   favourites         the user's saved places, keyed on the stable inventory key
+ *   forecasts          cached Open-Meteo hourly series, one row per place and level
  *   settings           one JSON blob per key (prefs, units, theme, ...)
  *   meta               inventory provenance and the refresh log
  */
 import { openDatabaseAsync, type SQLiteDatabase } from 'expo-sqlite';
 
 const NAME = 'snowpace.db';
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 let opening: Promise<SQLiteDatabase> | null = null;
 
@@ -26,6 +27,7 @@ async function open(): Promise<SQLiteDatabase> {
   const row = await d.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
   const version = row?.user_version ?? 0;
   if (version < 1) await migrateToV1(d);
+  if (version < 2) await migrateToV2(d);
   if (version < SCHEMA_VERSION) await d.execAsync(`PRAGMA user_version = ${SCHEMA_VERSION}`);
   return d;
 }
@@ -66,6 +68,20 @@ async function migrateToV1(d: SQLiteDatabase): Promise<void> {
     CREATE TABLE IF NOT EXISTS meta (
       key   TEXT PRIMARY KEY NOT NULL,
       value TEXT NOT NULL
+    );
+  `);
+}
+
+async function migrateToV2(d: SQLiteDatabase): Promise<void> {
+  await d.execAsync(`
+    CREATE TABLE IF NOT EXISTS forecasts (
+      key        TEXT NOT NULL,
+      level      TEXT NOT NULL,
+      fetched_at TEXT NOT NULL,
+      elevation  REAL,
+      timezone   TEXT NOT NULL,
+      hours      TEXT NOT NULL,
+      PRIMARY KEY (key, level)
     );
   `);
 }

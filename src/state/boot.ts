@@ -12,7 +12,9 @@
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 
+import { refreshForecasts } from '@/data/forecast-refresh';
 import { isRefreshDue, refreshInventoryIfDue } from '@/data/inventory-refresh';
+import type { Forecast } from '@/data/open-meteo';
 import { listFavourites, type Favourite } from '@/db/favourites';
 import { ensureSeeded, inventoryStatus } from '@/db/inventory';
 import { getSetting } from '@/db/settings';
@@ -29,6 +31,7 @@ export type Boot = {
   steps: BootStep[];
   initial: Partial<PersistedState> | null;
   favourites: Favourite[];
+  forecasts: Map<string, Forecast[]>;
 };
 
 // Keep the loading screen up at least this long so it reads as a screen,
@@ -36,7 +39,7 @@ export type Boot = {
 const MIN_LOADING_MS = 700;
 
 export function useBoot(): Boot {
-  const [boot, setBoot] = useState<Boot>({ phase: 'splash', steps: [], initial: null, favourites: [] });
+  const [boot, setBoot] = useState<Boot>({ phase: 'splash', steps: [], initial: null, favourites: [], forecasts: new Map() });
 
   useEffect(() => {
     let cancelled = false;
@@ -88,12 +91,22 @@ export function useBoot(): Boot {
       mark('location', 'done');
 
       mark('forecast', 'active');
-      // Forecasts are placeholder data until Open-Meteo is wired in; nothing to fetch yet.
+      let forecasts = new Map<string, Forecast[]>();
+      if (Platform.OS !== 'web') {
+        try {
+          const areas = favourites.map((f) => f.area).filter((a): a is NonNullable<typeof a> => !!a);
+          const out = await refreshForecasts(areas);
+          forecasts = out.forecasts;
+          if (out.result.failed.length) console.warn('forecast refresh:', out.result.failed);
+        } catch (e) {
+          console.warn('forecast refresh failed', e);
+        }
+      }
       mark('forecast', 'done');
 
       const remaining = MIN_LOADING_MS - (Date.now() - shownAt);
       if (remaining > 0) await new Promise((r) => setTimeout(r, remaining));
-      set({ phase: 'ready', initial, favourites });
+      set({ phase: 'ready', initial, favourites, forecasts });
     })();
 
     return () => { cancelled = true; };

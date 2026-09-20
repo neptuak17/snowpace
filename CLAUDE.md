@@ -160,36 +160,48 @@ the **age of the cached forecast** for that place instead.
 
 ### Weather — Open-Meteo
 
-**Source:** Open-Meteo forecast API (`api.open-meteo.com/v1/forecast`). 
+**Source:** Open-Meteo forecast API (`api.open-meteo.com/v1/forecast`), **free tier**. Snowpace is
+not monetised, which is the free tier's condition (it is explicitly non-commercial; a paid or
+ad-supported app would need a subscription and `customer-api.open-meteo.com`). Free-tier limits are
+10,000 calls/day, 5,000/hour, 600/minute per source, which a single phone never approaches.
+Decided Sep 2026.
 
-Variables used:
+**Requests are hourly-only, at most 10 variables.** Open-Meteo counts a request with more than 10
+variables (or more than two weeks) as several calls, so daily aggregates are computed on the
+phone from the hourly series rather than requested. Verified Sep 2026:
 
-* snowfall (hourly), plus `past\_days` for recent snowfall totals (24/48/72 h)
-* snow depth (modelled — see below)
-* relative humidity
-* cloud cover, including the low/mid/high split
-* visibility
-* wind speed and gusts
-* apparent temperature
-* freezing level height
-* sunshine duration
+* `hourly=temperature_2m,snowfall,rain,precipitation,wind_speed_10m,wind_gusts_10m,cloud_cover,snow_depth`
+* `past_days=3&forecast_days=5&timezone=auto` — three days of history for the "recent snowfall"
+  and freeze–thaw inputs, today plus four ahead for the grid, in the place's local time.
+* Units come back as the engine expects: °C, snowfall **cm**, precipitation/rain **mm**, wind
+  **km/h**, snow depth **m**.
 
-**Elevation handling:** Open-Meteo accepts an `elevation` parameter and adjusts values to that
-height, and accepts multiple coordinates in one request. For downhill areas, request both base and
-summit elevation from the bundled snapshot in a single call. For Nordic areas, a single elevation is
-sufficient. Freezing level is a key input for the "good day?" scoring, since it separates
-powder-on-top-slush-at-the-bottom days.
+**Model selection (verified against the live endpoint, Sep 2026):** the forecast endpoint's
+identifiers are `gem_seamless`, `gem_hrdps_continental`, `gem_regional`, `gem_global` — *not* the
+`cmc_gem_*` names on the docs page. Use **`gem_seamless` for Canadian places** (HRDPS 2.5 km for
+two days, then RDPS, then global, with the fallback handled server-side) and **`best_match` for US
+places** (NOAA HRRR/GFS blend). One request cannot vary the model per coordinate, so places are
+grouped into one multi-coordinate request per model.
 
-**Model selection:** Environment Canada's GEM models, including the high-resolution HRDPS, are
-available through Open-Meteo and handle BC terrain better than coarse global models. Look up the
-exact model identifiers in the current API documentation rather than assuming them.
+**Elevation handling:** the `elevation` parameter is honoured and changes the result (base and
+summit of the same area differ by ~2 °C). Downhill areas request **both base and summit** as two
+coordinates; nordic areas request the **mid-elevation**; areas with no elevation data omit the
+parameter and get the model's own terrain height. Downhill scoring uses the elementwise mean of
+the base and summit series as a mid-mountain proxy.
+
+**Freezing level is not used.** GEM returns it (and `visibility`) as null; only `best_match` has
+it. Temperature at base and summit carries the same information more directly. Decided Sep 2026.
+
+**Caching:** one row per place and level in SQLite, with `fetchedAt`. Stale after **3 hours** (GEM
+updates every 6). Refreshed at launch behind the loading screen, on foreground when stale, and
+immediately for a newly added favourite. Requests carry ski-area coordinates only — the phone's
+location never leaves the device.
 
 **Carried over from HazePace:**
 
 * Missing values stay `null`. Never substitute zero. A failed fetch must not render as "0 cm new
-snow" on a powder day.
-* Attribution required (CC BY 4.0). Reuse the HazePace attribution constant with the air quality
-reference removed.
+snow" on a powder day. A day with a missing required value is unscoreable and shows "—".
+* Attribution required (CC BY 4.0): "Weather data by Open-Meteo.com".
 
 ### Snow depth
 
@@ -229,10 +241,9 @@ The about/credits screen must include:
 
 ### Open items
 
-* Confirm Open-Meteo's commercial-use terms for a paid app (same question as HazePace; apply the
-same conclusion).
-* Confirm the current Open-Meteo model identifiers for GEM/HRDPS.
-* Measure the bundled snapshot size once built, and revisit the format if it is material.
+* The scoring tuning was calibrated on the design's daily placeholder figures; the "rain now"
+  factor now sees hourly mm rather than daily totals and will read lighter. Retune once real
+  winter data is flowing.
 
 ## Conventions
 

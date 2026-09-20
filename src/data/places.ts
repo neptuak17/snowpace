@@ -1,12 +1,13 @@
 /**
  * The Place model the screens and the scoring engine consume, built from an
- * inventory record (OpenSkiData) plus weather.
+ * inventory record (OpenSkiData) plus its cached forecast (Open-Meteo).
  *
- * Weather is still a placeholder: `withPlaceholderWeather` attaches one of
- * the design's forecast profiles, chosen by hashing the key so each place
- * looks different but stays stable. Open-Meteo replaces this in a later step.
+ * Daily figures are aggregated here from the hourly series. A day is only
+ * present when every value the engine needs is present — a missing value
+ * makes the day null, never zero.
  */
 
+import { meanSeries, type Forecast, type HourWx } from '@/data/open-meteo';
 import type { SkiArea } from '@/data/openskidata';
 import { distanceKm, type LatLon } from '@/lib/geo';
 import { strings } from '@/strings';
@@ -23,7 +24,33 @@ export const ACTS: Activity[] = (['classic', 'skate', 'snowshoe', 'downhill'] as
 
 export const ACT_NOTES: Record<ActivityKey, string> = strings.activityNotes;
 
-export type DayWx = { t: number; snow: number; wind: number; cloud: number; precip: number };
+/** One day as the engine sees it. Daytime (7–17) means for feel, 24 h sums for fall. */
+export type DayWx = {
+  /** Local date at the place, YYYY-MM-DD. */
+  date: string;
+  /** Daytime mean temperature, °C. */
+  t: number;
+  /** Day's high and low, °C. */
+  hi: number;
+  lo: number;
+  /** New snow over the 24 h, cm. */
+  snow: number;
+  /** Daytime mean wind, km/h. */
+  wind: number;
+  /** Daytime max gust, km/h. */
+  gust: number;
+  /** Daytime mean cloud cover, %. */
+  cloud: number;
+  /** Precipitation over the 24 h, mm. */
+  precip: number;
+  /** Rain over the 24 h, mm. */
+  rain: number;
+  /** Modelled snow depth at midday, metres; null if the model has none. */
+  depth: number | null;
+};
+
+/** The three days before day 0, condensed to what the engine needs. */
+export type Prior = { snow72: number; temps: [number, number]; rain72: number };
 
 export type Place = {
   /** Inventory key: osm:way/123, osm:relation/123 or skimap:123. */
@@ -40,21 +67,22 @@ export type Place = {
   area: string | null;
   acts: ActivityKey[];
   website: string | null;
+  country: string | null;
   /** Straight-line distance from the phone; null until we have a location. */
   distanceKm: number | null;
   /** False for a favourite the inventory no longer lists. */
   listed: boolean;
-  /** When the forecast was fetched; null means placeholder data. */
+  /** When the forecast was fetched; null means no forecast yet. */
   forecastAt: string | null;
-  prior: { snow72: number; temps: [number, number]; rain72?: number };
-  days: DayWx[];
+  /** Today and the next four days at the place; null entries are unscoreable. Empty with no forecast. */
+  days: (DayWx | null)[];
+  /** The three days before today, or null if any is incomplete. */
+  prior: Prior | null;
+  /** Today's hourly series at the place, when the forecast covers today. */
+  hours: HourWx[] | null;
 };
 
-export const DAYS = [
-  { label: 'Today', date: 'Jan 13' }, { label: 'Wed', date: 'Jan 14' },
-  { label: 'Thu', date: 'Jan 15' }, { label: 'Fri', date: 'Jan 16' },
-  { label: 'Sat', date: 'Jan 17' },
-];
+export const DAY_COUNT = 5;
 
 /**
  * OpenSkiData knows downhill and nordic. Nordic centres set both classic and
@@ -92,9 +120,9 @@ export function shortNameOf(name: string): string {
   return s.length >= 3 ? s : name;
 }
 
-/** Build a Place from an inventory record and (optionally) the phone's location. */
-export function placeFromArea(a: SkiArea, here: LatLon | null, listed = true): Place {
-  const wx = placeholderWeather(a.key);
+/** Build a Place from an inventory record, the phone's location, and its cached forecasts. */
+export function placeFromArea(a: SkiArea, here: LatLon | null, forecasts: Forecast[] = [], listed = true): Place {
+  const wx = weatherFrom(forecasts);
   return {
     key: a.key,
     name: a.name,
@@ -106,57 +134,136 @@ export function placeFromArea(a: SkiArea, here: LatLon | null, listed = true): P
     area: a.locality ?? a.regionName,
     acts: activitiesOf(a),
     website: a.website,
+    country: a.country,
     distanceKm: here ? distanceKm(here, a) : null,
     listed,
-    forecastAt: null,
-    prior: wx.prior,
-    days: wx.days,
+    ...wx,
   };
 }
 
-// ── Placeholder weather ──────────────────────────────────────────────────
+// ── Aggregation ──────────────────────────────────────────────────────────
 
-type Profile = { prior: Place['prior']; days: DayWx[] };
+type Weather = Pick<Place, 'forecastAt' | 'days' | 'prior' | 'hours'>;
 
-const BASE: DayWx[] = [
-  { t: -6, snow: 9, wind: 11, cloud: 40, precip: 0 },
-  { t: -9, snow: 2, wind: 8, cloud: 20, precip: 0 },
-  { t: -12, snow: 14, wind: 14, cloud: 85, precip: 1.2 },
-  { t: -4, snow: 0, wind: 26, cloud: 70, precip: 0.4 },
-  { t: 1, snow: 0, wind: 18, cloud: 95, precip: 3.1 },
-];
+const NO_WEATHER: Weather = { forecastAt: null, days: [], prior: null, hours: null };
 
-// The design's six hand-written profiles plus eight derived from BASE by offset.
-const PROFILES: Profile[] = [
-  { prior: { snow72: 7, temps: [-8, -5] }, days: BASE },
-  { prior: { snow72: 9, temps: [-9, -6] }, days: [{ t: -7, snow: 11, wind: 19, cloud: 45, precip: 0 }, { t: -10, snow: 3, wind: 15, cloud: 25, precip: 0 }, { t: -13, snow: 17, wind: 22, cloud: 90, precip: 1.6 }, { t: -5, snow: 1, wind: 34, cloud: 75, precip: 0.6 }, { t: 0, snow: 0, wind: 24, cloud: 95, precip: 2.8 }] },
-  { prior: { snow72: 3, temps: [2, -4], rain72: 5.5 }, days: [{ t: 1, snow: 0, wind: 9, cloud: 90, precip: 2.4 }, { t: -6, snow: 1, wind: 7, cloud: 35, precip: 0 }, { t: -8, snow: 9, wind: 11, cloud: 80, precip: 0.9 }, { t: -1, snow: 0, wind: 20, cloud: 85, precip: 1.1 }, { t: 3, snow: 0, wind: 14, cloud: 100, precip: 4.2 }] },
-  { prior: { snow72: 14, temps: [-13, -10] }, days: [{ t: -11, snow: 16, wind: 24, cloud: 70, precip: 0.3 }, { t: -14, snow: 6, wind: 18, cloud: 40, precip: 0 }, { t: -16, snow: 22, wind: 29, cloud: 95, precip: 2.0 }, { t: -8, snow: 3, wind: 41, cloud: 80, precip: 0.8 }, { t: -3, snow: 1, wind: 27, cloud: 90, precip: 1.9 }] },
-  { prior: { snow72: 5, temps: [-10, -7] }, days: [{ t: -8, snow: 6, wind: 10, cloud: 35, precip: 0 }, { t: -11, snow: 2, wind: 9, cloud: 15, precip: 0 }, { t: -13, snow: 11, wind: 13, cloud: 75, precip: 0.8 }, { t: -6, snow: 0, wind: 22, cloud: 65, precip: 0.3 }, { t: -1, snow: 0, wind: 16, cloud: 90, precip: 2.4 }] },
-  { prior: { snow72: 8, temps: [-11, -8] }, days: [{ t: -9, snow: 8, wind: 21, cloud: 50, precip: 0.1 }, { t: -12, snow: 4, wind: 16, cloud: 30, precip: 0 }, { t: -14, snow: 19, wind: 26, cloud: 92, precip: 1.7 }, { t: -7, snow: 2, wind: 37, cloud: 78, precip: 0.7 }, { t: -2, snow: 0, wind: 23, cloud: 88, precip: 2.2 }] },
-  ...[
-    { t: 2, snow: -3, wind: -2, cloud: 5, precip: 0.2 },
-    { t: -2, snow: 2, wind: 6, cloud: -5, precip: 0 },
-    { t: -1, snow: -2, wind: 1, cloud: -10, precip: 0 },
-    { t: -3, snow: 4, wind: 3, cloud: 0, precip: 0.1 },
-    { t: -1, snow: 9, wind: 5, cloud: 10, precip: 0.6 },
-    { t: -4, snow: 1, wind: -3, cloud: -15, precip: 0 },
-    { t: 4, snow: 6, wind: 2, cloud: 15, precip: 1.4 },
-    { t: 1, snow: 3, wind: 0, cloud: 10, precip: 0.8 },
-  ].map((mod): Profile => ({
-    prior: { snow72: Math.max(0, 6 + mod.snow * 2), temps: [-7 + mod.t, -4 + mod.t] },
-    days: BASE.map((d) => ({
-      t: d.t + mod.t,
-      snow: Math.max(0, d.snow + mod.snow),
-      wind: Math.max(2, d.wind + mod.wind),
-      cloud: Math.max(0, Math.min(100, d.cloud + mod.cloud)),
-      precip: Math.max(0, d.precip + mod.precip),
-    })),
-  })),
-];
+/** Pick the series to score on: the midpoint, else the mean of base and summit. */
+function seriesOf(forecasts: Forecast[]): { hours: HourWx[]; fetchedAt: string; timezone: string } | null {
+  const mid = forecasts.find((f) => f.level === 'mid');
+  if (mid) return mid;
+  const base = forecasts.find((f) => f.level === 'base');
+  const summit = forecasts.find((f) => f.level === 'summit');
+  if (base && summit) return { hours: meanSeries(base.hours, summit.hours), fetchedAt: base.fetchedAt, timezone: base.timezone };
+  const any = base ?? summit;
+  return any ?? null;
+}
 
-function placeholderWeather(key: string): Profile {
-  let h = 0;
-  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
-  return PROFILES[h % PROFILES.length];
+function weatherFrom(forecasts: Forecast[]): Weather {
+  const s = seriesOf(forecasts);
+  if (!s || s.hours.length === 0) return NO_WEATHER;
+
+  const byDate = new Map<string, HourWx[]>();
+  for (const h of s.hours) {
+    const date = h.time.slice(0, 10);
+    byDate.set(date, [...(byDate.get(date) ?? []), h]);
+  }
+  const dates = [...byDate.keys()].sort();
+  const today = localDate(s.timezone);
+  const t0 = dates.indexOf(today);
+  // The cache may predate today (offline for a day): then there is no "today" and nothing to score.
+  if (t0 < 0) return { forecastAt: s.fetchedAt, days: [], prior: null, hours: null };
+
+  const dayAt = (i: number): DayWx | null => (i >= 0 && i < dates.length ? aggregateDay(dates[i], byDate.get(dates[i]) ?? []) : null);
+  const days: (DayWx | null)[] = [];
+  for (let i = 0; i < DAY_COUNT; i++) days.push(dayAt(t0 + i));
+
+  const p3 = dayAt(t0 - 3), p2 = dayAt(t0 - 2), p1 = dayAt(t0 - 1);
+  const prior: Prior | null =
+    p3 && p2 && p1
+      ? { snow72: round1(p3.snow + p2.snow + p1.snow), temps: [p2.t, p1.t], rain72: round1(p3.rain + p2.rain + p1.rain) }
+      : null;
+
+  return { forecastAt: s.fetchedAt, days, prior, hours: byDate.get(today) ?? null };
+}
+
+const DAY_START = 7, DAY_END = 17;
+
+/**
+ * One day from its hours. Sums need every hour (a missing hour would silently
+ * understate a snowfall); daytime means tolerate a few gaps.
+ */
+function aggregateDay(date: string, hours: HourWx[]): DayWx | null {
+  if (hours.length < 24) return null;
+  const sum = (pick: (h: HourWx) => number | null): number | null => {
+    let total = 0;
+    for (const h of hours) {
+      const v = pick(h);
+      if (v === null) return null;
+      total += v;
+    }
+    return total;
+  };
+  const daytime = hours.filter((h) => { const hr = Number(h.time.slice(11, 13)); return hr >= DAY_START && hr <= DAY_END; });
+  const mean = (pick: (h: HourWx) => number | null): number | null => {
+    const vals = daytime.map(pick).filter((v): v is number => v !== null);
+    if (vals.length < daytime.length * 0.8) return null;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  };
+  const allT = hours.map((h) => h.t).filter((v): v is number => v !== null);
+
+  const t = mean((h) => h.t), wind = mean((h) => h.wind), cloud = mean((h) => h.cloud);
+  const snow = sum((h) => h.snow), precip = sum((h) => h.precip), rain = sum((h) => h.rain);
+  const gusts = daytime.map((h) => h.gust).filter((v): v is number => v !== null);
+  if (t === null || wind === null || cloud === null || snow === null || precip === null || rain === null || allT.length < 20) return null;
+
+  const noon = hours.find((h) => h.time.slice(11, 13) === '12');
+  return {
+    date,
+    t: round1(t), hi: round1(Math.max(...allT)), lo: round1(Math.min(...allT)),
+    snow: round1(snow), wind: round1(wind), gust: gusts.length ? round1(Math.max(...gusts)) : round1(wind),
+    cloud: Math.round(cloud), precip: round1(precip), rain: round1(rain),
+    depth: noon?.depth ?? null,
+  };
+}
+
+function round1(x: number): number {
+  return Math.round(x * 10) / 10;
+}
+
+/** Today's date (YYYY-MM-DD) in a named time zone, falling back to the device's. */
+export function localDate(timeZone: string, at = new Date()): string {
+  try {
+    return new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(at);
+  } catch {
+    return deviceDate(at);
+  }
+}
+
+/** Today's date on the device, YYYY-MM-DD. */
+export function deviceDate(at = new Date()): string {
+  const y = at.getFullYear(), m = String(at.getMonth() + 1).padStart(2, '0'), d = String(at.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/** The five column dates for the Forecast grid: device-local today onward. */
+export function gridDates(at = new Date()): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < DAY_COUNT; i++) {
+    const d = new Date(at.getFullYear(), at.getMonth(), at.getDate() + i);
+    out.push(deviceDate(d));
+  }
+  return out;
+}
+
+/** Index into `place.days` for a grid date, or -1 if the place has no such day. */
+export function dayIndexFor(p: Place, date: string): number {
+  return p.days.findIndex((d) => d?.date === date);
+}
+
+/** "Today" / "Wed" and "Jan 13" for a YYYY-MM-DD, relative to the device's today. */
+export function dayLabel(date: string, at = new Date()): { label: string; date: string } {
+  const [y, m, d] = date.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  const label = date === deviceDate(at) ? strings.format.today : strings.format.weekday(dt);
+  return { label, date: strings.format.monthDay(dt) };
 }

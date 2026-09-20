@@ -69,6 +69,8 @@ export const strings = {
     seeAll: 'See all',
     noAlternatives: (activity: string, distance: string) =>
       `None of your other places offer ${activity} within ${distance}.`,
+    noForecastKicker: 'No forecast yet',
+    noForecastBody: 'The mountain forecast for this place has not been fetched yet. It will be tried again when you next open the app.',
     noHomeKicker: 'No home hill yet',
     noHomeBody: 'Add the places you go to and pick one as your home hill — that is the one this screen opens on.',
     addPlaces: 'Add your places',
@@ -93,6 +95,7 @@ export const strings = {
     betterBet: (day: string, best: number) => `${day} is the better bet at ${best}.`,
     withinFew: 'Within a few points of the best day here.',
     forecastLabel: 'Forecast',
+    noDay: 'No forecast for this day.',
   },
 
   places: {
@@ -205,6 +208,7 @@ export const strings = {
       { t: 'Look ahead', d: 'Forecast lays out every saved place against the next five days. Tap any square for the detail on that day.' },
     ],
     dataKicker: 'A word on the data',
+    attribution: 'Weather data by Open-Meteo.com (CC BY 4.0). Ski areas from OpenSkiData, © OpenStreetMap contributors and Skimap.org (ODbL).',
     data: "Scores come from mountain forecasts, not from someone standing on the trail. Each place shows how old its conditions report is — if it says a few hours, treat the number as a good guess rather than a promise, and check the operator's own snow report before a long drive.",
   },
 
@@ -213,7 +217,10 @@ export const strings = {
     forecastMinAgo: (min: number) => `from ${min} min ago`,
     forecastHoursAgo: (h: number) => `from ${h} h ago`,
     forecastDaysAgo: (d: number) => `from ${d} day ago`,
-    placeholderForecast: 'sample data',
+    noForecast: 'not yet fetched',
+    today: 'Today',
+    weekday: (d: Date) => d.toLocaleDateString('en-CA', { weekday: 'short' }),
+    monthDay: (d: Date) => d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }),
     noon: 'noon',
     am: (h: number) => `${h} AM`,
     pm: (h: number) => `${h} PM`,
@@ -261,6 +268,7 @@ export const strings = {
 
   verdict: {
     doesNotDo: (name: string, activity: string) => `${name} does not do ${activity}.`,
+    noForecast: 'No forecast for this day yet.',
     manyThings: (count: string) => `${count} things are working against it today — see the breakdown.`,
     countWords: ['', '', '', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'],
     excellent: 'Everything lines up — go now, and go early.',

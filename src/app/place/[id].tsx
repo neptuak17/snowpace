@@ -8,12 +8,12 @@ import { LinkButton } from '@/components/ui/app-button';
 import { AppText } from '@/components/ui/app-text';
 import { ScorePill } from '@/components/ui/score-pill';
 import { BackButton, Screen } from '@/components/ui/screen';
-import { ACTS, DAYS, placeFromArea, type Place } from '@/data/places';
+import { ACTS, dayIndexFor, dayLabel, gridDates, placeFromArea, type Place } from '@/data/places';
 import { getArea } from '@/db/inventory';
 import { fmtForecastAge, fmtS, fmtT, fmtW } from '@/lib/format';
 import { fromRouteId } from '@/lib/geo';
 import { placeMetaAway } from '@/lib/place-text';
-import { actLabel, band, dialMetrics, freezeThaw, isRain, score, snow72 } from '@/lib/scoring';
+import { actLabel, band, canScore, dialMetrics, freezeThaw, score, snow72, snowFallingMm } from '@/lib/scoring';
 import { useAppState } from '@/state/app-state';
 import { gutter } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
@@ -29,7 +29,7 @@ export default function PlaceDetailScreen() {
   useEffect(() => {
     if (saved) return;
     let cancelled = false;
-    getArea(key).then((a) => { if (a && !cancelled) setLoaded(placeFromArea(a, s.location)); }).catch(() => {});
+    getArea(key).then((a) => { if (a && !cancelled) setLoaded(placeFromArea(a, s.location, [])); }).catch(() => {});
     return () => { cancelled = true; };
   }, [key, saved, s.location]);
   const l = saved ?? loaded;
@@ -43,23 +43,26 @@ function PlaceDetail({ l, from }: { l: Place; from?: string }) {
   const router = useRouter();
   const act = s.activity;
 
-  const sc = score(l, 0, act, s.prefs);
+  const hasToday = canScore(l, 0);
+  const sc = hasToday ? score(l, 0, act, s.prefs) : null;
   const b = band(sc);
-  const d = l.days[0];
-  const ft = freezeThaw(l, 0);
-  const metrics = dialMetrics(l, 0, act, sc, s.prefs, s.units);
+  const d = hasToday ? l.days[0] : null;
+  const metrics = hasToday ? dialMetrics(l, 0, act, sc, s.prefs, s.units) : [];
   const mine = ACTS.filter((a) => l.acts.includes(a.key) && s.myActs.includes(a.key));
+  const dates = gridDates();
 
   const dt = strings.detail;
+  const dash = strings.common.dash;
+  const ft = hasToday ? freezeThaw(l, 0) : null;
   const rows = [
-    { k: dt.rows.temp, v: fmtT(d.t, s.units) },
-    { k: dt.rows.newSnow, v: fmtS(d.snow, s.units) },
-    { k: dt.rows.threeDay, v: fmtS(snow72(l, 0), s.units) },
-    { k: dt.rows.freezeThaw, v: ft.hit ? dt.yesTo(fmtT(ft.maxHi, s.units)) : dt.none },
-    { k: dt.rows.wind, v: fmtW(d.wind, s.units) },
-    { k: dt.rows.cloud, v: d.cloud + '%' },
-    { k: dt.rows.rain, v: isRain(d.t) && d.precip ? strings.format.mm(d.precip) : dt.none },
-    { k: dt.rows.snowFalling, v: isRain(d.t) ? dt.none : strings.format.mm(d.precip || 0) },
+    { k: dt.rows.temp, v: d ? fmtT(d.t, s.units) : dash },
+    { k: dt.rows.newSnow, v: d ? fmtS(d.snow, s.units) : dash },
+    { k: dt.rows.threeDay, v: hasToday ? fmtS(snow72(l, 0), s.units) : dash },
+    { k: dt.rows.freezeThaw, v: ft ? (ft.hit ? dt.yesTo(fmtT(ft.maxHi, s.units)) : dt.none) : dash },
+    { k: dt.rows.wind, v: d ? fmtW(d.wind, s.units) : dash },
+    { k: dt.rows.cloud, v: d ? d.cloud + '%' : dash },
+    { k: dt.rows.rain, v: d ? (d.rain > 0 ? strings.format.mm(d.rain.toFixed(1)) : dt.none) : dash },
+    { k: dt.rows.snowFalling, v: d ? (snowFallingMm(d) > 0 ? strings.format.mm(snowFallingMm(d).toFixed(1)) : dt.none) : dash },
     { k: dt.rows.yourActivities, v: mine.map((a) => a.label.toLowerCase()).join(dt.listSep) || dt.noneOfYours },
   ];
 
@@ -81,7 +84,7 @@ function PlaceDetail({ l, from }: { l: Place; from?: string }) {
       </View>
 
       <View style={[styles.gutter, styles.pad14]}>
-        <DialCard score={sc} line={dt.dialLine(actLabel(act), b.word)} metrics={metrics} />
+        <DialCard score={sc} line={hasToday ? dt.dialLine(actLabel(act), b.word) : strings.today.noForecastKicker} metrics={metrics} />
       </View>
 
       <View style={[styles.gutter, styles.pad16]}>
@@ -89,17 +92,21 @@ function PlaceDetail({ l, from }: { l: Place; from?: string }) {
       </View>
 
       <View style={[styles.gutter, styles.pad18, styles.days]}>
-        {DAYS.map((dd, di) => (
-          <View key={dd.label} style={styles.day}>
-            <AppText size={9.5} muted>
-              {dd.label}
-            </AppText>
-            <ScorePill score={score(l, di, act, s.prefs)} style={styles.dayPill} />
-            <AppText size={9.5} muted numberOfLines={1}>
-              {fmtS(l.days[di].snow, s.units)}
-            </AppText>
-          </View>
-        ))}
+        {dates.map((date) => {
+          const di = dayIndexFor(l, date);
+          const day = di >= 0 ? l.days[di] : null;
+          return (
+            <View key={date} style={styles.day}>
+              <AppText size={9.5} muted>
+                {dayLabel(date).label}
+              </AppText>
+              <ScorePill score={di >= 0 ? score(l, di, act, s.prefs) : null} style={styles.dayPill} />
+              <AppText size={9.5} muted numberOfLines={1}>
+                {day ? fmtS(day.snow, s.units) : dash}
+              </AppText>
+            </View>
+          );
+        })}
       </View>
 
       <View style={[styles.gutter, styles.pad18]}>

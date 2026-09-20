@@ -17,14 +17,6 @@ export const TUNING = {
   bands: { hi: 80, go: 70, fair: 55, poor: 40 },
   verdictExcellent: 90,
 
-  // ── Daily temperature swing around the forecast mean, by cloud cover.
-  // Clear days swing wider than overcast ones.
-  diurnal: {
-    clearBelowCloud: 40, clearAmp: 4,
-    partlyBelowCloud: 75, partlyAmp: 3,
-    overcastAmp: 2.2,
-  },
-
   // ── Temperature: points off per °C from the user's ideal.
   tempPenaltyPerDeg: 8,
 
@@ -63,10 +55,6 @@ export const TUNING = {
 
   // ── Rain: always bad, no user tolerance.
   rain: {
-    // Precip falling now counts as rain when the current temperature is above this.
-    nowRainAbove: 0,
-    // A day's rain (later today / previous days) is judged by its daily high against this.
-    dayHighRainAbove: 0.5,
     // Amount below which we treat it as "no rain".
     floorMm: 0.05,
     nowPerMm: 12, nowCap: 55,
@@ -102,8 +90,9 @@ export const TUNING = {
     classic:  { t: 0.17, s: 0.2,  base: 0.09, ft: 0.11, w: 0.15, pr: 0.14, fall: 0.09, c: 0.05 },
   } as Record<ActivityKey, Record<FactorKey, number>>,
 
-  // ── Hourly model: temperature follows a half-sine between the day's lo and
-  // hi from `sunrise` over `dayLength` hours; wind builds through the afternoon.
+  // ── Hourly fallback when the forecast has no hourly series for a day:
+  // temperature follows a half-sine between the day's lo and hi from `sunrise`
+  // over `dayLength` hours; wind builds through the afternoon.
   hourly: {
     hours: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
     sunriseHour: 6,
