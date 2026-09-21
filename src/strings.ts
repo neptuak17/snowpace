@@ -176,7 +176,7 @@ export const strings = {
 
   help: {
     title: 'How Snowpace works',
-    warning: "Snowpace only scores the weather, so always check the location's web site for hours, grooming and lift status before you drive.",
+    warning: "Snowpace only scores the weather. Before you go, check the location's web site for hours, grooming and lift status, and the avalanche forecast for the area.",
     whatKicker: 'What it is for',
     what: 'Snowpace answers one question: is it worth going out today, and where. It gathers past, current and forecast weather information for the places you have saved and calculates a score out of 100 based on the characteristics of the activities you participate in. Good conditions for skate skiing are not necessarily good conditions for downhill skiing, so every place gets a different score for each activity.',
     scoreKicker: 'What the score means',
