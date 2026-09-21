@@ -171,7 +171,7 @@ export const strings = {
     },
     working: 'Scoring your places',
     ready: 'Ready',
-    disclaimer: "Snowpace only scores the weather, so always check the location's web site for hours, grooming and lift status before you drive.",
+    disclaimer: "Snowpace only scores the weather. Before you go, check the location's web site for hours, grooming and lift status, and the avalanche forecast for the area.",
   },
 
   help: {
