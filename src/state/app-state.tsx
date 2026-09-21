@@ -17,6 +17,7 @@ import { AppState as RNAppState, Platform, useColorScheme } from 'react-native';
 
 import { refreshForecasts } from '@/data/forecast-refresh';
 import type { Forecast } from '@/data/open-meteo';
+import type { SkiArea } from '@/data/openskidata';
 import { ACTS, placeFromArea, type ActivityKey, type Place } from '@/data/places';
 import * as fav from '@/db/favourites';
 import { pruneForecasts } from '@/db/forecasts';
@@ -68,6 +69,8 @@ type Derived = {
   home: Place | null;
   /** The set of favourite keys, for quick "is this saved?" checks. */
   savedKeys: Set<string>;
+  /** The favourites' inventory records, home first, for lists that show places to pick from. */
+  savedAreas: SkiArea[];
 };
 
 const Ctx = createContext<(State & Actions & Derived) | null>(null);
@@ -199,7 +202,8 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
     );
     const homeIndex = favourites.findIndex((f) => f.isHome);
     const home = homeIndex >= 0 && places[homeIndex].listed ? places[homeIndex] : null;
-    return { places, home, refreshing, savedKeys: new Set(favourites.map((f) => f.key)) };
+    const savedAreas = favourites.map((f) => f.area).filter((a): a is SkiArea => !!a);
+    return { places, home, refreshing, savedKeys: new Set(favourites.map((f) => f.key)), savedAreas };
   }, [favourites, forecasts, refreshing, state.location]);
 
   const value = useMemo(() => ({ ...state, ...actions, ...derived }), [state, actions, derived]);

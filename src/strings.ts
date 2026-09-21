@@ -139,6 +139,7 @@ export const strings = {
     title: 'Add a place',
     intro: 'Add the places you visit, and pick which one is your home hill — that is the one Today opens on.',
     placeholder: 'Search by name or town',
+    yours: 'Your places',
     nearby: 'Nearest to you',
     typeToSearch: 'Type a name or a town to search all of North America.',
     meta: (parts: (string | null)[], count: number) => [...parts.filter(Boolean), `${count} of your activities`].join(' · '),

@@ -47,6 +47,13 @@ export default function SearchScreen() {
     return () => { cancelled = true; clearTimeout(timer); };
   }, [q, s.location]);
 
+  // Saved places first so they never need scrolling for. Without a query
+  // that means all of them, ahead of the nearest list; with a query, the
+  // matches that are saved rise to the top.
+  const shown = results === null ? null : q
+    ? [...results.filter((a) => s.savedKeys.has(a.key)), ...results.filter((a) => !s.savedKeys.has(a.key))]
+    : [...s.savedAreas, ...results.filter((a) => !s.savedKeys.has(a.key))];
+
   return (
     <Screen contentStyle={styles.content}>
       <BackButton label={strings.search.backLabel} onPress={() => router.back()} />
@@ -76,56 +83,60 @@ export default function SearchScreen() {
           {strings.search.searching}
         </AppText>
       )}
-      {results !== null && (
+      {shown !== null && (
         <View style={styles.list}>
-          {!q && <SectionLabel>{strings.search.nearby}</SectionLabel>}
-          {results.map((a) => {
+          {shown.map((a, i) => {
             const saved = s.savedKeys.has(a.key);
             const isHome = s.home?.key === a.key;
             const mine = activitiesOf(a).filter((k) => s.myActs.includes(k)).length;
             const dist = s.location ? fmtDistance(distanceKm(s.location, a), s.units) : null;
+            // Without a query the list is saved places then nearest; label each section's first row.
+            const label = q ? null : i === 0 && saved ? strings.search.yours : i === s.savedAreas.length ? strings.search.nearby : null;
             return (
-              <View key={a.key} style={[styles.item, { backgroundColor: theme.surface }, theme.shadowSm]}>
-                <View style={styles.itemText}>
-                  <View style={styles.nameRow}>
-                    <AppText size={13.5} weight={700} style={styles.name}>
-                      {a.name}
+              <View key={a.key} style={styles.gap}>
+                {label && <SectionLabel>{label}</SectionLabel>}
+                <View style={[styles.item, { backgroundColor: theme.surface }, theme.shadowSm]}>
+                  <View style={styles.itemText}>
+                    <View style={styles.nameRow}>
+                      <AppText size={13.5} weight={700} style={styles.name}>
+                        {a.name}
+                      </AppText>
+                      {isHome && <HomeTag />}
+                    </View>
+                    <AppText size={11} muted>
+                      {strings.search.meta([a.locality ?? a.regionName, dist], mine)}
                     </AppText>
-                    {isHome && <HomeTag />}
                   </View>
-                  <AppText size={11} muted>
-                    {strings.search.meta([a.locality ?? a.regionName, dist], mine)}
-                  </AppText>
+                  {!isHome && (
+                    <View style={styles.actions}>
+                      <Pressable
+                        accessibilityRole="button"
+                        onPress={() => s.setHome(a.key)}
+                        style={({ pressed }) => [styles.pill, styles.homeBtn, pressed && styles.pressed]}>
+                        <AppText size={11.5} weight={700} color={theme.accent}>
+                          {strings.search.setHome}
+                        </AppText>
+                      </Pressable>
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityState={{ selected: saved }}
+                        onPress={() => (saved ? s.removeFavourite(a.key) : s.addFavourite(a.key))}
+                        style={({ pressed }) => [
+                          styles.pill,
+                          { backgroundColor: saved ? theme.tagAccent.bg : theme.accent },
+                          pressed && styles.pressed,
+                        ]}>
+                        <AppText size={11.5} weight={700} color={saved ? theme.tagAccent.fg : '#fff'}>
+                          {saved ? strings.search.saved : strings.search.add}
+                        </AppText>
+                      </Pressable>
+                    </View>
+                  )}
                 </View>
-                {!isHome && (
-                  <View style={styles.actions}>
-                    <Pressable
-                      accessibilityRole="button"
-                      onPress={() => s.setHome(a.key)}
-                      style={({ pressed }) => [styles.pill, styles.homeBtn, pressed && styles.pressed]}>
-                      <AppText size={11.5} weight={700} color={theme.accent}>
-                        {strings.search.setHome}
-                      </AppText>
-                    </Pressable>
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityState={{ selected: saved }}
-                      onPress={() => (saved ? s.removeFavourite(a.key) : s.addFavourite(a.key))}
-                      style={({ pressed }) => [
-                        styles.pill,
-                        { backgroundColor: saved ? theme.tagAccent.bg : theme.accent },
-                        pressed && styles.pressed,
-                      ]}>
-                      <AppText size={11.5} weight={700} color={saved ? theme.tagAccent.fg : '#fff'}>
-                        {saved ? strings.search.saved : strings.search.add}
-                      </AppText>
-                    </Pressable>
-                  </View>
-                )}
               </View>
             );
           })}
-          {results.length === 0 && (
+          {shown.length === 0 && (
             <AppText size={12.5} muted>
               {strings.search.noResults}
             </AppText>
@@ -148,6 +159,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
   },
   list: { gap: 7 },
+  gap: { gap: 7 },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
