@@ -131,11 +131,17 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
     setFavourites(await fav.listFavourites());
   }, []);
 
-  // Fetch forecasts for the given favourites (stale ones only, unless forced),
-  // then drop cached rows for places no longer saved.
-  const refresh = useCallback(async (favs: fav.Favourite[], force = false) => {
+  /**
+   * Refresh forecasts for every saved place. It reads the favourites itself
+   * rather than taking a list, because the map it returns replaces the whole
+   * cache and the prune deletes rows for every key not in it — a subset would
+   * silently discard the other places' forecasts. refreshForecasts fetches
+   * only what is stale, so calling this after saving a place fetches that one
+   * and leaves the rest alone.
+   */
+  const refresh = useCallback(async (force = false) => {
     if (Platform.OS === 'web') return;
-    const areas = favs.map((f) => f.area).filter((a): a is NonNullable<typeof a> => !!a);
+    const areas = (await fav.listFavourites()).map((f) => f.area).filter((a): a is NonNullable<typeof a> => !!a);
     setRefreshing(true);
     try {
       const { forecasts: next } = await refreshForecasts(areas, { force });
@@ -151,9 +157,9 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
   // Coming back to the foreground: refresh anything stale. refreshForecasts
   // itself decides what is stale, so this is cheap when nothing is.
   useEffect(() => {
-    const sub = RNAppState.addEventListener('change', (st) => { if (st === 'active') refresh(favourites); });
+    const sub = RNAppState.addEventListener('change', (st) => { if (st === 'active') void refresh(); });
     return () => sub.remove();
-  }, [favourites, refresh]);
+  }, [refresh]);
 
   const actions = useMemo<Actions>(
     () => ({
@@ -169,17 +175,15 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
         }),
       addFavourite: async (key) => {
         await fav.addFavourite(key);
-        const favs = await fav.listFavourites();
-        setFavourites(favs);
-        // A new place gets its forecast straight away rather than at the next launch.
-        void refresh(favs.filter((f) => f.key === key));
+        await reloadFavourites();
+        // The new place has no cache, so this fetches it and skips the rest.
+        void refresh();
       },
       removeFavourite: async (key) => { await fav.removeFavourite(key); await reloadFavourites(); },
       setHome: async (key) => {
         await fav.setHome(key);
-        const favs = await fav.listFavourites();
-        setFavourites(favs);
-        if (!forecasts.has(key)) void refresh(favs.filter((f) => f.key === key));
+        await reloadFavourites();
+        if (!forecasts.has(key)) void refresh();
       },
       setPref: (key, v) =>
         patch((s) => ({
