@@ -35,6 +35,7 @@ export const strings = {
 
   common: {
     back: 'Back',
+    cancel: 'Cancel',
     backTo: (label: string) => `‹ ${label}`,
     help: 'Help',
     home: 'Home',
@@ -130,7 +131,10 @@ export const strings = {
     appearance: 'Appearance',
     light: 'Light',
     dark: 'Dark',
-    reset: 'Reset to defaults',
+    reset: 'Reset all activity preferences',
+    resetTitle: 'Reset all activity preferences?',
+    resetBody: 'This puts the temperature, wind, snow and precipitation settings back to their defaults for every activity, not just this one, and resets how far you will go. Your places are not affected.',
+    resetConfirm: 'Reset',
     percent: (n: number) => `${n}%`,
   },
 

@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 
 import { ActivityChips } from '@/components/activity-chips';
 import { AppButton } from '@/components/ui/app-button';
@@ -23,6 +23,13 @@ export default function YouScreen() {
   const act = s.activity;
   const p = s.prefs[act];
   const y = strings.you;
+
+  // The reset spans every activity, not the one on screen, so it asks first.
+  const confirmReset = () =>
+    Alert.alert(y.resetTitle, y.resetBody, [
+      { text: strings.common.cancel, style: 'cancel' },
+      { text: y.resetConfirm, style: 'destructive', onPress: s.resetPrefs },
+    ]);
 
   return (
     <Screen help contentStyle={styles.content}>
@@ -114,7 +121,7 @@ export default function YouScreen() {
         </View>
       </Card>
 
-      <AppButton variant="ghost" size={12.5} style={styles.reset} onPress={s.resetPrefs}>
+      <AppButton variant="ghost" size={12.5} style={styles.reset} onPress={confirmReset}>
         {y.reset}
       </AppButton>
     </Screen>
