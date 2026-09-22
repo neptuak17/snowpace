@@ -226,16 +226,8 @@ guesses pending winter data.
 Mountain News is fee-based and sales-gated, aimed at media companies and institutions, with a
 default quota of 5,000 requests/day per account that does not survive direct-from-device calls.
 SnoCountry is a non-profit with no published pricing and a 3-resort example key. Neither fits the
-current cost model. 
-
-### Open/closed: estimate, then link out
-
-Since no status feed is used, Snowpace presents an explicit **estimate**, never a status:
-
-* Derived from a typical season window plus modelled snow depth.
-* Worded as an estimate, e.g. "Season: typically Dec–Mar. Snowpack looks adequate."
-* Always paired with a link to the area's own website (from the bundled snapshot) for the
-authoritative answer.
+current cost model. Snowpace does not estimate open/closed either — decided Sep 2026. Every place
+links to the operator's own web site, and that is the authoritative answer.
 
 The same principle applies throughout: Snowpace answers "is the weather good for skiing here?" and
 hands off "is it open and groomed?" to the operator.
