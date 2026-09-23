@@ -66,13 +66,19 @@ export default function ForecastScreen() {
     .filter((o): o is { i: number; sc: number } => o.sc !== null)
     .sort((a, b) => b.sc - a.sc)[0];
   const todayScore = scoreAt(selLoc, dates[0]);
+  // Ranking the five days only means something if one of them is worth going
+  // to. Below the Poor band the app already says "skip it", so a "best day"
+  // there would read as a recommendation nobody should take.
+  const worthRanking = bestDay && bestDay.sc >= TUNING.bands.poor;
   let vs = '';
-  if (selScore !== null && bestDay) {
+  if (selScore === null) {
+    vs = f.noDay;
+  } else if (!worthRanking) {
+    vs = scoreable && coverageSub(selLoc, selDay, act) <= 0 ? f.bareWeek : f.noGoodDay;
+  } else if (bestDay) {
     if (bestDay.i === selCol) vs = f.bestOfFive;
     else if (selCol === 0) vs = f.looksBetter(labels[bestDay.i].label, bestDay.sc, todayScore ?? 0);
     else vs = bestDay.sc - selScore > 4 ? f.betterBet(labels[bestDay.i].label, bestDay.sc) : f.withinFew;
-  } else if (selScore === null) {
-    vs = f.noDay;
   }
 
   const legend = (['hi', 'go', 'fair', 'poor'] as const).map((key) => ({ key, text: f.legend[key] }));

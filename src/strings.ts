@@ -95,6 +95,8 @@ export const strings = {
       `${day} looks better — ${best} against today’s ${today}.`,
     betterBet: (day: string, best: number) => `${day} is the better bet at ${best}.`,
     withinFew: 'Within a few points of the best day here.',
+    bareWeek: 'No snow on the ground here yet.',
+    noGoodDay: 'None of the next five days look good here.',
     forecastLabel: 'Forecast',
     noDay: 'No forecast for this day.',
   },
