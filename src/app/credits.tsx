@@ -42,7 +42,11 @@ export default function CreditsScreen() {
             <AppText size={11.5} lh={1.4} muted>
               {s.licence}
             </AppText>
-            <OpenLink label={s.name} href={s.url} />
+            <View style={styles.links}>
+              {s.links.map((l) => (
+                <OpenLink key={l.url} label={l.label} href={l.url} />
+              ))}
+            </View>
           </View>
         ))}
       </Card>
@@ -81,6 +85,7 @@ const styles = StyleSheet.create({
   gap11: { gap: 11 },
   gap13: { gap: 13 },
   source: { gap: 3 },
+  links: { flexDirection: 'row', flexWrap: 'wrap', columnGap: 18 },
   link: { minHeight: 44, justifyContent: 'center' },
   pressed: { opacity: 0.6 },
 });
