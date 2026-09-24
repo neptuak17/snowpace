@@ -10,7 +10,7 @@ import { ScoreDial } from '@/components/ui/score-dial';
 import { ScorePill } from '@/components/ui/score-pill';
 import { Screen, ScreenTitle } from '@/components/ui/screen';
 import { dayIndexFor, dayLabel, gridDates } from '@/data/places';
-import { fmtDistance, fmtForecastAge, fmtS, fmtT, fmtW } from '@/lib/format';
+import { fmtForecastAge, fmtS, fmtT, fmtW } from '@/lib/format';
 import { placeMetaAway } from '@/lib/place-text';
 import { actLabel, canScore, coverageSub, coverageWord, freezeThaw, hasDepth, limiters, rainSub, score, snow72, snowFallingMm, type FactorKey } from '@/lib/scoring';
 import { TUNING } from '@/lib/tuning';
@@ -170,6 +170,7 @@ function EmptyForecast() {
   const s = useAppState();
   const router = useRouter();
   const activityLabel = actLabel(s.activity);
+  const f = strings.forecast;
   return (
     <Screen help contentStyle={styles.content}>
       <View style={styles.head}>
@@ -180,12 +181,12 @@ function EmptyForecast() {
       </View>
       <View style={styles.inset}>
         <Card style={styles.empty}>
-          <Kicker>{strings.places.emptyKicker(activityLabel)}</Kicker>
+          <Kicker>{f.emptyKicker(activityLabel)}</Kicker>
           <AppText size={13} lh={1.45}>
-            {strings.places.emptyBody(activityLabel, fmtDistance(s.maxDistanceKm, s.units))}
+            {f.emptyBody(activityLabel)}
           </AppText>
           <AppButton size={12.5} onPress={() => router.push('/search')}>
-            {strings.places.addPlace}
+            {f.addPlace}
           </AppButton>
         </Card>
       </View>

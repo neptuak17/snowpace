@@ -99,16 +99,19 @@ export const strings = {
     noGoodDay: 'None of the next five days look good here.',
     forecastLabel: 'Forecast',
     noDay: 'No forecast for this day.',
+    emptyKicker: (activity: string) => `Nothing here for ${activity}`,
+    emptyBody: (activity: string) => `None of your places offer ${activity}. Pick another activity, or add a place that does.`,
+    addPlace: 'Add a place',
   },
 
   places: {
     title: 'My places',
     add: '+ Add',
-    note: (activity: string) => `Your places that offer ${activity}, best right now first.`,
+    note: (activity: string) => `Best for ${activity} now.`,
     rank: (n: number, name: string) => `${n}. ${name}`,
-    emptyKicker: (activity: string) => `Nothing here for ${activity}`,
-    emptyBody: (activity: string, distance: string) =>
-      `None of your places offer ${activity} within ${distance}. Pick another activity or add a place that offers.`,
+    notAvailable: (activity: string) => `${activity.charAt(0).toUpperCase() + activity.slice(1)} not available at these locations`,
+    emptyKicker: 'No places yet',
+    emptyBody: 'Add the centres and hills you go to. Everything you save shows up here, however far away it is.',
     unlistedNote: 'This place has dropped out of the OpenSkiData ski-area listing. You can keep it or remove it.',
     addPlace: 'Add a place',
   },
