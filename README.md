@@ -34,6 +34,11 @@ Cliff Smith — clifford.smith@gmail.com
 If you run one of the services above and have any concern about Snowpace's traffic,
 please get in touch; the fetch policy is documented in `CLAUDE.md` and is easy to change.
 
+## Privacy
+
+No account, no analytics, no tracking. Everything stays on the phone and your location
+is never transmitted — see [PRIVACY.md](PRIVACY.md).
+
 ## Data credits
 
 - Ski areas: [OpenSkiData](https://openskimap.org), built from

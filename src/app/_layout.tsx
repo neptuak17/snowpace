@@ -85,6 +85,7 @@ function RootNavigator() {
         <Stack.Screen name="place/[id]" />
         <Stack.Screen name="help" />
         <Stack.Screen name="feedback" />
+        <Stack.Screen name="credits" />
       </Stack>
     </ThemeProvider>
   );

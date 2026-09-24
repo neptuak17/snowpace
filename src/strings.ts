@@ -215,11 +215,48 @@ export const strings = {
       { t: 'Look ahead', d: 'Forecast lays out every saved place against the next five days. Tap any square for the detail on that day.' },
     ],
     dataKicker: 'A word on the data',
-    attribution: 'Weather data by Open-Meteo.com (CC BY 4.0). Ski areas from OpenSkiData, © OpenStreetMap contributors and Skimap.org (ODbL).',
+    creditsLink: 'Credits and data sources',
     data: "Scores come from mountain forecasts, not from someone standing on the trail. Each place shows how old its conditions report is — if it says a few hours, treat the number as a good guess rather than a promise, and check the operator's own snow report before a long drive.",
     feedbackKicker: 'Something to tell me?',
     feedbackBody: 'A score that looked wrong, something broken, or an idea — feedback goes straight to the person who built this.',
     feedbackButton: 'Send feedback',
+  },
+
+  credits: {
+    title: 'Credits',
+    intro: 'Snowpace has no data of its own. Everything it shows comes from these projects, and it is only as good as they are.',
+    sourcesKicker: 'Where the data comes from',
+    sources: [
+      {
+        name: 'Open-Meteo',
+        what: 'The mountain forecasts behind every score — temperature, snow, wind, cloud and modelled snow depth, hour by hour.',
+        licence: 'Weather data by Open-Meteo.com, CC BY 4.0',
+        url: 'https://open-meteo.com',
+      },
+      {
+        name: 'OpenSkiData',
+        what: 'The list of ski areas: names, locations, elevations and what each one offers.',
+        licence: 'Open Database License (ODbL) 1.0',
+        url: 'https://openskimap.org',
+      },
+      {
+        name: 'OpenStreetMap contributors',
+        what: 'Most of that listing began as someone mapping a trail network by hand.',
+        licence: '© OpenStreetMap contributors, ODbL',
+        url: 'https://www.openstreetmap.org/copyright',
+      },
+      {
+        name: 'Skimap.org',
+        what: 'The areas OpenStreetMap has not mapped, about a third of them.',
+        licence: 'ODbL',
+        url: 'https://skimap.org',
+      },
+    ] as const,
+    appKicker: 'The app',
+    projectLink: 'Snowpace on GitHub',
+    privacyLink: 'Privacy policy',
+    version: (v: string) => `Version ${v}`,
+    openLink: (name: string) => `${name} ↗`,
   },
 
   feedback: {

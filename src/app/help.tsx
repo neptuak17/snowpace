@@ -95,9 +95,9 @@ export default function HelpScreen() {
         <AppText size={13.5} lh={1.5}>
           {h.data}
         </AppText>
-        <AppText size={11.5} lh={1.45} muted>
-          {h.attribution}
-        </AppText>
+        <AppButton variant="ghost" size={12.5} style={styles.creditsBtn} onPress={() => router.push('/credits')}>
+          {h.creditsLink}
+        </AppButton>
       </Card>
 
       <Card style={styles.gap11}>
@@ -118,6 +118,7 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: gutter, gap: 13 },
   warning: { paddingVertical: 13, paddingHorizontal: 15, borderRadius: 16, borderWidth: 2 },
   gap11: { gap: 11 },
+  creditsBtn: { alignSelf: 'flex-start', marginLeft: -10, marginTop: -2 },
   bandRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   bandPill: { minWidth: 76, paddingVertical: 6, paddingHorizontal: 10, borderRadius: radius.pill },
   factorRow: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
