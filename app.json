@@ -23,7 +23,11 @@
     "android": {
       "icon": "./assets/images/icon-light.png",
       "predictiveBackGestureEnabled": false,
-      "package": "io.github.neptuak17.snowpace"
+      "package": "io.github.neptuak17.snowpace",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "output": "static",
@@ -56,6 +60,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "38a9fa99-5694-4f76-9c54-cb37c878b8de"
+      }
+    },
+    "owner": "neptuak"
   }
 }
