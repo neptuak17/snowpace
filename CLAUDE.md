@@ -246,6 +246,32 @@ The about/credits screen must include:
   factor now sees hourly mm rather than daily totals and will read lighter. Retune once real
   winter data is flowing.
 
+* **Fat biking and data-driven snowshoe, if OpenSkiData exposes more activities.** OSM tags
+  `piste:type=fatbike` and `piste:type=hike` on individual runs, but the published ski areas
+  file reduces everything to `downhill` and `nordic`, so neither reaches the app. Measured Sep
+  2026 at Larch Hills (`osm:way/1135735100`): 219 nordic ways, 36 fatbike, 27 hike — several of
+  the latter named as snowshoe routes. Asked about in a report to OpenSkiData (that area is also
+  published as `downhill` despite having no downhill pistes, possibly the same mapping).
+
+  If those activities appear in the file:
+  - **Snowshoe** stops being assumed everywhere and becomes real per-area data. The change is
+    confined to `activitiesOf()` and the slim record's booleans.
+  - **Fat biking** becomes buildable with genuine availability rather than a guess — worth
+    doing, because it is prohibited at many nordic centres, so assuming it everywhere would be
+    materially wrong in a way the snowshoe assumption is not.
+
+  Fat biking is not just a new `ActivityKey`, though. Its scoring inverts the engine's
+  assumptions: fresh snow is a negative until packed, falling snow is worse than for skate, a
+  freeze–thaw may *help* by setting up hardpack, and temperature is asymmetric (cold is fine,
+  warm is ruinous) where the engine currently penalises symmetrically. "Hardpack" is the
+  central variable and is not modelled at all — the nearest proxy is low recent snowfall plus
+  adequate depth plus a freeze cycle, which would be a new factor and so a new column in every
+  activity's blend weights. Budget engine work, not config, and do it alongside the retune
+  above so it can be calibrated against real conditions.
+
+  If the activities never appear, the fallback is a per-place activity override stored against
+  the favourite, which would also let a user correct upstream errors like Larch Hills.
+
 ## Conventions
 
 - Ask before adding a dependency.
