@@ -71,7 +71,7 @@ export const strings = {
     noAlternatives: (activity: string, distance: string) =>
       `None of your other places offer ${activity} within ${distance}.`,
     noForecastKicker: 'No forecast yet',
-    noForecastBody: 'The mountain forecast for this place will be fetched when you next open the app.',
+    noForecastBody: 'The forecast for this place will be fetched when you next open the app.',
     noHomeKicker: 'No home hill set yet',
     noHomeBody: 'Add the places you go to and pick one as your home hill.',
     addPlaces: 'Add your places',
@@ -190,7 +190,7 @@ export const strings = {
     what: 'Snowpace answers one question: is it worth going out today, and where should I go? It gathers past, current and forecast weather information for the places you have saved and calculates a score out of 100 based on the characteristics of the activities you participate in. Good conditions for skate skiing are not necessarily good conditions for downhill skiing, so every place gets a different score for each activity.',
     scoreKicker: 'What the score means',
     bands: [
-      { key: 'hi', range: '80+', text: 'Go. Conditions should be ideal.' },
+      { key: 'hi', range: '80+', text: 'Conditions should be ideal.' },
       { key: 'go', range: '70–79', text: 'A good day out, with one small catch.' },
       { key: 'fair', range: '55–69', text: 'Fine if you are keen, but manage your expectations.' },
       { key: 'poor', range: 'Under 55', text: 'Save your legs or look for another day or location.' },
@@ -203,8 +203,8 @@ export const strings = {
       { k: 'Freeze–thaw', v: 'whether it went above zero and refroze, which means crust' },
       { k: 'Temperature', v: 'measured against the temperature you said you prefer' },
       { k: 'Wind', v: 'exposure and windchill up high' },
-      { k: 'Rain', v: 'now, later today, or in the last three days — always bad, for every activity' },
-      { k: 'Snow falling now', v: 'welcome on a hill or snowshoes, slow going in a set track' },
+      { k: 'Rain', v: 'Recent or forecast rain is always bad, for every activity' },
+      { k: 'Snow falling now', v: 'welcome for downhill or snowshoeing, slow going on skinny skis' },
       { k: 'Cloud cover', v: 'flat light versus a bluebird day' },
     ],
     factorSep: ' — ',
