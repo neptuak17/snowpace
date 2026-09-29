@@ -22,6 +22,35 @@ export const DEFAULT_PREFS: PrefsByAct = {
   downhill: { temp: -8, wind: 24, snow: 18, precipTol: 60 },
 };
 
+const PREF_KEYS: (keyof Prefs)[] = ['temp', 'wind', 'snow', 'precipTol'];
+
+/**
+ * Rebuild the preference table from whatever was persisted, filling any gap
+ * from the defaults. Restoring it with a plain spread would replace the whole
+ * table, so a blob written before an activity (or a preference) existed would
+ * leave that entry undefined and the engine would read `undefined.temp` on the
+ * first render. The stored value is parsed JSON, so each number is checked too.
+ */
+export function mergePrefs(stored: unknown): PrefsByAct {
+  const src = (stored ?? {}) as Partial<Record<ActivityKey, Partial<Record<keyof Prefs, unknown>>>>;
+  const out = {} as PrefsByAct;
+  for (const act of Object.keys(DEFAULT_PREFS) as ActivityKey[]) {
+    const fallback = DEFAULT_PREFS[act];
+    const saved = src[act] ?? {};
+    out[act] = { ...fallback };
+    for (const key of PREF_KEYS) {
+      const v = saved[key];
+      if (typeof v === 'number' && Number.isFinite(v)) out[act][key] = v;
+    }
+  }
+  return out;
+}
+
+/** A persisted activity key is only usable if the app still has that activity. */
+export function knownActivity(key: unknown): key is ActivityKey {
+  return ACTS.some((a) => a.key === key);
+}
+
 
 export type { FactorKey };
 export type Subs = Record<FactorKey, number>;

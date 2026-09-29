@@ -24,7 +24,7 @@ import { pruneForecasts } from '@/db/forecasts';
 import { setSetting } from '@/db/settings';
 import type { Units } from '@/lib/format';
 import type { LatLon } from '@/lib/geo';
-import { DEFAULT_PREFS, type Prefs, type PrefsByAct } from '@/lib/scoring';
+import { DEFAULT_PREFS, knownActivity, mergePrefs, type Prefs, type PrefsByAct } from '@/lib/scoring';
 import { TUNING } from '@/lib/tuning';
 import type { Scheme } from '@/theme/tokens';
 
@@ -91,19 +91,25 @@ type ProviderProps = {
 
 export function AppStateProvider({ children, initial, initialFavourites, initialForecasts }: ProviderProps) {
   const system = useColorScheme();
-  const [state, setState] = useState<State>(() => ({
-    activity: 'classic',
-    myActs: ['classic', 'skate', 'snowshoe', 'downhill'],
-    prefs: DEFAULT_PREFS,
-    units: 'metric',
-    theme: system === 'dark' ? 'dark' : 'light',
-    maxDistanceKm: TUNING.distance.defaultKm,
-    location: null,
-    selHour: Math.max(7, Math.min(17, new Date().getHours())),
-    selCell: null,
-    showBreakdown: false,
-    ...(initial ?? {}),
-  }));
+  const [state, setState] = useState<State>(() => {
+    const saved = initial ?? {};
+    const myActs = (saved.myActs ?? []).filter(knownActivity);
+    return {
+      units: 'metric',
+      theme: system === 'dark' ? 'dark' : 'light',
+      maxDistanceKm: TUNING.distance.defaultKm,
+      location: null,
+      selHour: Math.max(7, Math.min(17, new Date().getHours())),
+      selCell: null,
+      showBreakdown: false,
+      ...saved,
+      // Repaired values go after the spread, so a blob written by an older
+      // version cannot reintroduce a missing activity or an unknown one.
+      prefs: mergePrefs(saved.prefs),
+      myActs: myActs.length ? myActs : ACTS.map((a) => a.key),
+      activity: knownActivity(saved.activity) ? saved.activity : 'classic',
+    };
+  });
   const [favourites, setFavourites] = useState<fav.Favourite[]>(initialFavourites ?? []);
   const [forecasts, setForecasts] = useState<Map<string, Forecast[]>>(initialForecasts ?? new Map());
   const [refreshing, setRefreshing] = useState(false);
