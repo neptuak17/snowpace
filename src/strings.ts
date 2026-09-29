@@ -203,7 +203,7 @@ export const strings = {
       { k: 'Freeze–thaw', v: 'whether it went above zero and refroze, which means crust' },
       { k: 'Temperature', v: 'measured against the temperature you said you prefer' },
       { k: 'Wind', v: 'exposure and windchill up high' },
-      { k: 'Rain', v: 'Recent or forecast rain is always bad, for every activity' },
+      { k: 'Rain', v: 'recent or forecast rain is always bad, for every activity' },
       { k: 'Snow falling now', v: 'welcome for downhill or snowshoeing, slow going on skinny skis' },
       { k: 'Cloud cover', v: 'flat light versus a bluebird day' },
     ],
