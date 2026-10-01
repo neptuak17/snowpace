@@ -272,6 +272,23 @@ The about/credits screen must include:
   If the activities never appear, the fallback is a per-place activity override stored against
   the favourite, which would also let a user correct upstream errors like Larch Hills.
 
+* **Webcams on the place detail screen** — a design handoff exists at
+  `docs/snowpace-webcams-feature-handoff.md`. **Not scheduled**; do not implement until it is
+  explicitly prioritized. It covers the Windy Webcams API v3 free tier, runtime camera matching by
+  name similarity (no mapping table), a required user override persisted per area, caching the
+  resolved camera ID rather than the expiring image URL, and display rules for darkness, missing
+  cameras and attribution.
+
+  Two things to settle against this file's own rules before any work starts:
+  - **Quota.** Windy's free tier is keyed per account, and the architecture constraint above rules
+    out APIs with per-account daily quotas, because usage scales with installs and cannot be cached
+    centrally. Check the actual free-tier limit first — it may disqualify the feature outright.
+  - **The key ships in the binary** and is extractable, so it cannot be treated as a secret.
+
+  The handoff also records a separate idea worth its own entry if pursued: DriveBC highway cameras
+  via DataBC, under the Open Government Licence – British Columbia, no key and no quota, showing the
+  drive rather than the hill. US equivalents are the state 511 systems.
+
 ## Conventions
 
 - Ask before adding a dependency.
