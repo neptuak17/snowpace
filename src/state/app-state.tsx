@@ -225,7 +225,7 @@ function unlistedPlace(key: string): Place {
   return {
     key, name: key, shortName: key, lat: 0, lon: 0, minElev: null, maxElev: null, area: null,
     acts: [], website: null, country: null, distanceKm: null, listed: false,
-    forecastAt: null, days: [], prior: null, hours: null,
+    forecastAt: null, days: [], prior: null, hours: null, surface: null,
   };
 }
 

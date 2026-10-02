@@ -14,6 +14,7 @@ import { fmtForecastAge, fmtS, fmtT, fmtW } from '@/lib/format';
 import { fromRouteId } from '@/lib/geo';
 import { placeMetaAway } from '@/lib/place-text';
 import { actLabel, band, canScore, dialMetrics, freezeThaw, score, snow72, snowFallingMm } from '@/lib/scoring';
+import { daySurfaceText, showsSurface } from '@/lib/surface';
 import { useAppState } from '@/state/app-state';
 import { gutter } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
@@ -63,6 +64,7 @@ function PlaceDetail({ l, from }: { l: Place; from?: string }) {
     { k: dt.rows.cloud, v: d ? d.cloud + '%' : dash },
     { k: dt.rows.rain, v: d ? (d.rain > 0 ? strings.format.mm(d.rain.toFixed(1)) : dt.none) : dash },
     { k: dt.rows.snowFalling, v: d ? (snowFallingMm(d) > 0 ? strings.format.mm(snowFallingMm(d).toFixed(1)) : dt.none) : dash },
+    ...(showsSurface(act) && d ? [{ k: dt.rows.surface, v: daySurfaceText(l.surface, d.date) ?? dash }] : []),
     { k: dt.rows.yourActivities, v: mine.map((a) => a.label.toLowerCase()).join(dt.listSep) || dt.noneOfYours },
   ];
 

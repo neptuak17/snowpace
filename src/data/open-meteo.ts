@@ -1,9 +1,11 @@
 /**
  * Open-Meteo forecast API: request building and response parsing.
  *
- * Hourly-only, eight variables, so every coordinate is exactly one call on
- * Open-Meteo's weighted accounting. Daily figures are aggregated on the
- * phone (see places.ts). Imports nothing so Node can run it for tests.
+ * Hourly-only, nine variables over twelve days, so every coordinate is
+ * exactly one call on Open-Meteo's weighted accounting (more than ten
+ * variables or two weeks would count as several). Daily figures are
+ * aggregated on the phone (see places.ts). Imports nothing so Node can run
+ * it for tests.
  *
  * Every value is number | null. A null from the API stays null all the way
  * to the screen — never coerced to zero.
@@ -13,10 +15,12 @@ export const OPEN_METEO_URL = 'https://api.open-meteo.com/v1/forecast';
 
 export const HOURLY_VARS = [
   'temperature_2m', 'snowfall', 'rain', 'precipitation',
-  'wind_speed_10m', 'wind_gusts_10m', 'cloud_cover', 'snow_depth',
+  'wind_speed_10m', 'wind_gusts_10m', 'cloud_cover', 'snow_depth', 'shortwave_radiation',
 ] as const;
 
-export const PAST_DAYS = 3;
+// A week of history: the surface model needs several days for new snow to
+// settle, and the scoring windows only read the last three.
+export const PAST_DAYS = 7;
 export const FORECAST_DAYS = 5;
 
 export type Model = 'gem_seamless' | 'best_match';
@@ -39,6 +43,13 @@ export type HourWx = {
   cloud: number | null;
   /** Modelled snow depth, metres. */
   depth: number | null;
+  /**
+   * Shortwave radiation, W/m², mean of the preceding hour. GEM's last
+   * forecast day can return physically impossible values (1800+); the
+   * surface model saturates the sun term, so they read as "full sun".
+   * Absent on rows cached before it was requested.
+   */
+  sun: number | null;
 };
 
 export type Forecast = {
@@ -141,6 +152,7 @@ export function parseForecasts(doc: unknown, coords: Coordinate[], fetchedAt: st
       gust: numOrNull(col('wind_gusts_10m')[j]),
       cloud: numOrNull(col('cloud_cover')[j]),
       depth: numOrNull(col('snow_depth')[j]),
+      sun: numOrNull(col('shortwave_radiation')[j]),
     }));
     forecasts.push({
       key: coords[i].key,
@@ -157,13 +169,16 @@ export function parseForecasts(doc: unknown, coords: Coordinate[], fetchedAt: st
 /** Elementwise mean of two series — the mid-mountain proxy for downhill areas. */
 export function meanSeries(a: HourWx[], b: HourWx[]): HourWx[] {
   const n = Math.min(a.length, b.length);
-  const avg = (x: number | null, y: number | null) => (x === null || y === null ? null : (x + y) / 2);
+  // typeof rather than === null: a row cached before a variable existed has
+  // it undefined, and undefined arithmetic would give NaN, not null.
+  const avg = (x: number | null, y: number | null) => (typeof x !== 'number' || typeof y !== 'number' ? null : (x + y) / 2);
   const out: HourWx[] = [];
   for (let i = 0; i < n; i++) {
     const p = a[i], q = b[i];
     out.push({
       time: p.time, t: avg(p.t, q.t), snow: avg(p.snow, q.snow), rain: avg(p.rain, q.rain), precip: avg(p.precip, q.precip),
       wind: avg(p.wind, q.wind), gust: avg(p.gust, q.gust), cloud: avg(p.cloud, q.cloud), depth: avg(p.depth, q.depth),
+      sun: avg(p.sun, q.sun),
     });
   }
   return out;

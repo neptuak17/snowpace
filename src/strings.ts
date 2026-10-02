@@ -85,6 +85,7 @@ export const strings = {
     metrics: {
       temp: 'Temp', newSnow: 'New snow', threeDay: '3-day', wind: 'Wind',
       rain: 'Rain', rain3: 'Rain, 3 days', snowing: 'Snowing', freezeThaw: 'Freeze–thaw', snowpack: 'Snowpack',
+      surface: 'Surface',
     },
     rainLater: 'Later today',
     none: 'None',
@@ -164,6 +165,7 @@ export const strings = {
     rows: {
       temp: 'Temperature', newSnow: 'New snow, 24 h', threeDay: 'Snowfall, 3 days', freezeThaw: 'Freeze–thaw',
       wind: 'Wind', cloud: 'Cloud cover', rain: 'Rain', snowFalling: 'Snow falling', yourActivities: 'Your activities here',
+      surface: 'Surface today',
     },
     yesTo: (temp: string) => `Yes, to ${temp}`,
     none: 'None',
@@ -312,6 +314,13 @@ export const strings = {
   // Coverage, from the modelled snow depth. The depth itself is never shown.
   coverage: { bare: 'Bare', thin: 'Thin', enough: 'Enough' },
 
+  // Surface firmness, from the weather (shadow mode: shown, not yet scored).
+  surface: {
+    words: { fresh: 'Fresh', soft: 'Soft', packed: 'Packed', firm: 'Firm', icy: 'Icy', slushy: 'Slushy' },
+    // Morning and afternoon, when the day changes.
+    change: (am: string, pm: string) => `${am} → ${pm}`,
+  },
+
   // The rows of the Today breakdown card.
   breakdown: {
     temp: 'Temperature',
@@ -334,6 +343,8 @@ export const strings = {
     cloudNote: 'Light quality, weighted lightly.',
     snowpack: 'Snowpack',
     snowpackNote: 'Modelled depth, not a measurement (it does not account for snowmaking).',
+    surface: 'Surface',
+    surfaceNote: 'An estimate of what the weather is doing to the snow, assuming normal overnight grooming. Shown for information; not yet part of the score.',
   },
 
   verdict: {

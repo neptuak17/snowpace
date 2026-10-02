@@ -141,14 +141,16 @@ function HomeToday({ home }: { home: Place }) {
                         {f.value}
                       </AppText>
                     </View>
-                    <View style={[styles.track, { backgroundColor: theme.track }]}>
-                      <View
-                        style={[
-                          styles.fill,
-                          { width: `${Math.round(f.v)}%`, backgroundColor: bandColors(theme, band(f.v)).ring },
-                        ]}
-                      />
-                    </View>
+                    {!f.info && (
+                      <View style={[styles.track, { backgroundColor: theme.track }]}>
+                        <View
+                          style={[
+                            styles.fill,
+                            { width: `${Math.round(f.v)}%`, backgroundColor: bandColors(theme, band(f.v)).ring },
+                          ]}
+                        />
+                      </View>
+                    )}
                     <AppText size={10.5} muted>
                       {f.note}
                     </AppText>

@@ -94,6 +94,66 @@ export const TUNING = {
     skate: { noneM: 0.05, fullM: 0.3 },
   } as Record<ActivityKey, { noneM: number; fullM: number }>,
 
+  // ── Surface firmness (src/lib/surface.ts). SHADOW MODE: shown as a word for
+  // classic and skate, never part of the score, until checked against real
+  // winter days. Three quantities, each 0–1, advanced hour by hour:
+  // firm (loose new snow → fully set up), wet (dry → slush), ice (none → glaze).
+  surface: {
+    // Below this modelled depth (m) there is no snow surface to describe: the
+    // hour has no word and the state resets, so the first snowfall onto bare
+    // ground starts as fresh snow. No depth in the forecast means no gate.
+    minDepthM: 0.03,
+    // New snow buries the surface: firmness falls by e^(−cm / scale). Ice is
+    // covered more slowly — a dusting over a glaze still skis like a glaze.
+    burialScaleCm: 3,
+    iceBurialScaleCm: 4,
+    // Dry settling toward fully set up, as a fraction of the gap per hour at
+    // 0 °C; colder snow settles more slowly, by e^(t / scale).
+    settlePerHourAt0: 0.03,
+    settleColdScaleDeg: 8,
+    // Assumed overnight grooming at a typical nordic centre: firmness moves
+    // this fraction of the way to fully set up, and tilling breaks up ice.
+    // Skipped when the surface is wet. Very cold snow gets packed but does not
+    // sinter, so the gain shrinks with the settling cold factor, down to
+    // `groomColdFloor` of its full value.
+    groomHour: 4,
+    groomFirmGain: 0.5,
+    groomColdFloor: 0.4,
+    groomIceTill: 0.6,
+    // Wetting: per °C above zero per hour; sun adds up to `sunMeltPerHour` at
+    // `sunFullW`, scaling in from `sunMinTempC` up to 0 °C air temperature.
+    // The sun term saturates at sunFullW, so GEM's occasional impossible
+    // radiation values read as full sun rather than as a heatwave.
+    meltPerDegHour: 0.06,
+    sunFullW: 600,
+    sunMeltPerHour: 0.05,
+    sunMinTempC: -4,
+    rainWetPerMm: 0.15,
+    // Wet snow loses firmness; water drains away slowly when it is neither
+    // melting nor freezing; below `refreezeBelowC` it refreezes into ice.
+    wetSoftenPerHour: 0.25,
+    drainPerHour: 0.03,
+    refreezeBelowC: -1,
+    // Fraction of the water frozen per hour just below the threshold, growing
+    // by 1 for every `refreezeColdScaleDeg` colder — slush at −8 °C is solid
+    // within a few hours.
+    refreezePerHour: 0.25,
+    refreezeColdScaleDeg: 4,
+    iceFromFreeze: 0.6,
+    // Words, in priority order: slushy, icy, soft (wet), fresh/soft (loose),
+    // packed, firm.
+    slushyWet: 0.55,
+    softWet: 0.2,
+    icyIce: 0.5,
+    softFirm: 0.35,
+    firmFirm: 0.7,
+    // "Fresh" rather than "soft" when at least this much fell in the last 24 h.
+    freshCm24h: 2,
+    // The morning and afternoon hours a day is summarised by.
+    amHour: 10,
+    pmHour: 14,
+  },
+
   // ── Blend weights per activity. Skate leans on surface quality (freeze–thaw)
   // and wind because a skate lane is usually open and exposed; classic keeps
   // the balanced set. Each row sums to 1.

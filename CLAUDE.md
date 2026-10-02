@@ -169,13 +169,19 @@ Decided Sep 2026.
 
 **Requests are hourly-only, at most 10 variables.** Open-Meteo counts a request with more than 10
 variables (or more than two weeks) as several calls, so daily aggregates are computed on the
-phone from the hourly series rather than requested. Verified Sep 2026:
+phone from the hourly series rather than requested. Verified Oct 2026:
 
-* `hourly=temperature_2m,snowfall,rain,precipitation,wind_speed_10m,wind_gusts_10m,cloud_cover,snow_depth`
-* `past_days=3&forecast_days=5&timezone=auto` — three days of history for the "recent snowfall"
-  and freeze–thaw inputs, today plus four ahead for the grid, in the place's local time.
+* `hourly=temperature_2m,snowfall,rain,precipitation,wind_speed_10m,wind_gusts_10m,cloud_cover,snow_depth,shortwave_radiation`
+  — nine variables, leaving one spare.
+* `past_days=7&forecast_days=5&timezone=auto` — a week of history, today plus four ahead for the
+  grid, in the place's local time. Twelve days stays under the two-week threshold, so each
+  coordinate is still one call. The scoring windows read only the last three days; the week is
+  for the surface model, which needs several days for new snow to settle.
 * Units come back as the engine expects: °C, snowfall **cm**, precipitation/rain **mm**, wind
-  **km/h**, snow depth **m**.
+  **km/h**, snow depth **m**, radiation **W/m²**.
+* `shortwave_radiation` is populated for both `gem_seamless` and `best_match`. GEM's **last**
+  forecast day can return physically impossible values (1800+ W/m², where clear-sky sun tops out
+  near 1000); the surface model saturates its sun term, so these read as full sun.
 
 **Model selection (verified against the live endpoint, Sep 2026):** the forecast endpoint's
 identifiers are `gem_seamless`, `gem_hrdps_continental`, `gem_regional`, `gem_global` — *not* the
@@ -218,6 +224,36 @@ Thin / Enough — because the model does not know about snowmaking or grooming. 
 guesses pending winter data.
 
 
+### Surface firmness — shadow mode
+
+`src/lib/surface.ts` estimates what the weather is doing to the snow surface, hour by hour, and
+names it: **Fresh, Soft, Packed, Firm, Icy or Slushy**. Added Oct 2026, in **shadow mode**: shown
+for classic and skate (a breakdown row on Today, a cell on the Forecast detail, a row on the place
+screen, and a line in the feedback diagnostics), but **never part of the score**. Do not promote it
+into the score until its calls have been compared with real winter days.
+
+* It carries three 0–1 quantities — firmness, wetness and ice — through the whole hourly series,
+  so the week of history has washed out the starting state by today. New snow buries the
+  surface; dry snow settles, more slowly in the cold; warmth, sun and rain wet it; it refreezes
+  below −1 °C, faster the colder it is, into firmness and ice.
+* It **assumes normal overnight grooming** (at 04:00): a pass packs the snow, less effectively in
+  deep cold, and tills ice — skipped when the surface is wet. Grooming is the dominant real
+  factor and Snowpace has no data on it, so the honest framing is "what the weather is doing to
+  the surface". A centre that doesn't groom will be softer after snow and icier after a freeze
+  than shown; whether a rain crust reads Firm or Icy the next morning hinges on `groomIceTill`.
+* **Bare ground has no surface**: an hour below `minDepthM` of modelled snow has no word and
+  resets the state, so a warm autumn day doesn't read as "slushy".
+* Missing temperature, snowfall or rain carries the state through unchanged with no word for that
+  hour — no guessing. Missing radiation only drops the sun term.
+* A day is summarised as its 10:00 word, plus its 14:00 word when different: "Firm → Slushy".
+
+**Promotion plan**, during the winter retune: for classic and skate it **replaces** freeze–thaw,
+the "too much fresh snow" half of new snow and probably the 3-day snowfall factor, rather than
+being added on top of them, which would double-count. Skate's score rises with firmness and drops
+sharply at ice; classic peaks in the middle — ice kills kick, and very soft snow breaks down a set
+track. Downhill and snowshoe keep their current factors. The same model is the foundation for fat
+biking's missing "hardpack" variable.
+
 ### Deliberately excluded
 
 * **Grooming recency.** No free public dataset exists. Do not scrape it or resort websites. 
@@ -244,7 +280,8 @@ The about/credits screen must include:
 
 * The scoring tuning was calibrated on the design's daily placeholder figures; the "rain now"
   factor now sees hourly mm rather than daily totals and will read lighter. Retune once real
-  winter data is flowing.
+  winter data is flowing — and at the same time compare the shadow-mode surface words with how
+  real days actually skied, before promoting them into the score (see Surface firmness above).
 
 * **Fat biking and data-driven snowshoe, if OpenSkiData exposes more activities.** OSM tags
   `piste:type=fatbike` and `piste:type=hike` on individual runs, but the published ski areas

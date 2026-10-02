@@ -10,6 +10,7 @@
 import { meanSeries, type Forecast, type HourWx } from '@/data/open-meteo';
 import type { SkiArea } from '@/data/openskidata';
 import { distanceKm, type LatLon } from '@/lib/geo';
+import { surfaceSeries, type SurfaceSeries } from '@/lib/surface';
 import { strings } from '@/strings';
 
 export type ActivityKey = 'classic' | 'skate' | 'snowshoe' | 'downhill';
@@ -80,6 +81,8 @@ export type Place = {
   prior: Prior | null;
   /** Today's hourly series at the place, when the forecast covers today. */
   hours: HourWx[] | null;
+  /** Modelled surface firmness by local date and hour (shadow mode). Null with no forecast. */
+  surface: SurfaceSeries | null;
 };
 
 export const DAY_COUNT = 5;
@@ -143,9 +146,9 @@ export function placeFromArea(a: SkiArea, here: LatLon | null, forecasts: Foreca
 
 // ── Aggregation ──────────────────────────────────────────────────────────
 
-type Weather = Pick<Place, 'forecastAt' | 'days' | 'prior' | 'hours'>;
+type Weather = Pick<Place, 'forecastAt' | 'days' | 'prior' | 'hours' | 'surface'>;
 
-const NO_WEATHER: Weather = { forecastAt: null, days: [], prior: null, hours: null };
+const NO_WEATHER: Weather = { forecastAt: null, days: [], prior: null, hours: null, surface: null };
 
 /** Pick the series to score on: the midpoint, else the mean of base and summit. */
 function seriesOf(forecasts: Forecast[]): { hours: HourWx[]; fetchedAt: string; timezone: string } | null {
@@ -171,7 +174,7 @@ function weatherFrom(forecasts: Forecast[]): Weather {
   const today = localDate(s.timezone);
   const t0 = dates.indexOf(today);
   // The cache may predate today (offline for a day): then there is no "today" and nothing to score.
-  if (t0 < 0) return { forecastAt: s.fetchedAt, days: [], prior: null, hours: null };
+  if (t0 < 0) return { forecastAt: s.fetchedAt, days: [], prior: null, hours: null, surface: null };
 
   const dayAt = (i: number): DayWx | null => (i >= 0 && i < dates.length ? aggregateDay(dates[i], byDate.get(dates[i]) ?? []) : null);
   const days: (DayWx | null)[] = [];
@@ -183,7 +186,9 @@ function weatherFrom(forecasts: Forecast[]): Weather {
       ? { snow72: round1(p3.snow + p2.snow + p1.snow), temps: [p2.t, p1.t], rain72: round1(p3.rain + p2.rain + p1.rain) }
       : null;
 
-  return { forecastAt: s.fetchedAt, days, prior, hours: byDate.get(today) ?? null };
+  // The surface model runs over the whole series, history included, so its
+  // state has settled by the hours anyone looks at.
+  return { forecastAt: s.fetchedAt, days, prior, hours: byDate.get(today) ?? null, surface: surfaceSeries(s.hours) };
 }
 
 const DAY_START = 7, DAY_END = 17;

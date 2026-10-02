@@ -12,6 +12,7 @@ import type { Forecast } from '@/data/open-meteo';
 import { ACTS, type ActivityKey, type Place } from '@/data/places';
 import type { Units } from '@/lib/format';
 import { canScore, score, subsFor, type PrefsByAct } from '@/lib/scoring';
+import { daySurfaceText } from '@/lib/surface';
 import { TUNING, type FactorKey } from '@/lib/tuning';
 import { strings } from '@/strings';
 
@@ -104,6 +105,12 @@ function placeBlock(p: Place, d: Diagnostics): string[] {
     const x = subsFor(p, 0, act, d.prefs);
     const factors = FACTOR_ORDER.map((k) => `${k}:${Math.round(x[k])}`).join(' ');
     out.push(`Score for ${act} today: ${s} — ${factors}`);
+  }
+  // Shadow-mode surface calls, so a report of how it actually skied can be
+  // compared with what the model said. Every forecast day, not just today.
+  const days = p.days.filter((day): day is NonNullable<typeof day> => day !== null);
+  if (p.surface && days.length) {
+    out.push(`Surface (model, not scored): ${days.map((day) => `${day.date.slice(5)} ${daySurfaceText(p.surface, day.date) ?? '—'}`).join(' · ')}`);
   }
   return out;
 }

@@ -8,6 +8,7 @@ import { ACTS, type ActivityKey, type DayWx, type Place } from '@/data/places';
 export type Wx = Pick<DayWx, 't' | 'snow' | 'wind' | 'cloud' | 'precip' | 'rain'>;
 import { fmtS, fmtT, fmtW, hourLabel, type Units } from '@/lib/format';
 import { strings } from '@/strings';
+import { showsSurface, surfaceAt, surfaceWord } from '@/lib/surface';
 import { TUNING, type BlendKey, type FactorKey } from '@/lib/tuning';
 
 const T = TUNING;
@@ -479,7 +480,11 @@ export function snowHint(act: ActivityKey, want: number, units: Units): string {
   return strings.snowPref.hintNordic(fmtS(want, units));
 }
 
-export type Factor = { label: string; value: string; v: number; note: string };
+/**
+ * A breakdown row. `info` rows carry no score — they are shown for context
+ * and drawn without a bar (the surface model, while in shadow mode).
+ */
+export type Factor = { label: string; value: string; v: number; note: string; info?: boolean };
 
 /**
  * The breakdown card on Today: eight rows, plus snowpack when the forecast
@@ -508,5 +513,14 @@ export function breakdown(
     { label: b.snowFalling, value: strings.format.mm(snowFallingMm(day).toFixed(1)), v: x.fall, note: fallCopy(act, p.precipTol) },
     { label: b.cloud, value: day.cloud + '%', v: x.c, note: b.cloudNote },
     ...(leads ? [] : snowpack),
+    ...surfaceRow(l, di, act, selHour),
   ];
+}
+
+/** The shadow-mode surface row, for nordic activities only. Never scored. */
+function surfaceRow(l: Place, di: number, act: ActivityKey, selHour: number): Factor[] {
+  if (!showsSurface(act)) return [];
+  const st = surfaceAt(l.surface, dayAt(l, di).date, selHour);
+  const b = strings.breakdown;
+  return [{ label: b.surface, value: st ? surfaceWord(st.word) : strings.common.dash, v: 0, note: b.surfaceNote, info: true }];
 }

@@ -13,6 +13,7 @@ import { dayIndexFor, dayLabel, gridDates } from '@/data/places';
 import { fmtForecastAge, fmtS, fmtT, fmtW } from '@/lib/format';
 import { placeMetaAway } from '@/lib/place-text';
 import { actLabel, canScore, coverageSub, coverageWord, freezeThaw, hasDepth, limiters, rainSub, score, snow72, snowFallingMm, type FactorKey } from '@/lib/scoring';
+import { daySurfaceText, showsSurface } from '@/lib/surface';
 import { TUNING } from '@/lib/tuning';
 import { useAppState } from '@/state/app-state';
 import { useTheme } from '@/theme/use-theme';
@@ -47,7 +48,7 @@ export default function ForecastScreen() {
   if (sd) {
     const selFt = freezeThaw(selLoc, selDay);
     const selRain = rainSub(selLoc, selDay);
-    const rows: { key: FactorKey | 'pr3'; k: string; v: string }[] = [
+    const rows: { key: FactorKey | 'pr3' | 'surface'; k: string; v: string }[] = [
       { key: 't', k: f.metrics.temp, v: fmtT(sd.t, s.units) },
       { key: 's', k: f.metrics.newSnow, v: fmtS(sd.snow, s.units) },
       { key: 'base', k: f.metrics.threeDay, v: fmtS(snow72(selLoc, selDay), s.units) },
@@ -57,6 +58,8 @@ export default function ForecastScreen() {
       { key: 'fall', k: f.metrics.snowing, v: strings.format.mm(snowFallingMm(sd).toFixed(1)) },
       { key: 'ft', k: f.metrics.freezeThaw, v: selFt.hit ? f.thawTo(fmtT(selFt.maxHi, s.units)) : f.none },
       ...(hasDepth(selLoc, selDay) ? [{ key: 'cov' as const, k: f.metrics.snowpack, v: coverageWord(coverageSub(selLoc, selDay, act)) }] : []),
+      // Shadow mode: shown for nordic, never a limiter (it isn't scored).
+      ...(showsSurface(act) ? [{ key: 'surface' as const, k: f.metrics.surface, v: daySurfaceText(selLoc.surface, sd.date) ?? strings.common.dash }] : []),
     ];
     metrics = rows.map((r) => ({ k: r.k, v: r.v, rank: keys.indexOf(r.key as FactorKey) }));
   }
