@@ -326,6 +326,27 @@ The about/credits screen must include:
   via DataBC, under the Open Government Licence – British Columbia, no key and no quota, showing the
   drive rather than the hill. US equivalents are the state 511 systems.
 
+* **Nordic wax guidance** — a design handoff exists at
+  `docs/snowpace-wax-guidance-feature-handoff.md`. **Not scheduled**; do not implement until it is
+  explicitly prioritized. For classic, a grip outlook in wide generic bands (hard wax through
+  klister, with "tricky wax day" near zero and a within-session change note such as "hard wax this
+  morning, klister by early afternoon"); for skate, the firmness and speed outlook first and a glide
+  band second. Generic wax families only, never brands. An optional on-device "how was your wax?"
+  rating, keyed on the area ID and date, nudges the band edges for that user.
+
+  It depends on snow-history logic, and that foundation now exists: the shadow-mode surface model
+  above (`src/lib/surface.ts`) already tracks new snow, settling, thaw–refreeze and rain-on-snow, and
+  its words are the skate firmness outlook. Build wax guidance on top of it rather than
+  duplicating it, and ideally after the surface calls have been checked against real days.
+
+  Two things to settle against this file before any work starts:
+  - **Relative humidity is listed in the handoff as data Snowpace already has. It isn't** — it is
+    not in the forecast request. Adding `relative_humidity_2m` takes the tenth and last variable
+    slot, still one call per coordinate; anything requested after that would double the call cost.
+  - **A snow surface or skin temperature variable** would beat deriving one from air temperature,
+    cloud and wind. Whether either model returns a usable one is unverified — GEM returned null for
+    freezing level, so check against the live endpoint rather than assume.
+
 ## Conventions
 
 - Ask before adding a dependency.
