@@ -177,8 +177,11 @@ export const TUNING = {
     windowHours: 3,
   },
 
-  // ── Best-window chart geometry (bar heights as % of the chart).
-  chart: { topMin: 45, topPerScore: 0.53, topCap: 98, span: 58, bottomMin: 20 },
+  // ── Hour-by-hour grid under the dial. The rain sub-score is calibrated on
+  // daily totals and reads light against one hour's mm (see the retune note
+  // in CLAUDE.md), so drizzle would show green; in the grid any hour with
+  // rain above `rain.floorMm` shows as the worst band instead.
+  grid: { rainCell: 0 },
 
   // ── Limiters: factors called out in gold on the breakdown.
   limiters: {

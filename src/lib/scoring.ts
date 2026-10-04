@@ -253,13 +253,8 @@ export const HOURS: readonly number[] = T.hourly.hours;
  */
 export function hourDay(l: Place, di: number, h: number): Wx {
   const day = dayAt(l, di);
-  if (di === 0 && l.hours) {
-    const hh = String(h).padStart(2, '0');
-    const real = l.hours.find((x) => x.time.slice(11, 13) === hh);
-    if (real && real.t !== null && real.wind !== null && real.cloud !== null && real.precip !== null && real.rain !== null) {
-      return { t: real.t, snow: day.snow, wind: real.wind, cloud: real.cloud, precip: real.precip, rain: real.rain };
-    }
-  }
+  const real = di === 0 ? realHour(l, h) : null;
+  if (real) return real;
   const hr = T.hourly;
   const f = Math.max(0, Math.sin((Math.PI * (h - hr.sunriseHour)) / hr.dayLengthHours));
   return {
@@ -277,45 +272,110 @@ export function hourScore(l: Place, di: number, act: ActivityKey, h: number, pre
   return blend(subsFor(l, di, act, prefs, hourDay(l, di, h)), act);
 }
 
-export function hourly(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct): { h: number; s: number }[] | null {
-  if (!l.acts.includes(act) || !canScore(l, di)) return null;
-  return HOURS.map((h) => ({ h, s: hourScore(l, di, act, h, prefs) as number }));
+/**
+ * The forecast's own values for hour `h` of today, or null if any value the
+ * score reads is missing. New snow stays the day's 24 h total.
+ */
+export function realHour(l: Place, h: number): Wx | null {
+  const day = l.days[0];
+  if (!day || !l.hours) return null;
+  const hh = String(h).padStart(2, '0');
+  const real = l.hours.find((x) => x.time.slice(11, 13) === hh);
+  if (!real || real.t === null || real.wind === null || real.cloud === null || real.precip === null || real.rain === null) return null;
+  return { t: real.t, snow: day.snow, wind: real.wind, cloud: real.cloud, precip: real.precip, rain: real.rain };
 }
 
-export type WindowBar = { h: number; s: number; hour: string; inWindow: boolean; heightPct: number };
+/** A row of the hour grid: the overall score, or one condition that changes through the day. */
+export type GridRowKey = 'all' | 't' | 'w' | 'precip' | 'light' | 'sky';
 
-export type BestWindow = { label: string; bars: WindowBar[] };
+/**
+ * The condition rows under "Overall", per activity. Only factors that vary
+ * hour to hour get a row; new snow, the 3-day base, freeze–thaw and snowpack
+ * are daily and would be a row of one colour. Cloud earns a row where it
+ * carries weight: flat light on a hill, the view on snowshoes.
+ */
+const GRID_ROWS: Record<ActivityKey, GridRowKey[]> = {
+  downhill: ['all', 't', 'w', 'precip', 'light'],
+  snowshoe: ['all', 't', 'w', 'precip', 'sky'],
+  classic: ['all', 't', 'w', 'precip'],
+  skate: ['all', 't', 'w', 'precip'],
+};
 
-export function bestWindow(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct): BestWindow | null {
-  const hrs = hourly(l, di, act, prefs);
-  if (!hrs) return null;
-  // A day with no hour above zero has no best window; showing one would be advice.
-  if (hrs.every((o) => o.s <= 0)) return null;
-  const n = T.hourly.windowHours;
-  let bi = 0, best = -1;
-  for (let i = 0; i + n <= hrs.length; i++) {
-    const m = hrs.slice(i, i + n).reduce((sum, o) => sum + o.s, 0) / n;
-    if (m > best) { best = m; bi = i; }
-  }
-  const peak = hrs.slice().sort((a, b) => b.s - a.s)[0];
-  // Bars read against the day's own range so the diurnal shape shows; the
-  // ceiling still tracks the absolute score, so a poor day stays a short chart.
-  const c = T.chart;
-  const lowest = hrs.slice().sort((a, b) => a.s - b.s)[0].s;
-  const top = Math.min(c.topCap, c.topMin + c.topPerScore * peak.s), bottom = Math.max(c.bottomMin, top - c.span);
-  const span = peak.s - lowest;
-  const startH = hrs[bi].h, endH = hrs[bi + n - 1].h + 1;
-  const sameHalf = startH < 12 === endH < 12;
-  return {
-    label: strings.today.bestLabel(sameHalf ? startH + '–' + hourLabel(endH) : hourLabel(startH) + '–' + hourLabel(endH)),
-    bars: hrs.map((o, i) => ({
-      h: o.h,
-      s: o.s,
-      hour: o.h === 12 ? '12' : String(o.h > 12 ? o.h - 12 : o.h),
-      inWindow: i >= bi && i < bi + n,
-      heightPct: Math.round(span > 0 ? bottom + ((top - bottom) * (o.s - lowest)) / span : (top + bottom) / 2),
-    })),
+/** Null where the hour's forecast is missing — shown blank, never estimated. */
+export type GridRow = { key: GridRowKey; cells: (number | null)[] };
+
+export type HourGrid = {
+  hours: readonly number[];
+  /** The real weather per hour, for captions; null where missing. */
+  wx: (Wx | null)[];
+  rows: GridRow[];
+  /** The best run of `windowHours` hours, as indexes into `hours`; null when no hour scores above 0. */
+  window: { from: number; to: number } | null;
+};
+
+/** Today hour by hour for one activity, from the real hourly forecast only. */
+export function hourGrid(l: Place, act: ActivityKey, prefs: PrefsByAct): HourGrid | null {
+  if (!l.acts.includes(act) || !canScore(l, 0)) return null;
+  const wx = HOURS.map((h) => realHour(l, h));
+  const subsAt = wx.map((d) => (d ? subsFor(l, 0, act, prefs, d) : null));
+  const cell = (key: GridRowKey, i: number): number | null => {
+    const d = wx[i], x = subsAt[i];
+    if (!d || !x) return null;
+    if (key === 'all') return blend(x, act);
+    if (key === 't') return x.t;
+    if (key === 'w') return x.w;
+    if (key === 'light' || key === 'sky') return x.c;
+    // Snow or rain falling this hour. The rain sub-score also reads the
+    // previous days and the rest of today, which belong to the day, not the hour.
+    const rain = d.rain > T.rain.floorMm ? T.grid.rainCell : 100;
+    return Math.min(rain, fallSub(d, prefs[act], act));
   };
+  const rows = GRID_ROWS[act].map((key) => ({ key, cells: HOURS.map((_, i) => cell(key, i)) }));
+  return { hours: HOURS, wx, rows, window: bestRun(rows[0].cells) };
+}
+
+// The best-scoring run of consecutive known hours. A day with nothing above
+// zero has no best window; naming one would be advice.
+function bestRun(cells: (number | null)[]): HourGrid['window'] {
+  const n = T.hourly.windowHours;
+  let from = -1, best = 0;
+  for (let i = 0; i + n <= cells.length; i++) {
+    const run = cells.slice(i, i + n);
+    if (run.some((v) => v === null)) continue;
+    const m = (run as number[]).reduce((sum, v) => sum + v, 0) / n;
+    if (m > best) { best = m; from = i; }
+  }
+  return from < 0 ? null : { from, to: from + n - 1 };
+}
+
+/** "Best 10 AM–1 PM", or "Best 9–11 AM" when the window sits in one half of the day. */
+export function windowLabel(g: HourGrid): string | null {
+  if (!g.window) return null;
+  const startH = g.hours[g.window.from], endH = g.hours[g.window.to] + 1;
+  const sameHalf = startH < 12 === endH < 12;
+  return strings.today.bestLabel(sameHalf ? startH + '–' + hourLabel(endH) : hourLabel(startH) + '–' + hourLabel(endH));
+}
+
+/**
+ * The surface through the grid's hours in words: "Firm until 11 AM, then
+ * Soft". Null when no hour has a surface (bare ground, or no model).
+ */
+export function surfaceRuns(l: Place, act: ActivityKey, hours: readonly number[]): string | null {
+  if (!showsSurface(act) || !l.days[0]) return null;
+  const date = l.days[0].date;
+  const runs: { word: string; from: number }[] = [];
+  for (const h of hours) {
+    const st = surfaceAt(l.surface, date, h);
+    if (!st) continue;
+    const word = surfaceWord(st.word);
+    if (runs.length === 0 || runs[runs.length - 1].word !== word) runs.push({ word, from: h });
+  }
+  if (runs.length === 0) return null;
+  const s = strings.hourGrid.surfaceRun;
+  if (runs.length === 1) return s.allDay(runs[0].word);
+  return runs
+    .map((r, i) => (i === runs.length - 1 ? s.then(r.word) : s.until(r.word, hourLabel(runs[i + 1].from))))
+    .join(s.sep);
 }
 
 export type BandKey = 'hi' | 'go' | 'fair' | 'poor' | 'skip' | 'none';

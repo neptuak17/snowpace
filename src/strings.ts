@@ -42,7 +42,6 @@ export const strings = {
     chevron: '›',
     dash: '—',
     siteLink: (name: string) => `${name} web site ↗`,
-    away: (distance: string) => `${distance} away`,
     forecastAge: (age: string) => `Forecast ${age}`,
     placeMeta: (parts: (string | null)[]) => parts.filter(Boolean).join(' · '),
     placeMetaAway: (parts: (string | null)[], distance: string) => [...parts.filter(Boolean), `${distance} away`].join(' · '),
@@ -62,9 +61,7 @@ export const strings = {
     showBreakdown: (hour: string) => `Breakdown for ${hour} ›`,
     breakdownKicker: (hour: string) => `Breakdown for ${hour}`,
     dialLine: (hour: string, band: string) => `${hour} · ${band}`,
-    bestWindow: 'Best window today',
     bestLabel: (range: string) => `Best ${range}`,
-    barLabel: (hour: string, score: number) => `${hour}, score ${score}`,
     otherActivitiesAt: (name: string) => `Other activities at ${name}`,
     otherNearby: 'Other options nearby',
     seeAll: 'See all',
@@ -158,19 +155,6 @@ export const strings = {
     add: 'Add',
     noResults: 'Nothing by that name. Try the town, or a shorter word.',
     searching: 'Searching…',
-  },
-
-  detail: {
-    dialLine: (activity: string, band: string) => `${activity} · ${band}`,
-    rows: {
-      temp: 'Temperature', newSnow: 'New snow, 24 h', threeDay: 'Snowfall, 3 days', freezeThaw: 'Freeze–thaw',
-      wind: 'Wind', cloud: 'Cloud cover', rain: 'Rain', snowFalling: 'Snow falling', yourActivities: 'Your activities here',
-      surface: 'Surface today',
-    },
-    yesTo: (temp: string) => `Yes, to ${temp}`,
-    none: 'None',
-    noneOfYours: 'None of yours',
-    listSep: ', ',
   },
 
   loading: {
@@ -319,6 +303,26 @@ export const strings = {
     words: { fresh: 'Fresh', soft: 'Soft', packed: 'Packed', firm: 'Firm', icy: 'Icy', slushy: 'Slushy' },
     // Morning and afternoon, when the day changes.
     change: (am: string, pm: string) => `${am} → ${pm}`,
+  },
+
+  // The hour-by-hour grid under the dial on Today and the place screen.
+  hourGrid: {
+    title: 'Today, hour by hour',
+    rows: { all: 'Overall', t: 'Temp', w: 'Wind', precip: 'Snow/rain', light: 'Light', sky: 'Sky' },
+    // Spoken by VoiceOver for one hour of the Overall row.
+    cellLabel: (hour: string, band: string, score: number | null) =>
+      score === null ? `${hour}, no forecast` : `${hour}, ${band}, ${score}`,
+    // Spoken for a whole condition row: "Wind: Excellent 7 AM to 1 PM, Poor 2 PM to 5 PM".
+    rowLabel: (row: string, runs: string[]) => `${row}: ${runs.join(', ')}`,
+    rowRun: (band: string, from: string, to: string) => (from === to ? `${band} at ${from}` : `${band} ${from} to ${to}`),
+    noForecast: 'no forecast',
+    surface: (text: string) => `Surface: ${text}`,
+    surfaceRun: {
+      allDay: (word: string) => `${word} all day`,
+      until: (word: string, hour: string) => `${word} until ${hour}`,
+      then: (word: string) => `then ${word}`,
+      sep: ', ',
+    },
   },
 
   // The rows of the Today breakdown card.

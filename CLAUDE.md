@@ -228,9 +228,9 @@ guesses pending winter data.
 
 `src/lib/surface.ts` estimates what the weather is doing to the snow surface, hour by hour, and
 names it: **Fresh, Soft, Packed, Firm, Icy or Slushy**. Added Oct 2026, in **shadow mode**: shown
-for classic and skate (a breakdown row on Today, a cell on the Forecast detail, a row on the place
-screen, and a line in the feedback diagnostics), but **never part of the score**. Do not promote it
-into the score until its calls have been compared with real winter days.
+for classic and skate (a breakdown row and a line under the hour-by-hour grid on Today and the
+place screen, a cell on the Forecast detail, and a line in the feedback diagnostics), but **never part of the score** and never coloured — a colour is a verdict.
+Do not promote it into the score until its calls have been compared with real winter days.
 
 * It carries three 0–1 quantities — firmness, wetness and ice — through the whole hourly series,
   so the week of history has washed out the starting state by today. New snow buries the
