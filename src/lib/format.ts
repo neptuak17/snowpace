@@ -11,7 +11,7 @@ export function fmtS(cm: number, units: Units): string {
 }
 
 export function fmtW(kmh: number, units: Units): string {
-  return units === 'imperial' ? Math.round(kmh * 0.621) + ' mph' : kmh + ' km/h';
+  return units === 'imperial' ? Math.round(kmh * 0.621) + ' mph' : Math.round(kmh) + ' km/h';
 }
 
 /** "45 km" / "28 mi". Null distance (no location yet) renders as a dash. */
