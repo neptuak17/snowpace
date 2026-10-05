@@ -65,6 +65,9 @@ export default function HelpScreen() {
           </View>
         ))}
         <AppText size={13.5} lh={1.5}>
+          {h.decidesSnowpack}
+        </AppText>
+        <AppText size={13.5} lh={1.5}>
           {h.decidesOutro}
         </AppText>
       </Card>

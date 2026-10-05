@@ -164,34 +164,24 @@ export const TUNING = {
     classic:  { t: 0.17, s: 0.2,  base: 0.09, ft: 0.11, w: 0.15, pr: 0.14, fall: 0.09, c: 0.05 },
   } as Record<ActivityKey, Record<BlendKey, number>>,
 
-  // ── Hourly fallback when the forecast has no hourly series for a day:
-  // temperature follows a half-sine between the day's lo and hi from `sunrise`
-  // over `dayLength` hours; wind builds through the afternoon.
+  // ── The hours today's strip shows, from the real hourly forecast only.
   hourly: {
     hours: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
-    sunriseHour: 6,
-    dayLengthHours: 16,
-    windMorningFraction: 0.72,
-    windAfternoonBoost: 0.5,
     // Best window is the best-scoring run of this many consecutive hours.
     windowHours: 3,
   },
 
-  // ── Hour-by-hour grid under the dial. The rain sub-score is calibrated on
+  // ── Hour-by-hour rows. The rain sub-score is calibrated on
   // daily totals and reads light against one hour's mm (see the retune note
-  // in CLAUDE.md), so drizzle would show green; in the grid any hour with
+  // in CLAUDE.md), so drizzle would show green; any hour with
   // rain above `rain.floorMm` shows as the worst band instead.
   grid: { rainCell: 0 },
 
-  // ── Limiters: factors called out in gold on the breakdown.
+  // ── Limiters: the factors holding a score down. A factor below
+  // `severeBelow` is severe; with `pluralFrom` or more the verdict says how
+  // many rather than naming one, and a severe snowpack leads the breakdown.
   limiters: {
-    // A factor below this is "severe" and always shown.
     severeBelow: 55,
-    // A second severe factor is shown too if it is within this many points of the first.
-    secondWithin: 15,
-    // On a day with no severe factor, the weakest one is still shown unless the score is at least this.
-    showWeakestBelow: 90,
-    // Three or more severe factors and the verdict goes plural instead.
     pluralFrom: 3,
   },
 

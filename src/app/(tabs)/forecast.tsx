@@ -2,18 +2,17 @@ import { useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { ActivityChips } from '@/components/activity-chips';
+import { DayAnswer } from '@/components/day-answer';
+import { DayBreakdown, WhyToggle } from '@/components/day-breakdown';
 import { AppButton, LinkButton } from '@/components/ui/app-button';
 import { AppText } from '@/components/ui/app-text';
 import { Card, Kicker } from '@/components/ui/card';
-import { MetricGrid } from '@/components/ui/metric-grid';
-import { ScoreDial } from '@/components/ui/score-dial';
 import { ScorePill } from '@/components/ui/score-pill';
 import { Screen, ScreenTitle } from '@/components/ui/screen';
 import { dayIndexFor, dayLabel, gridDates } from '@/data/places';
-import { fmtForecastAge, fmtS, fmtT, fmtW } from '@/lib/format';
+import { fmtForecastAge } from '@/lib/format';
 import { placeMetaAway } from '@/lib/place-text';
-import { actLabel, canScore, coverageSub, coverageWord, freezeThaw, hasDepth, limiters, rainSub, score, snow72, snowFallingMm, type FactorKey } from '@/lib/scoring';
-import { daySurfaceText, showsSurface } from '@/lib/surface';
+import { actLabel, canScore, dayFacts, hourGrid, isBare, score, verdict, windowLabel } from '@/lib/scoring';
 import { TUNING } from '@/lib/tuning';
 import { useAppState } from '@/state/app-state';
 import { useTheme } from '@/theme/use-theme';
@@ -41,28 +40,10 @@ export default function ForecastScreen() {
   const selDay = dayIndexFor(selLoc, dates[selCol]);
   const scoreable = selDay >= 0 && canScore(selLoc, selDay);
   const selScore = scoreable ? score(selLoc, selDay, act, s.prefs) : null;
-  const sd = scoreable ? selLoc.days[selDay] : null;
-  const keys = selScore === null ? [] : limiters(selLoc, selDay, act, s.prefs).keys;
+  // The same answer as Today: on bare ground it is the whole story.
+  const bare = selScore !== null && isBare(selLoc, selDay, act);
+  const grid = selScore !== null && !bare && selDay === 0 ? hourGrid(selLoc, act, s.prefs) : null;
   const f = strings.forecast;
-  let metrics: { k: string; v: string; rank: number }[] = [];
-  if (sd) {
-    const selFt = freezeThaw(selLoc, selDay);
-    const selRain = rainSub(selLoc, selDay);
-    const rows: { key: FactorKey | 'pr3' | 'surface'; k: string; v: string }[] = [
-      { key: 't', k: f.metrics.temp, v: fmtT(sd.t, s.units) },
-      { key: 's', k: f.metrics.newSnow, v: fmtS(sd.snow, s.units) },
-      { key: 'base', k: f.metrics.threeDay, v: fmtS(snow72(selLoc, selDay), s.units) },
-      { key: 'w', k: f.metrics.wind, v: fmtW(sd.wind, s.units) },
-      { key: 'pr', k: f.metrics.rain, v: selRain.nowMm > TUNING.rain.floorMm ? strings.format.mm(selRain.nowMm.toFixed(1)) : f.none },
-      { key: 'pr3', k: f.metrics.rain3, v: selRain.prior.mm > TUNING.rain.floorMm ? strings.format.mm(selRain.prior.mm.toFixed(1)) + (selRain.prior.iced ? f.iced : '') : f.none },
-      { key: 'fall', k: f.metrics.snowing, v: strings.format.mm(snowFallingMm(sd).toFixed(1)) },
-      { key: 'ft', k: f.metrics.freezeThaw, v: selFt.hit ? f.thawTo(fmtT(selFt.maxHi, s.units)) : f.none },
-      ...(hasDepth(selLoc, selDay) ? [{ key: 'cov' as const, k: f.metrics.snowpack, v: coverageWord(coverageSub(selLoc, selDay, act)) }] : []),
-      // Shadow mode: shown for nordic, never a limiter (it isn't scored).
-      ...(showsSurface(act) ? [{ key: 'surface' as const, k: f.metrics.surface, v: daySurfaceText(selLoc.surface, sd.date) ?? strings.common.dash }] : []),
-    ];
-    metrics = rows.map((r) => ({ k: r.k, v: r.v, rank: keys.indexOf(r.key as FactorKey) }));
-  }
 
   const scoreAt = (l: typeof selLoc, date: string) => { const i = dayIndexFor(l, date); return i >= 0 ? score(l, i, act, s.prefs) : null; };
   const bestDay = dates.map((d, i) => ({ i, sc: scoreAt(selLoc, d) }))
@@ -77,7 +58,7 @@ export default function ForecastScreen() {
   if (selScore === null) {
     vs = f.noDay;
   } else if (!worthRanking) {
-    vs = scoreable && coverageSub(selLoc, selDay, act) <= 0 ? f.bareWeek : f.noGoodDay;
+    vs = bare ? f.bareWeek : f.noGoodDay;
   } else if (bestDay) {
     if (bestDay.i === selCol) vs = f.bestOfFive;
     else if (selCol === 0) vs = f.looksBetter(labels[bestDay.i].label, bestDay.sc, todayScore ?? 0);
@@ -140,19 +121,21 @@ export default function ForecastScreen() {
 
       <View style={styles.inset}>
         <Card style={styles.selCard}>
-          <View style={styles.selHead}>
-            <View style={styles.selTitle}>
-              <Kicker>{f.selKicker(labels[selCol].label, labels[selCol].date, actLabel(act))}</Kicker>
-              <AppText heading size={20} lh={1.15}>
-                {selLoc.shortName}
-              </AppText>
-              <AppText size={11} muted>
-                {placeMetaAway(selLoc, s.units)}
-              </AppText>
-            </View>
-            <ScoreDial score={selScore} size={78} word />
+          <View style={styles.selTitle}>
+            <Kicker>{f.selKicker(labels[selCol].label, labels[selCol].date, actLabel(act))}</Kicker>
+            <AppText heading size={20} lh={1.15}>
+              {selLoc.shortName}
+            </AppText>
+            <AppText size={11} muted>
+              {placeMetaAway(selLoc, s.units)}
+            </AppText>
           </View>
-          {metrics.length > 0 && <MetricGrid metrics={metrics} compact />}
+          <DayAnswer
+            score={selScore}
+            verdict={selScore === null ? strings.verdict.noForecast : verdict(selLoc, selDay, act, s.prefs, s.units)}
+            best={grid ? windowLabel(grid) : null}
+            facts={selScore === null || bare ? null : dayFacts(selLoc, selDay, s.units)}
+          />
           <View style={[styles.selFoot, { borderTopColor: theme.divider }]}>
             <AppText size={10.5} muted style={styles.flex}>
               {vs}
@@ -161,8 +144,14 @@ export default function ForecastScreen() {
               {selCol === 0 ? strings.common.forecastAge(fmtForecastAge(selLoc.forecastAt)) : f.forecastLabel}
             </AppText>
           </View>
-          {selLoc.website && <LinkButton href={selLoc.website}>{strings.common.siteLink(selLoc.shortName)}</LinkButton>}
         </Card>
+        {selScore !== null && !bare && (
+          <View style={styles.why}>
+            <WhyToggle />
+            {s.showBreakdown && <DayBreakdown place={selLoc} di={selDay} />}
+          </View>
+        )}
+        {selLoc.website && <LinkButton href={selLoc.website} style={styles.site}>{strings.common.siteLink(selLoc.shortName)}</LinkButton>}
       </View>
     </Screen>
   );
@@ -211,7 +200,8 @@ const styles = StyleSheet.create({
   swatch: { width: 11, height: 11, borderRadius: 4 },
   selCard: { gap: 11 },
   empty: { alignItems: 'flex-start' },
-  selHead: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 },
-  selTitle: { flex: 1, gap: 3 },
+  selTitle: { gap: 3 },
+  why: { paddingTop: 10, gap: 6 },
+  site: { marginTop: 4 },
   selFoot: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, borderTopWidth: 1, paddingTop: 10 },
 });

@@ -57,12 +57,9 @@ export const strings = {
     noActivityBody: (verdict: string) =>
       `${verdict} Try one of the places below or switch activity to one offered there.`,
     whereCanIGo: 'Where can I go?',
-    hideBreakdown: 'Hide the breakdown ›',
-    showBreakdown: (hour: string) => `Breakdown for ${hour} ›`,
-    breakdownKicker: (hour: string) => `Breakdown for ${hour}`,
-    dialLine: (hour: string, band: string) => `${hour} · ${band}`,
     bestLabel: (range: string) => `Best ${range}`,
-    otherActivitiesAt: (name: string) => `Other activities at ${name}`,
+    // Moves up under the answer when the home hill is Poor or worse and somewhere nearby beats it.
+    betterToday: 'Better today',
     otherNearby: 'Other options nearby',
     seeAll: 'See all',
     noAlternatives: (activity: string, distance: string) =>
@@ -79,15 +76,6 @@ export const strings = {
     subtitle: (activity: string) => `Your ${activity} places. Tap a square for the detail.`,
     legend: { hi: '80+', go: '70–79 go', fair: '55–69', poor: 'under 55' },
     selKicker: (day: string, date: string, activity: string) => `${day} · ${date} · ${activity}`,
-    metrics: {
-      temp: 'Temp', newSnow: 'New snow', threeDay: '3-day', wind: 'Wind',
-      rain: 'Rain', rain3: 'Rain, 3 days', snowing: 'Snowing', freezeThaw: 'Freeze–thaw', snowpack: 'Snowpack',
-      surface: 'Surface',
-    },
-    rainLater: 'Later today',
-    none: 'None',
-    iced: ', iced',
-    thawTo: (temp: string) => `To ${temp}`,
     bestOfFive: 'The best of the five days here.',
     looksBetter: (day: string, best: number, today: number) =>
       `${day} looks better — ${best} against today’s ${today}.`,
@@ -190,17 +178,18 @@ export const strings = {
       { k: 'Temperature', v: 'measured against the temperature you said you prefer' },
       { k: 'Wind', v: 'exposure and windchill up high' },
       { k: 'Rain', v: 'recent or forecast rain is always bad, for every activity' },
-      { k: 'Snow falling now', v: 'welcome for downhill or snowshoeing, slow going on skinny skis' },
+      { k: 'Snow falling', v: 'welcome for downhill or snowshoeing, slow going on skinny skis' },
       { k: 'Cloud cover', v: 'flat light versus a bluebird day' },
     ],
     factorSep: ' — ',
-    decidesOutro: 'Whichever of those is holding the day back gets highlighted on the breakdown, so you can see at a glance what the catch is.',
+    decidesSnowpack: 'On top of those, the modelled snowpack caps the score: on bare ground it is 0, however good the weather.',
+    decidesOutro: 'The sentence under the dial names whatever is holding the day back, and Why? shows how each one scored.',
     useKicker: 'How to use it',
     steps: [
       { t: 'Turn on your activities', d: 'On the You tab, enable the ones you do. Everything else in the app filters to those.' },
       { t: 'Set what good feels like', d: 'Your ideal temperature, how much wind you will put up with, how much fresh snow you want, and how far you will travel.' },
       { t: 'Add your places', d: 'My places → Add. Pick the centres and hills you go to, and set one as your home hill. That is the one Today opens on.' },
-      { t: 'Check Today', d: 'The big dial is your home hill right now. Tap an hour on the chart to see how the score moves through the day, then tap the breakdown to see why.' },
+      { t: 'Check Today', d: 'The big dial is how today looks at your home hill, with its best hours and the reason in a sentence. Tap an hour on the strip for that hour, and tap Why? to see what is behind the score. On a poor day, better places nearby are listed right under it.' },
       { t: 'Look ahead', d: 'Forecast lays out every saved place against the next five days. Tap any square for the detail on that day.' },
     ],
     dataKicker: 'A word on the data',
@@ -290,11 +279,6 @@ export const strings = {
     none: '—',
   },
 
-  // Short labels for the metric boxes beside a dial.
-  metrics: {
-    t: 'Temp', s: 'New', w: 'Wind', c: 'Cloud', pr: 'Rain', fall: 'Snowing', base: '3-day', ft: 'Thaw', cov: 'Snowpack',
-  },
-
   // Coverage, from the modelled snow depth. The depth itself is never shown.
   coverage: { bare: 'Bare', thin: 'Thin', enough: 'Enough' },
 
@@ -305,7 +289,22 @@ export const strings = {
     change: (am: string, pm: string) => `${am} → ${pm}`,
   },
 
-  // The hour-by-hour grid under the dial on Today and the place screen.
+  // The answer card: the day's score, its best hours, and the day in three numbers.
+  answer: {
+    facts: (parts: string[]) => parts.join(' · '),
+    wind: (w: string) => `wind ${w}`,
+    newSnow: (s: string) => `${s} new`,
+  },
+
+  // The detail behind a day's score, opened from the answer.
+  why: {
+    show: 'Why? ›',
+    hide: 'Hide the detail ›',
+    kicker: 'Behind the score',
+    hours: 'Hour by hour',
+  },
+
+  // Today's hours, under the answer, and the condition rows in the detail.
   hourGrid: {
     title: 'Today, hour by hour',
     rows: { all: 'Overall', t: 'Temp', w: 'Wind', precip: 'Snow/rain', light: 'Light', sky: 'Sky' },
@@ -316,20 +315,19 @@ export const strings = {
     rowLabel: (row: string, runs: string[]) => `${row}: ${runs.join(', ')}`,
     rowRun: (band: string, from: string, to: string) => (from === to ? `${band} at ${from}` : `${band} ${from} to ${to}`),
     noForecast: 'no forecast',
-    surface: (text: string) => `Surface: ${text}`,
-    surfaceRun: {
-      allDay: (word: string) => `${word} all day`,
-      until: (word: string, hour: string) => `${word} until ${hour}`,
-      then: (word: string) => `then ${word}`,
-      sep: ', ',
-    },
+    // The line under the strip for the tapped hour: "3 PM · Fair 62 · 2°C · wind 30 km/h".
+    line: (parts: (string | null)[]) => parts.filter(Boolean).join(' · '),
+    scored: (band: string, score: number) => `${band} ${score}`,
+    wind: (w: string) => `wind ${w}`,
+    rain: (mm: string) => `rain ${mm} mm`,
+    snow: (mm: string) => `snow ${mm} mm`,
   },
 
   // The rows of the Today breakdown card.
   breakdown: {
     temp: 'Temperature',
-    tempNote: (hour: string, temp: string, activity: string) =>
-      `At ${hour}. You like it around ${temp} for ${activity}.`,
+    tempNote: (temp: string, activity: string) =>
+      `Daytime average. You like it around ${temp} for ${activity}.`,
     newSnow: 'New snow, 24 h',
     threeDay: 'Snowfall, 3 days',
     threeDayNote: 'How much has fallen recently (how fresh the surface is).',
@@ -342,7 +340,7 @@ export const strings = {
     wind: 'Wind',
     windNote: (limit: string) => `You call it off past ${limit}.`,
     rain: 'Rain',
-    snowFalling: 'Snow falling now',
+    snowFalling: 'Snow falling',
     cloud: 'Cloud cover',
     cloudNote: 'Light quality, weighted lightly.',
     snowpack: 'Snowpack',
@@ -388,14 +386,14 @@ export const strings = {
   },
 
   rain: {
-    raining: 'it is raining',
+    raining: 'rain is forecast',
     refroze: 'it rained and then refroze (expect ice)',
     recent: 'rain in the last three days has hurt the surface',
     later: 'rain is in the forecast for later today',
     movingIn: 'there is weather moving in',
-    copyNow: 'It is above freezing, so this is falling as rain.',
+    copyNow: 'Rain is forecast: it is warm enough to fall as rain rather than snow.',
     copyLater: 'Dry now, but rain is forecast later today.',
-    copyNone: 'Nothing falling as rain.',
+    copyNone: 'No rain forecast.',
     copyIced: (mm: string) => `${mm} mm fell in the last three days and refroze (expect ice).`,
     copyRecent: (mm: string) => `${mm} mm of rain in the last three days has degraded the surface.`,
   },

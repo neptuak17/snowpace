@@ -3,113 +3,108 @@ import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { AppText } from './ui/app-text';
 import { SectionLabel } from './ui/card';
 
-import { hourLabel } from '@/lib/format';
-import { band, windowLabel, type GridRow, type HourGrid as Grid } from '@/lib/scoring';
+import { hourLabel, type Units } from '@/lib/format';
+import { band, hourLine, type Band, type GridRow, type HourGrid } from '@/lib/scoring';
 import { bandColors } from '@/theme/band-colors';
+import type { Theme } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
 import { strings } from '@/strings';
 
-type Props = {
-  grid: Grid;
-  selHour: number;
-  onPick: (h: number) => void;
-  /** The surface in words, for classic and skate. Never coloured: it is not scored. */
-  surface?: string | null;
-};
-
-// Wide enough for "Snow/rain" at the default text size; grows with Dynamic Type.
-const LABEL_WIDTH = 58;
-
 /**
- * Today, hour by hour: an Overall row in the score colours, then one row per
- * condition that changes through the day, with the best window underlined
- * beneath the hours.
- * Tapping any column picks that hour. VoiceOver reads each Overall hour as a
- * button and each condition row as one sentence, so nothing rests on colour.
+ * Today's hours as one row of score colours, the best window underlined
+ * beneath them. Tapping an hour shows that hour in a line underneath; the
+ * dial above stays on the day. VoiceOver reads each hour as a button.
  */
-export function HourGrid({ grid, selHour, onPick, surface }: Props) {
+export function HourStrip({ grid, selHour, onPick, units }: {
+  grid: HourGrid; selHour: number; onPick: (h: number) => void; units: Units;
+}) {
   const theme = useTheme();
-  const { fontScale } = useWindowDimensions();
-  const labelWidth = Math.round(LABEL_WIDTH * Math.max(1, fontScale));
-  const best = windowLabel(grid);
-
+  const overall = grid.rows[0];
   return (
     <View style={styles.wrap}>
-      <View style={styles.head}>
-        <SectionLabel>{strings.hourGrid.title}</SectionLabel>
-        {best && (
-          <AppText size={12.5} weight={700} color={theme.accent}>
-            {best}
-          </AppText>
-        )}
+      <SectionLabel>{strings.hourGrid.title}</SectionLabel>
+      <View style={styles.cells}>
+        {overall.cells.map((v, i) => {
+          const h = grid.hours[i];
+          const b = band(v);
+          const on = h === selHour;
+          return (
+            <Pressable
+              key={h}
+              onPress={() => onPick(h)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: on }}
+              accessibilityLabel={strings.hourGrid.cellLabel(hourLabel(h), b.word, v)}
+              style={styles.flex}>
+              <View style={[styles.stripCell, cellFill(v, b, theme), on && { borderWidth: 2, borderColor: theme.text }]} />
+            </Pressable>
+          );
+        })}
       </View>
+      <HourNumbers grid={grid} selHour={selHour} window />
+      <AppText size={12.5} weight={600} lh={1.4}>
+        {hourLine(grid, selHour, units)}
+      </AppText>
+    </View>
+  );
+}
 
-      {grid.rows.map((row) => {
-        const overall = row.key === 'all';
+/**
+ * The conditions that change through the day, one row each, in the detail
+ * behind the score. Each row is read by VoiceOver as one sentence, so
+ * nothing rests on colour.
+ */
+export function HourConditions({ grid }: { grid: HourGrid }) {
+  const theme = useTheme();
+  const { fontScale } = useWindowDimensions();
+  // Wide enough for "Snow/rain" at the default text size; grows with Dynamic Type.
+  const labelWidth = Math.round(58 * Math.max(1, fontScale));
+  return (
+    <View style={styles.wrap}>
+      <SectionLabel>{strings.why.hours}</SectionLabel>
+      {grid.rows.slice(1).map((row) => (
+        <View key={row.key} style={styles.row} accessible accessibilityLabel={rowSummary(row, grid.hours)}>
+          <AppText size={10.5} muted style={{ width: labelWidth }}>
+            {strings.hourGrid.rows[row.key]}
+          </AppText>
+          <View style={[styles.cells, styles.flex]}>
+            {row.cells.map((v, i) => (
+              <View key={grid.hours[i]} style={[styles.flex, styles.cell, cellFill(v, band(v), theme)]} />
+            ))}
+          </View>
+        </View>
+      ))}
+      <View style={styles.row}>
+        <View style={{ width: labelWidth }} />
+        <View style={styles.flex}>
+          <HourNumbers grid={grid} />
+        </View>
+      </View>
+    </View>
+  );
+}
+
+// A missing hour is an empty outline, never a colour: it is not a score.
+function cellFill(v: number | null, b: Band, theme: Theme) {
+  return v === null ? { borderWidth: 1, borderColor: theme.divider } : { backgroundColor: bandColors(theme, b).bg };
+}
+
+function HourNumbers({ grid, selHour, window }: { grid: HourGrid; selHour?: number; window?: boolean }) {
+  const theme = useTheme();
+  return (
+    <View style={styles.cells} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
+      {grid.hours.map((h, i) => {
+        const on = h === selHour;
+        const inWindow = window && grid.window !== null && i >= grid.window.from && i <= grid.window.to;
         return (
-          <View
-            key={row.key}
-            style={styles.row}
-            accessible={!overall}
-            accessibilityLabel={overall ? undefined : rowSummary(row, grid.hours)}>
-            <AppText size={10.5} weight={overall ? 700 : 400} muted={!overall} style={{ width: labelWidth }}>
-              {strings.hourGrid.rows[row.key]}
+          <View key={h} style={styles.flex}>
+            <AppText size={9.5} center weight={on ? 800 : 400} muted={!on}>
+              {h === 12 ? '12' : String(h > 12 ? h - 12 : h)}
             </AppText>
-            <View style={styles.cells}>
-              {row.cells.map((v, i) => {
-                const h = grid.hours[i];
-                const b = band(v);
-                const on = overall && h === selHour;
-                return (
-                  <Pressable
-                    key={h}
-                    onPress={() => onPick(h)}
-                    accessible={overall}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: on }}
-                    accessibilityLabel={strings.hourGrid.cellLabel(hourLabel(h), b.word, v)}
-                    style={styles.cellHit}>
-                    <View
-                      style={[
-                        styles.cell,
-                        // A missing hour is an empty outline, never a colour: it is not a score.
-                        v === null
-                          ? { borderWidth: 1, borderColor: theme.divider }
-                          : { backgroundColor: bandColors(theme, b).bg },
-                        on && { borderWidth: 2, borderColor: theme.text },
-                      ]}
-                    />
-                  </Pressable>
-                );
-              })}
-            </View>
+            {window && <View style={[styles.mark, inWindow && { backgroundColor: theme.accent }]} />}
           </View>
         );
       })}
-
-      <View style={styles.row} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
-        <View style={{ width: labelWidth }} />
-        <View style={styles.cells}>
-          {grid.hours.map((h, i) => {
-            const on = h === selHour;
-            const inWindow = grid.window !== null && i >= grid.window.from && i <= grid.window.to;
-            return (
-              <View key={h} style={styles.cellHit}>
-                <AppText size={9.5} center weight={on ? 800 : 400} muted={!on}>
-                  {h === 12 ? '12' : String(h > 12 ? h - 12 : h)}
-                </AppText>
-                <View style={[styles.mark, inWindow && { backgroundColor: theme.accent }]} />
-              </View>
-            );
-          })}
-        </View>
-      </View>
-
-      {surface && (
-        <AppText size={11.5} muted lh={1.4}>
-          {strings.hourGrid.surface(surface)}
-        </AppText>
-      )}
     </View>
   );
 }
@@ -128,11 +123,11 @@ function rowSummary(row: GridRow, hours: readonly number[]): string {
 }
 
 const styles = StyleSheet.create({
-  wrap: { gap: 6 },
-  head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 3 },
+  wrap: { gap: 7 },
+  flex: { flex: 1 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  cells: { flex: 1, flexDirection: 'row', gap: 3 },
-  cellHit: { flex: 1 },
+  cells: { flexDirection: 'row', gap: 3 },
+  stripCell: { height: 26, borderRadius: 6 },
   cell: { height: 14, borderRadius: 4 },
   mark: { height: 3, borderRadius: 2, marginTop: 3 },
 });

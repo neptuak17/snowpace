@@ -38,12 +38,17 @@ export function AppButton({ variant = 'secondary', children, size = 13.5, style,
   );
 }
 
-/** A primary button that opens an operator's web site in the in-app browser. */
+/**
+ * A quiet link that opens an operator's web site in the in-app browser. It
+ * sits under the answer, so it must not outshout it.
+ */
 export function LinkButton({ href, children, style }: { href: string; children: string; style?: StyleProp<ViewStyle> }) {
   return (
     <AppButton
-      variant="primary"
-      style={style}
+      variant="ghost"
+      size={12.5}
+      accessibilityRole="link"
+      style={[styles.link, style]}
       onPress={() => openBrowserAsync(href, { presentationStyle: WebBrowserPresentationStyle.AUTOMATIC })}>
       {children}
     </AppButton>
@@ -62,6 +67,11 @@ const styles = StyleSheet.create({
   },
   ghost: {
     paddingHorizontal: 10,
+  },
+  // The ghost padding pulled back so the link's text lines up with the page.
+  link: {
+    alignSelf: 'flex-start',
+    marginLeft: -10,
   },
   pressed: {
     opacity: 0.7,
