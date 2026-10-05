@@ -287,8 +287,13 @@ The about/credits screen must include:
   `piste:type=fatbike` and `piste:type=hike` on individual runs, but the published ski areas
   file reduces everything to `downhill` and `nordic`, so neither reaches the app. Measured Sep
   2026 at Larch Hills (`osm:way/1135735100`): 219 nordic ways, 36 fatbike, 27 hike — several of
-  the latter named as snowshoe routes. Asked about in a report to OpenSkiData (that area is also
-  published as `downhill` despite having no downhill pistes, possibly the same mapping).
+  the latter named as snowshoe routes. Asked about in a report to OpenSkiData
+  ([openskimap.org#198](https://github.com/russellporter/openskimap.org/issues/198)), which
+  also flagged that area as published `downhill` with no downhill pistes. That turned out to be
+  a wrong tag on the Skimap.org record, not the fatbike mapping; it was fixed and the issue
+  closed in Oct 2026, and the file now lists Larch Hills as `nordic` only. The question of
+  exposing more activities went unanswered: on 5 Oct 2026 the file still carried only
+  `downhill` and `nordic`.
 
   If those activities appear in the file:
   - **Snowshoe** stops being assumed everywhere and becomes real per-area data. The change is
@@ -307,7 +312,7 @@ The about/credits screen must include:
   above so it can be calibrated against real conditions.
 
   If the activities never appear, the fallback is a per-place activity override stored against
-  the favourite, which would also let a user correct upstream errors like Larch Hills.
+  the favourite, which would also let a user correct upstream errors like the one Larch Hills had.
 
 * **Webcams on the place detail screen** — a design handoff exists at
   `docs/snowpace-webcams-feature-handoff.md`. **Not scheduled**; do not implement until it is
