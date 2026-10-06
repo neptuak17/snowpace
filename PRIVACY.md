@@ -62,8 +62,9 @@ does is covered by its own privacy policy, not this one.
 The feedback screen opens a draft email in your own mail app. You choose whether to
 include diagnostics, you can read and edit everything before sending, and nothing is
 sent unless you send it yourself. The diagnostics contain the app and iOS versions,
-your device model, your activities and preferences, when data was last fetched, and —
-if you picked a place — that place's forecast and score. They never contain your
+your device model, your activities and preferences, whether webcams are switched on
+and the last error from windy.com, when data was last fetched, and — if you picked a
+place — that place's forecast and score. They never contain your
 location or your other saved places.
 
 Email you send reaches Cliff Smith at clifford.smith@gmail.com. It is used to answer
