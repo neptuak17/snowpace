@@ -314,12 +314,27 @@ The about/credits screen must include:
   If the activities never appear, the fallback is a per-place activity override stored against
   the favourite, which would also let a user correct upstream errors like the one Larch Hills had.
 
-* **Webcams on the place detail screen** — a design handoff exists at
+* **Webcams on Today and the place screen** — a design handoff exists at
   `docs/snowpace-webcams-feature-handoff.md`. **Not scheduled**; do not implement until it is
-  explicitly prioritized. It covers the Windy Webcams API v3 free tier, runtime camera matching by
-  name similarity (no mapping table), a required user override persisted per area, caching the
-  resolved camera ID rather than the expiring image URL, and display rules for darkness, missing
-  cameras and attribution.
+  explicitly prioritized. It covers the Windy Webcams API v3 free tier (still images only; the
+  embedded player is excluded because it carries ads), runtime camera matching by name similarity
+  (no mapping table), a required user override persisted per area, caching the resolved camera ID
+  rather than the expiring image URL, and display rules for darkness, missing cameras and
+  attribution.
+
+  Layout and behaviour, decided Oct 2026 (details in the handoff):
+  - **One camera as a compact row, after the hour strip and before "Why? ›"** — the answer comes
+    first, the webcam is evidence for it. Other candidates sit behind "Other cameras ›", which is
+    also the override; there is no thumbnail strip. Shown on bare days (it can reveal snowmaking
+    the snowpack model cannot see); not on the Forecast detail.
+  - **Always the daylight image**, so never a black frame and no sunrise/sunset needed. Day or
+    night only picks the label ("Updated 12 min ago" or "Last daylight image"), decided from the
+    forecast's `shortwave_radiation` at the current hour.
+  - **Load once per session** (launch, or return once the forecast is stale), then only on a
+    manual **Refresh**. Images held in memory only, never on disk — `expo-image` is the likely
+    route, a new dependency to approve.
+  - Snowpace is free and stays free, so the handoff's free-tier use is the US Forest Service
+    precedent's case, not a paid app's.
 
   Two things to settle against this file's own rules before any work starts:
   - **Quota.** Windy's free tier is keyed per account, and the architecture constraint above rules
