@@ -33,6 +33,8 @@ export type Diagnostics = {
   locationGranted: boolean;
   inventory: { count: number; source: string | null; fetchedAt: string | null; lastError: string | null };
   forecast: { lastAttemptAt: string | null; lastError: string | null };
+  /** Whether webcams are switched on, and the last error from windy.com this session. */
+  webcams: { on: boolean; lastError: string | null };
 };
 
 export type FeedbackInput = {
@@ -85,6 +87,7 @@ function diagnosticsBlock({ place, diagnostics: d }: FeedbackInput): string[] {
     '',
     `Inventory: ${d.inventory.source ?? 'none'}${d.inventory.fetchedAt ? ` ${d.inventory.fetchedAt.slice(0, 10)}` : ''} (${d.inventory.count} areas) · last error: ${d.inventory.lastError ?? 'none'}`,
     `Forecasts: last attempt ${d.forecast.lastAttemptAt ?? 'never'} · last error: ${d.forecast.lastError ?? 'none'}`,
+    `Webcams: ${d.webcams.on ? 'on' : 'off'} · last error: ${d.webcams.lastError ?? 'none'}`,
   ];
   if (place) {
     out.push('', ...placeBlock(place, d));

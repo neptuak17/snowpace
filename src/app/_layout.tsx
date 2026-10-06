@@ -83,6 +83,7 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="search" />
         <Stack.Screen name="place/[id]" />
+        <Stack.Screen name="webcams/[id]" />
         <Stack.Screen name="help" />
         <Stack.Screen name="feedback" />
         <Stack.Screen name="credits" />

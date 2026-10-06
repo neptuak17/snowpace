@@ -12,6 +12,7 @@ import { Platform } from 'react-native';
 
 import { FORECAST_META } from '@/data/forecast-refresh';
 import { FEEDBACK_EMAIL } from '@/data/project';
+import { lastWebcamError } from '@/data/webcams';
 import { getMeta } from '@/db/database';
 import { getForecasts } from '@/db/forecasts';
 import { inventoryStatus } from '@/db/inventory';
@@ -29,7 +30,7 @@ export async function canSendMail(): Promise<boolean> {
   }
 }
 
-type SettingsSlice = Pick<Diagnostics, 'myActs' | 'activity' | 'units' | 'maxDistanceKm' | 'prefs' | 'locationGranted'>;
+type SettingsSlice = Pick<Diagnostics, 'myActs' | 'activity' | 'units' | 'maxDistanceKm' | 'prefs' | 'locationGranted'> & { webcamsOn: boolean };
 
 export async function sendFeedback(
   input: Omit<FeedbackInput, 'diagnostics' | 'forecasts'>,
@@ -46,13 +47,15 @@ export async function sendFeedback(
     ...input,
     forecasts: input.place ? (forecasts.get(input.place.key) ?? []) : [],
     diagnostics: {
-      ...settings,
+      myActs: settings.myActs, activity: settings.activity, units: settings.units,
+      maxDistanceKm: settings.maxDistanceKm, prefs: settings.prefs, locationGranted: settings.locationGranted,
       appVersion: Constants.expoConfig?.version ?? null,
       device: Device.modelName,
       osVersion: Device.osVersion,
       now: new Date(),
       inventory: { count: inv.count, source: inv.source, fetchedAt: inv.fetchedAt, lastError: inv.lastError },
       forecast: { lastAttemptAt, lastError },
+      webcams: { on: settings.webcamsOn, lastError: lastWebcamError },
     },
   });
 

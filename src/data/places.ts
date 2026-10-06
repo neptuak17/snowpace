@@ -83,6 +83,8 @@ export type Place = {
   hours: HourWx[] | null;
   /** Modelled surface firmness by local date and hour (shadow mode). Null with no forecast. */
   surface: SurfaceSeries | null;
+  /** The place's IANA time zone, from its forecast; null with no forecast. */
+  timezone: string | null;
 };
 
 export const DAY_COUNT = 5;
@@ -146,9 +148,9 @@ export function placeFromArea(a: SkiArea, here: LatLon | null, forecasts: Foreca
 
 // ── Aggregation ──────────────────────────────────────────────────────────
 
-type Weather = Pick<Place, 'forecastAt' | 'days' | 'prior' | 'hours' | 'surface'>;
+type Weather = Pick<Place, 'forecastAt' | 'days' | 'prior' | 'hours' | 'surface' | 'timezone'>;
 
-const NO_WEATHER: Weather = { forecastAt: null, days: [], prior: null, hours: null, surface: null };
+const NO_WEATHER: Weather = { forecastAt: null, days: [], prior: null, hours: null, surface: null, timezone: null };
 
 /** Pick the series to score on: the midpoint, else the mean of base and summit. */
 function seriesOf(forecasts: Forecast[]): { hours: HourWx[]; fetchedAt: string; timezone: string } | null {
@@ -174,7 +176,7 @@ function weatherFrom(forecasts: Forecast[]): Weather {
   const today = localDate(s.timezone);
   const t0 = dates.indexOf(today);
   // The cache may predate today (offline for a day): then there is no "today" and nothing to score.
-  if (t0 < 0) return { forecastAt: s.fetchedAt, days: [], prior: null, hours: null, surface: null };
+  if (t0 < 0) return { forecastAt: s.fetchedAt, days: [], prior: null, hours: null, surface: null, timezone: s.timezone };
 
   const dayAt = (i: number): DayWx | null => (i >= 0 && i < dates.length ? aggregateDay(dates[i], byDate.get(dates[i]) ?? []) : null);
   const days: (DayWx | null)[] = [];
@@ -188,7 +190,9 @@ function weatherFrom(forecasts: Forecast[]): Weather {
 
   // The surface model runs over the whole series, history included, so its
   // state has settled by the hours anyone looks at.
-  return { forecastAt: s.fetchedAt, days, prior, hours: byDate.get(today) ?? null, surface: surfaceSeries(s.hours) };
+  return {
+    forecastAt: s.fetchedAt, days, prior, hours: byDate.get(today) ?? null, surface: surfaceSeries(s.hours), timezone: s.timezone,
+  };
 }
 
 const DAY_START = 7, DAY_END = 17;
@@ -242,6 +246,19 @@ export function localDate(timeZone: string, at = new Date()): string {
   } catch {
     return deviceDate(at);
   }
+}
+
+/** The hour of the day (0–23) in a named time zone, falling back to the device's. */
+export function localHour(timeZone: string | null, at = new Date()): number {
+  if (timeZone) {
+    try {
+      const h = Number(new Intl.DateTimeFormat('en-CA', { timeZone, hour: 'numeric', hourCycle: 'h23' }).format(at));
+      if (Number.isInteger(h)) return h;
+    } catch {
+      // An unknown zone falls through to the device's hour.
+    }
+  }
+  return at.getHours();
 }
 
 /** Today's date on the device, YYYY-MM-DD. */

@@ -1,7 +1,7 @@
 # Future feature: webcams (Windy Webcams API)
 
-Status: **not scheduled.** This is a design handoff, not a work item. Do not implement until it is
-explicitly prioritized.
+Status: **built, Oct 2026.** The code follows this document; CLAUDE.md ("Webcams — Windy")
+summarises the rules it keeps. The open questions at the end still need a key and an email.
 
 Revision 4 (Oct 2026): layout settled for the answer-first Today screen; always show the daylight
 image; load once per session with a manual Refresh; Snowpace is free and stays free. Revision 3:
@@ -287,7 +287,11 @@ shown, so it ages while the app stays open.
   pixels, as above), a 400 px image may show only about 133 pt wide on a 3× iPhone. Windy's terms
   were written for web pages, where size is counted in CSS pixels — points on iOS — which would
   allow up to 400 pt. The 160 × 90 pt box works under either reading: under the strict one the
-  image sits slightly smaller, centred. Ask Windy which applies.
+  image sits slightly smaller, centred. **Decided Oct 2026: count points**, so the 400 px
+  preview fills the box (`strictPixels: false`); switch back if Windy says otherwise. Ask Windy
+  which applies.
+- **Titles are shown as delivered.** Windy's titles carry a location prefix ("Area C › North"),
+  but the terms allow the data only "as is", so it is never stripped or shortened.
 
 ## Linking implementation
 
@@ -330,19 +334,45 @@ shown, so it ages while the app stays open.
 - **One exception to omitting:** an image that loaded earlier in the session but has since been
   dropped from memory shows an empty box with Refresh, so the user has something to tap.
 
-## Open questions before building
+## Checked against the live API (Oct 2026)
+
+- **Image sizes on the free tier:** `icon` 48 × 48, `thumbnail` 200 × 112, `preview` 400 × 224;
+  JPEGs of roughly 20–30 KB. Under the strict "never stretch" reading the row's image shows at
+  about 133 × 74 pt on a 3× iPhone.
+- **`daylight` and `current` are separate images** with different URLs even by day
+  (`…/preview/plain/daylight/{id}/…` vs `…/current/…`), so comparing them cannot tell day from
+  night. The forecast-sunshine label rule stands. By day they are the same picture, though
+  (byte-identical when checked), so showing the daylight image costs nothing in freshness.
+- **A listed daylight image can be missing.** Big White's "Happy Valley Road" camera returned a
+  daylight URL that answered 404, while its current image loaded. Snowpace shows only daylight
+  images, so such a camera is skipped: the row moves to the next camera, and the Other cameras
+  list drops it.
+- **Categories:** there is no ski category. `mountain` and `sportArea` are the nearest, and
+  `indoor`, `building`, `traffic` and others are present and accurate — used in ranking.
+- **Titles carry a location prefix** ("Sun Peaks Mountain Resort Municipality: Sun Peaks Golf
+  Course", "Area C › North"), so near a resort nearly every camera matches the name. Ranking
+  therefore weighs categories ahead of popularity, drops `indoor`, and chooses a camera
+  automatically only when its title names the place (Sovereign Lake: nothing shown; none of the
+  five cameras within 5 km names it).
+- **`lastUpdatedOn` tracks captures.** Re-checked 12 minutes apart, five of six cameras had
+  moved on (the sixth captures less often), so the "Updated 12 min ago" label is used.
+- **Expiry is looser than documented.** A 12-minute-old image link still loaded (Windy's pricing
+  page says 15 minutes; the docs say 10). Snowpace keeps 10.
+- **Image URLs keep the same path** (`…/daylight/{id}/original.jpg`); only the token changes.
+- **A repeated ID is rejected** ("All webcamIds's elements must be unique", HTTP 400); the
+  by-ID request removes duplicates.
+- Tuned results: Silver Star → Top of Comet chair; Big White → Big White Mountain; Sun Peaks →
+  Top of the World.
+
+## Still open
 
 - **Email Windy** to confirm free-tier use. Snowpace is free, has no ads, and will stay that way
   (its Open-Meteo use depends on it too). Precedent: Windy staff approved a US Forest Service mobile
   app's free-tier use, conditional on crediting Windy as the image provider. In the same email, ask
-  which pixels "never stretch" counts (see "Image size") and what the free tier's request limit is.
-- **Free-tier request limit.** The key is per account and ships in every install, so usage scales
-  with installs. Check it against the expected load above before building; it may rule the feature
-  out.
+  which pixels "never stretch" counts (see "Image size").
+- **Request limit.** Windy publishes no daily limit for the free tier; its terms forbid
+  "intensive usage" and "continuous scanning". The loading policy is built around that.
 - Confirm `viewCount` semantics (lifetime vs. recent).
-- Confirm `lastUpdatedOn` tracks image capture.
-- Check `/categories` for a usable ski/mountain category.
-- Record actual free-tier image dimensions to size the UI.
 
 ## Related, separate idea (not part of this feature)
 

@@ -2,7 +2,7 @@
  * App-wide state, held in React context.
  *
  * Three kinds of state live here:
- *  - settings (activity, prefs, units, theme, distance limit) — persisted as
+ *  - settings (activity, prefs, units, theme, distance limit, webcams) — persisted as
  *    one JSON blob, loaded before first render, written back on change;
  *  - favourites and the home hill — rows in SQLite, keyed on the inventory
  *    key, reloaded after every write;
@@ -39,6 +39,8 @@ type State = {
   maxDistanceKm: number;
   /** Last known phone position; persisted so distances render on the next launch too. */
   location: LatLon | null;
+  /** Show a webcam for the place on screen (and so ask windy.com for one). */
+  webcams: boolean;
   selHour: number;
   selCell: SelCell | null;
   showBreakdown: boolean;
@@ -55,6 +57,7 @@ type Actions = {
   setUnits: (u: Units) => void;
   setTheme: (t: Scheme) => void;
   setMaxDistance: (km: number) => void;
+  setWebcams: (on: boolean) => void;
   setSelHour: (h: number) => void;
   setSelCell: (c: SelCell) => void;
   toggleBreakdown: () => void;
@@ -76,9 +79,9 @@ type Derived = {
 const Ctx = createContext<(State & Actions & Derived) | null>(null);
 
 /** The slice of state that survives a relaunch. Stored as one JSON blob. */
-export type PersistedState = Pick<State, 'activity' | 'myActs' | 'prefs' | 'units' | 'theme' | 'maxDistanceKm' | 'location'>;
+export type PersistedState = Pick<State, 'activity' | 'myActs' | 'prefs' | 'units' | 'theme' | 'maxDistanceKm' | 'location' | 'webcams'>;
 export const PERSIST_KEY = 'state';
-const PERSISTED: (keyof PersistedState)[] = ['activity', 'myActs', 'prefs', 'units', 'theme', 'maxDistanceKm', 'location'];
+const PERSISTED: (keyof PersistedState)[] = ['activity', 'myActs', 'prefs', 'units', 'theme', 'maxDistanceKm', 'location', 'webcams'];
 
 type ProviderProps = {
   children: ReactNode;
@@ -108,6 +111,8 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
       prefs: mergePrefs(saved.prefs),
       myActs: myActs.length ? myActs : ACTS.map((a) => a.key),
       activity: knownActivity(saved.activity) ? saved.activity : 'classic',
+      // On unless turned off; a blob from before webcams existed has no value.
+      webcams: typeof saved.webcams === 'boolean' ? saved.webcams : true,
     };
   });
   const [favourites, setFavourites] = useState<fav.Favourite[]>(initialFavourites ?? []);
@@ -199,6 +204,7 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
       setUnits: (units) => patch({ units }),
       setTheme: (theme) => patch({ theme }),
       setMaxDistance: (maxDistanceKm) => patch({ maxDistanceKm }),
+      setWebcams: (webcams) => patch({ webcams }),
       setSelHour: (selHour) => patch({ selHour }),
       setSelCell: (selCell) => patch({ selCell }),
       toggleBreakdown: () => patch((s) => ({ showBreakdown: !s.showBreakdown })),
@@ -225,7 +231,7 @@ function unlistedPlace(key: string): Place {
   return {
     key, name: key, shortName: key, lat: 0, lon: 0, minElev: null, maxElev: null, area: null,
     acts: [], website: null, country: null, distanceKm: null, listed: false,
-    forecastAt: null, days: [], prior: null, hours: null, surface: null,
+    forecastAt: null, days: [], prior: null, hours: null, surface: null, timezone: null,
   };
 }
 

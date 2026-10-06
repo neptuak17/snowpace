@@ -1,6 +1,6 @@
 # Snowpace privacy policy
 
-Last updated: 24 September 2026
+Last updated: 6 October 2026
 
 Snowpace does not collect your personal information. There is no account to create,
 no analytics, no advertising, and no tracking of any kind. Nothing you do in the app
@@ -14,7 +14,8 @@ Everything Snowpace knows about you is stored on your device and nowhere else:
 
 * the places you save and which one is your home hill
 * your activities and preferences (temperature, wind, snow, precipitation, distance)
-* your units and appearance settings
+* your units and appearance settings, and whether webcams are switched on
+* which webcam you chose for a place, if you chose one
 * the ski-area listing and the cached weather forecasts
 
 Deleting the app deletes all of it. None of it is backed up to a server by Snowpace,
@@ -32,16 +33,22 @@ works without it; it simply stops showing distances.
 
 ## Network requests Snowpace makes
 
-Snowpace talks to two public services directly from your phone. Neither request
-includes your location, your device identifier, or anything about you.
+Snowpace talks to three public services directly from your phone. None of these
+requests includes your location, your device identifier, or anything about you.
 
 * **Open-Meteo** (`api.open-meteo.com`) — weather forecasts. The request carries the
   coordinates and elevations of the ski areas you have saved. Open-Meteo's own privacy
   policy is at <https://open-meteo.com/en/terms>.
 * **OpenSkiData** (`tiles.openskimap.org`) — the list of ski areas, downloaded at most
   once every 30 days. The request carries no parameters at all.
+* **Windy** (`api.windy.com`) — webcam pictures, only while webcams are switched on in the
+  You tab (they are on unless you turn them off). When you look at a place, the request
+  carries that ski area's coordinates, or the number of a camera already chosen for it,
+  and the pictures then load from Windy's servers. Tapping a picture opens the camera's
+  page on windy.com in Safari. Windy's privacy policy is at
+  <https://account.windy.com/agreements/windy-privacy-policy>.
 
-Both requests identify the app with the name `Snowpace` and a link to its public source
+All three requests identify the app with the name `Snowpace` and a link to its public source
 repository, so the people running those services can get in touch if the traffic ever
 causes them trouble. Like any web request, they are visible to your internet provider
 and reach the service with your IP address attached; that is a property of the internet,

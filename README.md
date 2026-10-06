@@ -14,7 +14,7 @@ Snowpace is a hobby project, not monetised, and not on the App Store yet.
 
 ## How it works
 
-Snowpace is a standalone app with **no backend**. The phone talks directly to two
+Snowpace is a standalone app with **no backend**. The phone talks directly to three
 public services and caches what it gets:
 
 - **[OpenSkiData](https://openskimap.org)** for the list of ski areas in North America
@@ -23,8 +23,10 @@ public services and caches what it gets:
 - **[Open-Meteo](https://open-meteo.com)** for hourly forecasts at each saved place,
   at base and summit elevation for downhill areas. Refreshed when older than three
   hours.
+- **[Windy](https://www.windy.com)** for a webcam picture of the place on screen, when
+  webcams are switched on. Loaded once per session, then only when you tap Refresh.
 
-Every score is computed on the phone from those two sources. Your location never
+Every score is computed on the phone from the first two; webcams are for looking, not scoring. Your location never
 leaves the device; the forecast requests carry ski-area coordinates only.
 
 ## Contact
@@ -45,6 +47,7 @@ is never transmitted — see [PRIVACY.md](PRIVACY.md).
   [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors and
   [Skimap.org](https://skimap.org). Open Database License (ODbL).
 - Weather: [Open-Meteo.com](https://open-meteo.com), CC BY 4.0.
+- Webcams: provided by [windy.com](https://www.windy.com).
 
 ## Development
 
@@ -58,6 +61,11 @@ npx expo start
 
 Then open it in Expo Go on a phone. `npm run build-seed` regenerates the bundled
 ski-area seed from the live OpenSkiData file.
+
+Webcams need a Windy API key (free, from [api.windy.com/keys](https://api.windy.com/keys)).
+Copy `.env.example` to `.env.local` and put the key there; it is git-ignored, and
+Windy's terms forbid publishing the key. EAS builds read it from an EAS environment
+variable of the same name instead. Without a key the app works, with no webcams.
 
 `CLAUDE.md` holds the project's constraints and data-source decisions.
 

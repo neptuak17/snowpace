@@ -50,7 +50,7 @@ export default function FeedbackScreen() {
     try {
       const outcome = await sendFeedback(
         { kind, place, includeDiagnostics },
-        { myActs: s.myActs, activity: s.activity, units: s.units, maxDistanceKm: s.maxDistanceKm, prefs: s.prefs, locationGranted: s.location !== null },
+        { myActs: s.myActs, activity: s.activity, units: s.units, maxDistanceKm: s.maxDistanceKm, prefs: s.prefs, locationGranted: s.location !== null, webcamsOn: s.webcams },
       );
       if (outcome === 'sent') { setNotice(f.thanks); setTimeout(() => router.back(), 900); }
       else if (outcome === 'saved') setNotice(f.saved);

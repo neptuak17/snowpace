@@ -6,6 +6,7 @@ import { ActivityChips } from './activity-chips';
 import { DayAnswer } from './day-answer';
 import { DayBreakdown, WhyToggle } from './day-breakdown';
 import { HourStrip } from './hour-grid';
+import { WebcamSection } from './webcam-section';
 import { AppButton, LinkButton } from './ui/app-button';
 import { AppText } from './ui/app-text';
 import { Card, Kicker } from './ui/card';
@@ -99,6 +100,9 @@ export function PlaceToday({ place, afterAnswer }: Props) {
               <HourStrip grid={grid} selHour={s.selHour} onPick={s.setSelHour} units={s.units} />
             </View>
           )}
+
+          {/* Evidence for the answer: after the hours, or straight under the answer on bare ground. */}
+          <WebcamSection place={place} style={styles.pad18} />
 
           {!bare && (
             <>

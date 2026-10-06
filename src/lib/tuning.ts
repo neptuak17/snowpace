@@ -185,6 +185,64 @@ export const TUNING = {
     pluralFrom: 3,
   },
 
+  // ── Webcams (Windy, src/data/windy.ts). See docs/snowpace-webcams-feature-handoff.md.
+  webcam: {
+    // Nearby-search radius (km) from the area's single point: a big resort
+    // spreads further than a nordic club. Radius matters more than the weights.
+    radiusKm: { downhill: 10, nordic: 5 },
+    // A resolved camera is reused this long before the nearby search reruns.
+    resolveForHours: 24,
+    // A camera whose newest capture is older than this is dropped as stale.
+    staleAfterHours: 24,
+    // Free-tier image links expire after 10 minutes (Windy's pricing page
+    // says 15); never request one older than this.
+    urlTtlMin: 10,
+    // Day when the forecast's sun at the current hour is at least this, which
+    // also keeps dawn and dusk on the "Last daylight image" label.
+    dayRadiationW: 50,
+    // The image box on Today and the place screen, in points (16:9).
+    box: { w: 160, h: 90 },
+    // Thumbnails in the Other cameras list.
+    thumb: { w: 96, h: 54 },
+    // "Use images only in their original size or in a smaller size": true
+    // counts physical pixels (a 400 px image shows at most 133 pt on a 3×
+    // phone); false counts points, as the web pages the terms were written
+    // for count CSS pixels, so the 400 px preview fills the 160 pt box.
+    // Points chosen Oct 2026 so the image fills its box; set back to true if
+    // Windy answers that physical pixels are meant.
+    strictPixels: false,
+    // Ranking: name similarity leads; then what the camera looks at (Windy's
+    // categories); popularity (log-scaled within one result set) only
+    // separates comparable matches; distance breaks ties. Measured Oct 2026:
+    // Windy prefixes every title with its location ("Sun Peaks Mountain
+    // Resort Municipality: Sun Peaks Golf Course"), so near a resort nearly
+    // every camera matches the name, and without categories popularity alone
+    // picked a golf course and a reservations office.
+    nameWeight: 1,
+    popularityWeight: 0.3,
+    distanceWeight: 0.05,
+    // Per category id: a camera scores its best positive plus its worst
+    // negative. Windy has no ski category; mountain and sportArea are nearest.
+    categoryScores: {
+      mountain: 0.5, sportArea: 0.5, landscape: 0.2, meteo: 0.2, forest: 0.1,
+      building: -0.2, city: -0.2, square: -0.1, traffic: -0.3, airport: -0.3, port: -0.3,
+    } as Record<string, number>,
+    // Never shown: a camera indoors says nothing about conditions.
+    dropCategories: ['indoor'] as string[],
+    // A camera is only chosen automatically if its title names the place:
+    // at least this share of the place's distinctive words. Otherwise the
+    // section is left out rather than showing a neighbour's camera as if it
+    // were this place's (Sovereign Lake would get a Silver Star view). A
+    // user's own pick is exempt. Decided Oct 2026.
+    minNameScore: 0.5,
+    // Words that say what kind of place it is rather than which one.
+    nameStopWords: [
+      'resort', 'resorts', 'mountain', 'mountains', 'mtn', 'mt', 'nordic', 'centre', 'center', 'ski', 'skiing',
+      'area', 'club', 'trails', 'trail', 'the', 'and', 'of', 'at', 'webcam', 'cam', 'camera', 'live', 'hd', 'view',
+      'alpine', 'recreation', 'provincial', 'regional', 'society', 'association', 'outdoor', 'municipality',
+    ],
+  },
+
   // ── A forecast older than this (minutes) is shown in gold as a nudge to refresh.
   staleForecastMin: 360,
 

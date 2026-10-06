@@ -9,6 +9,7 @@ import { Screen, ScreenTitle } from '@/components/ui/screen';
 import { Segmented } from '@/components/ui/segmented';
 import { ToggleSwitch } from '@/components/ui/toggle-switch';
 import { ACT_NOTES, ACTS } from '@/data/places';
+import { WINDY_API_KEY } from '@/data/project';
 import { fmtDistance, fmtS, fmtT, fmtW } from '@/lib/format';
 import { actLabel, fallCopy, fallLabel, snowHint, snowLabel } from '@/lib/scoring';
 import { TUNING } from '@/lib/tuning';
@@ -96,6 +97,22 @@ export default function YouScreen() {
           hint={y.maxDistanceHint} onChange={s.setMaxDistance}
         />
       </Card>
+
+      {/* Only offered when the app was built with a Windy key (forks of the repo have none). */}
+      {WINDY_API_KEY && (
+        <Card style={styles.gap13}>
+          <Kicker>{y.webcamsKicker}</Kicker>
+          <View style={styles.dispRow}>
+            <AppText size={13} weight={600}>
+              {y.webcamsLabel}
+            </AppText>
+            <ToggleSwitch on={s.webcams} label={y.webcamsLabel} onToggle={() => s.setWebcams(!s.webcams)} />
+          </View>
+          <AppText size={10.5} muted lh={1.4}>
+            {y.webcamsHint}
+          </AppText>
+        </Card>
+      )}
 
       <Card style={styles.gap13}>
         <Kicker>{y.display}</Kicker>

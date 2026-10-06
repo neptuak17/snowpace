@@ -254,6 +254,65 @@ sharply at ice; classic peaks in the middle — ice kills kick, and very soft sn
 track. Downhill and snowshoe keep their current factors. The same model is the foundation for fat
 biking's missing "hardpack" variable.
 
+### Webcams — Windy
+
+**Source:** Windy Webcams API v3 (`api.windy.com/webcams/api/v3/webcams`), **free tier**. Built
+Oct 2026; the full design is `docs/snowpace-webcams-feature-handoff.md`, and the code is
+`src/data/windy.ts` (pure: requests, parsing, ranking, image choice), `src/data/webcams.ts`
+(fetching, the remembered camera, the session) and `src/components/webcam-section.tsx`.
+
+* **Still images only.** Never request the `player` part or embed a Windy player: it carries ads,
+  and Snowpace shows none. Snowpace is free and stays free, so the free tier's "not only in a paid
+  part of the app" condition is met.
+* **Terms that shape the code:** every image links to the camera's `urls.detail`, opened in Safari
+  (`Linking.openURL`) so Windy's own pages sit outside the app; the courtesy line "Webcams provided
+  by windy.com — add new webcam" sits under every webcam view, both parts linked; images are never
+  shown above native size, counted in points as web pages count CSS pixels (`strictPixels:
+  false`, chosen Oct 2026 so the 400 px preview fills its 160 pt box — set it back to `true`
+  if Windy says physical pixels are meant); titles are shown as delivered, never shortened
+  (the terms allow the data only "as is");
+  images are held in memory only (`expo-image` with `cachePolicy="memory"`), never written to disk.
+* **The API key is never committed** — Windy's terms forbid publishing it. Development reads
+  `EXPO_PUBLIC_WINDY_API_KEY` from `.env.local` (git-ignored; `.env.example` shows the name); EAS
+  builds read it from an EAS environment variable of the same name in the `production`
+  environment. Being `EXPO_PUBLIC_`, it ships inside the app, as any key a phone uses directly
+  must. With no key the feature, and its toggle, are simply absent.
+* **Quota.** Windy publishes no daily limit for the free tier; its terms forbid "intensive usage"
+  and "continuous scanning". That, not a number, is what the loading policy below is built
+  around. Decided Oct 2026 to build on that basis; if Windy objects or limits the key, the toggle
+  defaults off or the feature comes out.
+* **Layout:** one camera as a compact row on Today and the place screen (the shared
+  `PlaceToday`), after the hour strip and before "Why? ›" — straight under the answer on bare
+  ground, where it can show snowmaking the snowpack model cannot see. Not on the Forecast detail.
+  Other candidates sit behind "Other cameras ›", which is also the user's override.
+* **Which camera:** the user's pick (persisted per place in the settings table, key
+  `webcam:<place key>`) always wins; otherwise the nearby search (5 km nordic, 10 km downhill)
+  ranked by name similarity, then Windy's categories (`mountain`/`sportArea` preferred,
+  buildings and roads marked down, `indoor` dropped), then log-scaled popularity within the
+  result set, then distance. Categories matter more than the handoff expected because Windy
+  prefixes every title with its location ("Sun Peaks Mountain Resort Municipality: Sun Peaks
+  Golf Course"), so near a resort nearly every camera matches the name; without them popularity
+  picked a golf course and a reservations office. **A camera is only chosen automatically if
+  its title names the place** (`minNameScore`); otherwise the section is left out rather than
+  showing a neighbour's camera as if it were this place's — Sovereign Lake shows nothing rather
+  than a Silver Star view. A user's own pick is exempt. The choice is reused for 24 hours; a
+  search that finds nothing is remembered too.
+* **Which image:** always `images.daylight`, so never a black frame and no sunrise/sunset needed.
+  The forecast's `shortwave_radiation` at the place's current hour only picks the label: "Updated
+  12 min ago" by day, "Last daylight image" otherwise.
+* **Loading:** once per session (launch, or returning to the app after the forecast's 3-hour
+  staleness), then only on Refresh. Links expire after 10 minutes and are never requested after
+  that; an image dropped from memory shows an empty box with Refresh. No polling, no prefetching
+  places the user is not looking at. Offline or no camera: the section is omitted.
+* **Switch:** "Show webcams" on the You tab, on by default; off means no requests to Windy at all.
+
+Checked against the live API, Oct 2026 (details in the handoff): free-tier images are 48, 200
+and 400 px wide; `lastUpdatedOn` advances with each capture, so "Updated 12 min ago" is
+trustworthy; by day the daylight image is the current one; a listed daylight image can be
+missing (404), so such cameras are skipped; a 12-minute-old image link still loaded, so the
+10-minute expiry is conservative; Windy rejects a request that repeats a camera ID. Still open:
+email Windy about the free-tier use and how "never stretch" counts pixels.
+
 ### Deliberately excluded
 
 * **Grooming recency.** No free public dataset exists. Do not scrape it or resort websites. 
@@ -274,6 +333,7 @@ The about/credits screen must include:
 
 * OpenSkiData / OpenStreetMap / Skimap.org contributors (ODbL)
 * Open-Meteo (CC BY 4.0)
+* Windy ("Webcams provided by windy.com — add new webcam"; also required next to every webcam view)
 * USDA NRCS SNOTEL, if station readings are displayed
 
 ### Open items
@@ -313,38 +373,6 @@ The about/credits screen must include:
 
   If the activities never appear, the fallback is a per-place activity override stored against
   the favourite, which would also let a user correct upstream errors like the one Larch Hills had.
-
-* **Webcams on Today and the place screen** — a design handoff exists at
-  `docs/snowpace-webcams-feature-handoff.md`. **Not scheduled**; do not implement until it is
-  explicitly prioritized. It covers the Windy Webcams API v3 free tier (still images only; the
-  embedded player is excluded because it carries ads), runtime camera matching by name similarity
-  (no mapping table), a required user override persisted per area, caching the resolved camera ID
-  rather than the expiring image URL, and display rules for darkness, missing cameras and
-  attribution.
-
-  Layout and behaviour, decided Oct 2026 (details in the handoff):
-  - **One camera as a compact row, after the hour strip and before "Why? ›"** — the answer comes
-    first, the webcam is evidence for it. Other candidates sit behind "Other cameras ›", which is
-    also the override; there is no thumbnail strip. Shown on bare days (it can reveal snowmaking
-    the snowpack model cannot see); not on the Forecast detail.
-  - **Always the daylight image**, so never a black frame and no sunrise/sunset needed. Day or
-    night only picks the label ("Updated 12 min ago" or "Last daylight image"), decided from the
-    forecast's `shortwave_radiation` at the current hour.
-  - **Load once per session** (launch, or return once the forecast is stale), then only on a
-    manual **Refresh**. Images held in memory only, never on disk — `expo-image` is the likely
-    route, a new dependency to approve.
-  - Snowpace is free and stays free, so the handoff's free-tier use is the US Forest Service
-    precedent's case, not a paid app's.
-
-  Two things to settle against this file's own rules before any work starts:
-  - **Quota.** Windy's free tier is keyed per account, and the architecture constraint above rules
-    out APIs with per-account daily quotas, because usage scales with installs and cannot be cached
-    centrally. Check the actual free-tier limit first — it may disqualify the feature outright.
-  - **The key ships in the binary** and is extractable, so it cannot be treated as a secret.
-
-  The handoff also records a separate idea worth its own entry if pursued: DriveBC highway cameras
-  via DataBC, under the Open Government Licence – British Columbia, no key and no quota, showing the
-  drive rather than the hill. US equivalents are the state 511 systems.
 
 * **Nordic wax guidance** — a design handoff exists at
   `docs/snowpace-wax-guidance-feature-handoff.md`. **Not scheduled**; do not implement until it is
