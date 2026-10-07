@@ -169,10 +169,15 @@ function fallSub(day: Wx, p: Prefs, act: ActivityKey): number {
   const f = T.fall;
   const mm = snowFallingMm(day), tol = p.precipTol;
   if (isHill(act)) {
-    const rel = mm / (f.hillBaseMm + (tol / 100) * f.hillTolSpanMm);
+    const rel = mm / hillFallMm(p);
     return clamp(rel <= 1 ? f.hillFloor + (100 - f.hillFloor) * rel : 100 - (rel - 1) * f.hillOverPenaltyPerRel);
   }
   return clamp(100 - mm * (act === 'skate' ? f.skatePerMm : f.classicPerMm) * (1 - tol / f.tolDivisor));
+}
+
+// On a hill, the falling snow (mm) that scores best; more than this counts against the day.
+function hillFallMm(p: Prefs): number {
+  return T.fall.hillBaseMm + (p.precipTol / 100) * T.fall.hillTolSpanMm;
 }
 
 // 24 h new snow — the curve differs by activity, not just the target.
@@ -408,6 +413,8 @@ function weakest(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, unit
   const w = strings.weakest;
   const onHill = isHill(act);
   const snowNote = onHill ? w.notMuchFresh : d.snow < p.snow ? w.nothingNew : w.tooMuchUnpacked;
+  // On a hill, falling snow scores lower both when there is too little and when there is too much.
+  const fallNote = !onHill ? w.snowingOnTrack : snowFallingMm(d) > hillFallMm(p) ? w.tooMuchFalling : w.notMuchFalling;
   const items = [
     { k: 't', v: x.t, note: d.t < p.temp ? w.colder : w.warmer },
     { k: 's', v: x.s, note: snowNote },
@@ -415,7 +422,7 @@ function weakest(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, unit
     { k: 'ft', v: x.ft, note: w.crust },
     { k: 'w', v: x.w, note: w.wind },
     { k: 'pr', v: x.pr, note: rainNote(l, di, d) },
-    { k: 'fall', v: x.fall, note: onHill ? w.nothingFalling : w.snowingOnTrack },
+    { k: 'fall', v: x.fall, note: fallNote },
     { k: 'c', v: x.c, note: w.flatLight },
     { k: 'cov', v: x.cov, note: x.cov <= 0 ? w.bareGround : w.thinSnowpack },
   ];
