@@ -238,7 +238,7 @@ export const strings = {
     ] as const,
     appKicker: 'The app',
     projectLink: 'Snowpace on GitHub',
-    privacyLink: 'Privacy policy on GitHub',
+    privacyLink: 'Privacy policy',
     version: (v: string) => `Version ${v}`,
     openLink: (name: string) => `${name} ↗`,
   },

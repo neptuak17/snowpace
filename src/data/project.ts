@@ -8,8 +8,11 @@ export const PROJECT_URL = 'https://github.com/neptuak17/snowpace';
 
 export const FEEDBACK_EMAIL = 'clifford.smith@gmail.com';
 
+/** The website (site/ in this repository, published by GitHub Pages). */
+export const SITE_URL = 'https://neptuak17.github.io/snowpace/';
+
 /** The privacy policy, as the App Store listing and the credits screen link to it. */
-export const PRIVACY_URL = `${PROJECT_URL}/blob/main/PRIVACY.md`;
+export const PRIVACY_URL = `${SITE_URL}privacy/`;
 
 export const USER_AGENT = `Snowpace/1.0 (+${PROJECT_URL})`;
 
