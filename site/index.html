@@ -1,0 +1,202 @@
+<!doctype html>
+<!--
+  Snowpace website. How to edit it:
+
+  - The words on this page are yours to change: edit the text between the
+    tags, save, commit and push. The site republishes about a minute after
+    the change reaches main. Leave the <tags> themselves alone, and write a
+    plain & as &amp;.
+  - To see a change first, open this file in a browser (double-click it).
+  - The sample days, the eight factors and their weights, and the score
+    bands are not written here. They come from the app itself, through
+    demo-data.js. To change those, change the app and run
+      node scripts/build-site-demo.mts
+-->
+<html lang="en-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Snowpace: is it worth going out today?</title>
+  <meta name="description" content="Snowpace scores the day out of 100 at the places you ski and snowshoe, for downhill, classic, skate and snowshoe. Free, no ads, no account.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#edf2f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1626" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Snowpace: is it worth going out today?">
+  <meta property="og:description" content="A score out of 100 for the places you ski and snowshoe, the best hours, and the reason in a sentence.">
+  <meta property="og:image" content="https://neptuak17.github.io/snowpace/img/icon.png">
+  <meta property="og:url" content="https://neptuak17.github.io/snowpace/">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="img/icon.png">
+  <link rel="apple-touch-icon" href="img/icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="wrap top">
+  <a class="brand" href="#" aria-label="Snowpace">
+    <svg viewBox="0 0 1024 1024" aria-hidden="true"><rect width="1024" height="1024" fill="#eef3fa"/><rect y="424" width="1024" height="600" fill="#7a9cc0"/><path fill="#232d3a" d="M0 656H128C175 620 205 590 238 566C300 520 330 300 404 258C460 300 540 520 616 536C680 545 712 420 766 396C840 440 930 580 1024 606V1024H0Z"/></svg>
+    <b>Snowpace</b>
+  </a>
+  <a class="soon-link" href="#get">Coming soon</a>
+</header>
+
+<main>
+
+  <!-- ── Opening: the pitch and the demo card ──────────────────────────── -->
+  <section class="hero" aria-labelledby="h1">
+    <canvas id="sky" aria-hidden="true"></canvas>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="kicker">Downhill · Classic · Skate · Snowshoe</p>
+        <h1 id="h1">Is it worth going out today?</h1>
+        <p class="lede">Snowpace scores the day out of 100 at the places you ski and snowshoe. It reads the mountain forecast and judges it for the activity you're doing. You get one number, the best hours and the reason in a sentence.</p>
+        <div class="facts-row"><span>Free</span><span>No ads</span><span>No account</span><span>Nothing tracked</span></div>
+        <div class="cta">
+          <div class="soon"><small>Coming soon to the</small><b>App Store</b></div>
+          <a class="ghost" href="#score">How it decides ↓</a>
+        </div>
+      </div>
+
+      <div class="demo" aria-label="Try Snowpace on a sample day">
+        <p class="kicker">Try a sample day</p>
+        <div class="chips" id="days"></div>
+        <p class="demo-blurb" id="blurb"></p>
+        <hr>
+        <div class="chips" id="acts"></div>
+        <div class="answer-top">
+          <div id="dial-slot"></div>
+          <div class="answer-side">
+            <div class="band-word" id="word"></div>
+            <div class="best" id="best"></div>
+            <div class="dayfacts" id="facts"></div>
+          </div>
+        </div>
+        <p class="verdict" id="verdict" aria-live="polite"></p>
+        <div class="strip" id="strip">
+          <p class="kicker">Today, hour by hour</p>
+          <div class="cells" id="cells"></div>
+          <div class="hours" id="hours" aria-hidden="true"></div>
+          <p class="hourline" id="hourline"></p>
+        </div>
+        <div class="demo-foot">
+          <p>Made-up weather, scored by the app's own engine with its starting settings. You can change them in the app.</p>
+          <div class="chips" id="units" role="group" aria-label="Units"></div>
+        </div>
+      </div>
+    </div>
+    <svg class="ridge" viewBox="0 0 1440 220" preserveAspectRatio="none" aria-hidden="true">
+      <path class="far" d="M0 120C120 90 200 60 300 80C420 104 520 40 640 50C780 62 860 110 980 96C1100 82 1200 40 1320 58C1380 66 1420 80 1440 84V220H0Z"/>
+      <path class="near" d="M0 170H90C150 150 200 120 240 95C300 60 330 10 380 4C430 10 480 90 560 118C610 132 650 70 700 58C760 70 820 140 900 150C980 158 1040 120 1100 112C1180 104 1260 150 1340 160C1390 166 1420 168 1440 168V220H0Z"/>
+    </svg>
+  </section>
+
+  <!-- ── Same weather, four sports ─────────────────────────────────────── -->
+  <section class="band" aria-labelledby="h-sports">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">Same weather, different day</p>
+        <h2 id="h-sports">A powder day for one sport is a slog for another</h2>
+        <p>Fresh snow that makes a downhill day bogs down a skate ski. Every place gets its own score for each activity, measured against the temperature, wind and new snow you said you like.</p>
+      </div>
+      <div class="sports" id="sports"></div>
+      <p class="band-note"><span id="sports-day"></span> Pick another sample day above to compare.</p>
+    </div>
+  </section>
+
+  <!-- ── How it decides ────────────────────────────────────────────────── -->
+  <section class="section" id="score" aria-labelledby="h-score">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">How it decides</p>
+        <h2 id="h-score">Eight things go into every score</h2>
+        <p>Each one is weighted for the activity. Four of them are measured against what you tell the app: your ideal temperature, how much wind you'll put up with, how much fresh snow you want, and how you feel about snow falling while you're out.</p>
+      </div>
+      <div class="weights-for"><span>Weights for</span><div class="chips" id="acts2"></div></div>
+      <!-- data-you-set is the tag on the four factors you set yourself. -->
+      <div class="factors" id="factors" data-you-set="You set this"></div>
+      <p class="snowpack" id="snowpack"></p>
+      <div class="bands" id="bands"></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="h-more">
+    <div class="wrap">
+
+      <!-- ── Features ──────────────────────────────────────────────────── -->
+      <div class="section-head">
+        <p class="kicker">Around the answer</p>
+        <h2 id="h-more">What else you'll find</h2>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <div class="glyph" aria-hidden="true"><i class="b-go"></i><i class="b-hi"></i><i class="b-hi"></i><i class="b-hi"></i><i class="b-go"></i><i class="b-fair"></i></div>
+          <h3>The best hours</h3>
+          <p>Today, hour by hour, with the best three hours in a row marked. Tap an hour for its temperature, wind and any snow or rain.</p>
+        </div>
+        <div class="feature">
+          <div class="glyph grid" aria-hidden="true"><i class="b-hi"></i><i class="b-go"></i><i class="b-fair"></i><i class="b-go"></i><i class="b-hi"></i><i class="b-fair"></i><i class="b-poor"></i><i class="b-go"></i><i class="b-hi"></i><i class="b-go"></i></div>
+          <h3>Five days ahead</h3>
+          <p>Forecast lays out every place you've saved against the next five days. Tap any square for the detail on that day.</p>
+        </div>
+        <div class="feature">
+          <div class="glyph" aria-hidden="true"><i class="b-poor"></i><i class="b-poor"></i><i class="b-hi"></i><i class="b-hi"></i></div>
+          <h3>Better nearby</h3>
+          <p>On a poor day at your home hill, places nearby that score better are listed right under it, with how far away they are.</p>
+        </div>
+        <div class="feature">
+          <div class="glyph" aria-hidden="true"><i class="b-none cam"></i></div>
+          <h3>See it for yourself</h3>
+          <p>Where a place has a webcam of its own, a recent picture from windy.com sits under the hours. It's there to look at and never changes a score.</p>
+        </div>
+      </div>
+
+      <!-- ── Privacy ───────────────────────────────────────────────────── -->
+      <div class="private" aria-labelledby="h-private">
+        <div class="section-head">
+          <p class="kicker">Private by design</p>
+          <h2 id="h-private">There's no Snowpace server to send anything to</h2>
+          <p>The app talks straight to the public services it uses, and only asks them about ski areas.</p>
+        </div>
+        <ul>
+          <li><b>No account</b><span>Nothing to sign up for, nothing to sign in to.</span></li>
+          <li><b>No ads, no analytics, no tracking</b><span>None are built in, and none will be.</span></li>
+          <li><b>Your location stays on your phone</b><span>It's used to show how far away each place is and is never sent anywhere.</span></li>
+          <li><b>Public data, credited</b><span>Forecasts from Open-Meteo, ski areas from OpenSkiData, webcam pictures from windy.com.</span></li>
+        </ul>
+      </div>
+
+      <!-- ── What it doesn't know ──────────────────────────────────────── -->
+      <div class="caution">
+        <h3>Snowpace only scores the weather</h3>
+        <p>It doesn't know whether lifts are running or trails are groomed, so every place links to its operator's web site. Check it, and the avalanche forecast for the area, before you go.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ── Footer ────────────────────────────────────────────────────────── -->
+<footer class="foot" id="get">
+  <svg class="ridge" viewBox="0 0 1440 220" preserveAspectRatio="none" aria-hidden="true">
+    <path class="far" d="M0 140C160 120 260 70 400 76C540 82 600 130 760 120C900 110 980 50 1120 60C1260 70 1360 120 1440 110V220H0Z"/>
+    <path class="near" d="M0 190C120 180 220 150 320 120C400 96 450 60 520 64C600 70 660 150 760 160C860 170 940 110 1040 100C1140 92 1220 150 1320 168C1380 178 1420 180 1440 180V220H0Z"/>
+  </svg>
+  <div class="foot-band">
+    <div class="wrap foot-grid">
+      <div>
+        <h2>Coming soon to the App Store</h2>
+        <p style="margin-top:0.75rem">Free, for iPhone. Over 1,300 ski areas and nordic centres across North America.</p>
+      </div>
+      <div class="credits">
+        <div class="links"><a href="https://github.com/neptuak17/snowpace/blob/main/PRIVACY.md">Privacy policy</a><a href="https://github.com/neptuak17/snowpace">Source on GitHub</a></div>
+        <p>Weather data by <a href="https://open-meteo.com">Open-Meteo.com</a> (CC BY 4.0). Ski areas © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> and Skimap.org (ODbL), via <a href="https://openskimap.org">OpenSkiData</a>. Webcams provided by <a href="https://www.windy.com">windy.com</a>.</p>
+        <p>The sample days on this page are made-up weather, scored by the app's own engine.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="demo-data.js"></script>
+<script src="demo.js"></script>
+</body>
+</html>

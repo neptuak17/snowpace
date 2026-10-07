@@ -46,7 +46,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "build-seed": "node scripts/build-seed.mts"
+    "build-seed": "node scripts/build-seed.mts",
+    "build-site-demo": "node scripts/build-site-demo.mts"
   },
   "private": true
 }
