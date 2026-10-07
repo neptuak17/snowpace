@@ -6,7 +6,7 @@ import { ACTS, type ActivityKey, type DayWx, type Place } from '@/data/places';
 
 /** The weather values a score is computed from — a whole day, or one hour of it. */
 export type Wx = Pick<DayWx, 't' | 'snow' | 'wind' | 'cloud' | 'precip' | 'rain'>;
-import { fmtS, fmtT, fmtW, hourLabel, type Units } from '@/lib/format';
+import { clockHour, fmtS, fmtT, fmtW, hourLabel, type Units } from '@/lib/format';
 import { strings } from '@/strings';
 import { daySurfaceText, showsSurface } from '@/lib/surface';
 import { TUNING, type BlendKey, type FactorKey } from '@/lib/tuning';
@@ -352,7 +352,7 @@ export function windowLabel(g: HourGrid): string | null {
   if (!g.window) return null;
   const startH = g.hours[g.window.from], endH = g.hours[g.window.to] + 1;
   const sameHalf = startH < 12 === endH < 12;
-  return strings.today.bestLabel(sameHalf ? startH + '–' + hourLabel(endH) : hourLabel(startH) + '–' + hourLabel(endH));
+  return strings.today.bestLabel(sameHalf ? clockHour(startH) + '–' + hourLabel(endH) : hourLabel(startH) + '–' + hourLabel(endH));
 }
 
 export type BandKey = 'hi' | 'go' | 'fair' | 'poor' | 'skip' | 'none';

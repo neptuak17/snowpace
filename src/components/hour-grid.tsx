@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { AppText } from './ui/app-text';
 import { SectionLabel } from './ui/card';
 
-import { hourLabel, type Units } from '@/lib/format';
+import { clockHour, hourLabel, type Units } from '@/lib/format';
 import { band, hourLine, type Band, type GridRow, type HourGrid } from '@/lib/scoring';
 import { bandColors } from '@/theme/band-colors';
 import type { Theme } from '@/theme/tokens';
@@ -99,7 +99,7 @@ function HourNumbers({ grid, selHour, window }: { grid: HourGrid; selHour?: numb
         return (
           <View key={h} style={styles.flex}>
             <AppText size={9.5} center weight={on ? 800 : 400} muted={!on}>
-              {h === 12 ? '12' : String(h > 12 ? h - 12 : h)}
+              {clockHour(h)}
             </AppText>
             {window && <View style={[styles.mark, inWindow && { backgroundColor: theme.accent }]} />}
           </View>

@@ -37,3 +37,8 @@ export function forecastAgeMin(forecastAt: string | null, now = Date.now()): num
 export function hourLabel(h: number): string {
   return h === 12 ? strings.format.noon : h < 12 ? strings.format.am(h) : strings.format.pm(h - 12);
 }
+
+/** The hour as it reads on a 12-hour clock, with no AM or PM: 15 → 3, 12 → 12. */
+export function clockHour(h: number): number {
+  return h > 12 ? h - 12 : h;
+}
