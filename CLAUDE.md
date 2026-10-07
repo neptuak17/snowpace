@@ -413,6 +413,15 @@ npm. `.github/workflows/pages.yml` publishes the folder as it is to GitHub Pages
 commits do not trigger it. Built Oct 2026 from "mockup A": a working answer card first, then the
 four sports side by side, how the score is decided, features, privacy, and a footer.
 
+* **Three pages, three App Store Connect fields.** The main page is the Marketing URL;
+  `site/support/` (contact email and common questions; Apple requires a real way to get in
+  touch) is the Support URL; `site/privacy/` is the Privacy Policy URL. The privacy page is the
+  **one official copy of the privacy policy**: the app's Credits screen links to it
+  (`PRIVACY_URL` in `src/data/project.ts`), and `PRIVACY.md` only points to it, so links in
+  test builds 1–3 still work. When the app's data handling changes, update that page and its
+  "Last updated" date. The header and footer are repeated on all three pages (no build step,
+  so no templates): a change to a footer link goes in all three.
+
 * **Where the words live.** Marketing copy is written in `site/index.html` and edited by hand
   (the owner edits it directly, sometimes on github.com). Everything that describes how the app
   scores is generated into `site/demo-data.js` by `node scripts/build-site-demo.mts`: the sample

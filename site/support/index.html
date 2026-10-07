@@ -1,0 +1,83 @@
+<!doctype html>
+<!--
+  Snowpace support page: the App Store's Support URL. Edit the words between
+  the tags, save, commit and push; see the note at the top of ../index.html.
+  The header and footer are repeated on every page, so a change to a footer
+  link belongs in all three: index.html, support/index.html, privacy/index.html.
+-->
+<html lang="en-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Snowpace support</title>
+  <meta name="description" content="How to get in touch about Snowpace, and answers to common questions.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#edf2f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1626" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="../img/icon.png">
+  <link rel="apple-touch-icon" href="../img/icon.png">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<header class="wrap top">
+  <a class="brand" href="../" aria-label="Snowpace home">
+    <svg viewBox="0 0 1024 1024" aria-hidden="true"><rect width="1024" height="1024" fill="#eef3fa"/><rect y="424" width="1024" height="600" fill="#7a9cc0"/><path fill="#232d3a" d="M0 656H128C175 620 205 590 238 566C300 520 330 300 404 258C460 300 540 520 616 536C680 545 712 420 766 396C840 440 930 580 1024 606V1024H0Z"/></svg>
+    <b>Snowpace</b>
+  </a>
+  <a class="soon-link" href="../#get">Coming soon</a>
+</header>
+
+<main class="doc">
+  <p class="kicker">Support</p>
+  <h1>Get in touch</h1>
+  <p class="lede">Something broken, a score that looks wrong, a place that's missing, or an idea: I'd like to hear about it.</p>
+
+  <div class="contact">
+    <p class="email"><a href="mailto:clifford.smith@gmail.com?subject=Snowpace">clifford.smith@gmail.com</a></p>
+    <p><strong>For a score that looks wrong, send it from the app.</strong> Tap the <strong>?</strong> at the top of Today or any other main tab, then <strong>Send feedback</strong> at the bottom. Pick the place, and the app can attach its forecast and score, so I can see exactly what you saw. You read the email before it goes, and it's sent from your own Mail app.</p>
+    <p>Snowpace is a one-person project by Cliff Smith. I read everything, but a reply can take a few days.</p>
+  </div>
+
+  <h2>Common questions</h2>
+
+  <h3>My ski area is missing, or it's listed with the wrong activities</h3>
+  <p>Snowpace's list of ski areas comes from <a href="https://openskimap.org">OpenSkiData</a>, which builds it from <a href="https://www.openstreetmap.org">OpenStreetMap</a> and <a href="https://skimap.org">Skimap.org</a>. It covers named, operating areas in North America. Snowpace can't edit the list itself, but anyone can correct it at the source, and a fix reaches the app within about a month. If you're not sure how, email me and I'll help.</p>
+
+  <h3>Does Snowpace know whether the hill is open or the trails are groomed?</h3>
+  <p>No. Snowpace only scores the weather. Every place links to its operator's own web site, which is the place to check hours, grooming and lift status. Check the avalanche forecast for the area too.</p>
+
+  <h3>The score didn't match how it skied</h3>
+  <p>Scores come from mountain weather forecasts, so they're a forecast, not a report, and the snow depth behind them is modelled, not measured. If a day skied very differently from its score, please send feedback from the app with that place picked. Reports like that are how the scoring gets better.</p>
+
+  <h3>Can I change what counts as a good day?</h3>
+  <p>Yes. On the You tab, set your ideal temperature, how much wind you'll put up with, how much fresh snow you want, how you feel about snow falling while you're out, and how far you'll travel. The temperature, wind and snow settings are separate for each activity.</p>
+
+  <h3>Why is there no webcam for my place?</h3>
+  <p>Snowpace shows a webcam from windy.com only when a nearby camera's name matches the place, so it never passes off a neighbour's view as yours. Tap <strong>Other cameras</strong> to choose one yourself. Webcams can be switched off on the You tab.</p>
+
+  <h3>Why does Snowpace ask for my location?</h3>
+  <p>Only to show how far away each place is and to list search results nearest first. Your location never leaves your phone, and the app works without it; it just stops showing distances.</p>
+
+  <h3>How do I delete my data?</h3>
+  <p>Delete the app. Everything Snowpace knows about you is stored on your phone and nowhere else. See the <a href="../privacy/">privacy policy</a> for the details.</p>
+
+  <h3>Does it cost anything?</h3>
+  <p>No. Snowpace is free, with no ads, no account and no in-app purchases.</p>
+</main>
+
+<footer class="foot small">
+  <svg class="ridge" viewBox="0 0 1440 220" preserveAspectRatio="none" aria-hidden="true">
+    <path class="far" d="M0 140C160 120 260 70 400 76C540 82 600 130 760 120C900 110 980 50 1120 60C1260 70 1360 120 1440 110V220H0Z"/>
+    <path class="near" d="M0 190C120 180 220 150 320 120C400 96 450 60 520 64C600 70 660 150 760 160C860 170 940 110 1040 100C1140 92 1220 150 1320 168C1380 178 1420 180 1440 180V220H0Z"/>
+  </svg>
+  <div class="foot-band">
+    <div class="wrap credits">
+      <div class="links"><a href="../">Snowpace</a><a href="./">Support</a><a href="../privacy/">Privacy policy</a><a href="https://github.com/neptuak17/snowpace">Source on GitHub</a></div>
+      <p>Weather data by <a href="https://open-meteo.com">Open-Meteo.com</a> (CC BY 4.0). Ski areas © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> and Skimap.org (ODbL), via <a href="https://openskimap.org">OpenSkiData</a>. Webcams provided by <a href="https://www.windy.com">windy.com</a>.</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

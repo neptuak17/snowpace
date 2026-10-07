@@ -1,0 +1,98 @@
+<!doctype html>
+<!--
+  Snowpace privacy policy: the one official copy, and the App Store's Privacy
+  Policy URL. The app's Credits screen links here (PRIVACY_URL in
+  src/data/project.ts); PRIVACY.md in the repository only points here.
+  When the policy changes, change the "Last updated" date too.
+  The header and footer are repeated on every page, so a change to a footer
+  link belongs in all three: index.html, support/index.html, privacy/index.html.
+-->
+<html lang="en-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Snowpace privacy policy</title>
+  <meta name="description" content="Snowpace collects no personal information: no account, no analytics, no advertising and no tracking.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#edf2f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1626" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="../img/icon.png">
+  <link rel="apple-touch-icon" href="../img/icon.png">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<header class="wrap top">
+  <a class="brand" href="../" aria-label="Snowpace home">
+    <svg viewBox="0 0 1024 1024" aria-hidden="true"><rect width="1024" height="1024" fill="#eef3fa"/><rect y="424" width="1024" height="600" fill="#7a9cc0"/><path fill="#232d3a" d="M0 656H128C175 620 205 590 238 566C300 520 330 300 404 258C460 300 540 520 616 536C680 545 712 420 766 396C840 440 930 580 1024 606V1024H0Z"/></svg>
+    <b>Snowpace</b>
+  </a>
+  <a class="soon-link" href="../#get">Coming soon</a>
+</header>
+
+<main class="doc">
+  <p class="kicker">Privacy policy</p>
+  <h1>Snowpace privacy policy</h1>
+  <p class="updated">Last updated: 7 October 2026</p>
+
+  <p class="lede">Snowpace does not collect your personal information. There is no account to create, no analytics, no advertising, and no tracking of any kind. Nothing you do in the app is reported to anyone.</p>
+  <p>This policy covers the Snowpace iOS app and this website, both published by Cliff Smith.</p>
+
+  <h2>What stays on your phone</h2>
+  <p>Everything Snowpace knows about you is stored on your device and nowhere else:</p>
+  <ul>
+    <li>the places you save and which one is your home hill</li>
+    <li>your activities and preferences (temperature, wind, snow, precipitation, distance)</li>
+    <li>your units and appearance settings, and whether webcams are switched on</li>
+    <li>which webcam you chose for a place, if you chose one</li>
+    <li>the ski-area listing and the cached weather forecasts</li>
+  </ul>
+  <p>Deleting the app deletes all of it. None of it is backed up to a server by Snowpace, because Snowpace has no server.</p>
+
+  <h2>Your location</h2>
+  <p>If you allow it, Snowpace reads your device's location to show how far away each place is and to sort search results nearest-first. It is requested at a deliberately coarse accuracy, it is used only while the app is open, and <strong>it is never transmitted</strong>. It is stored on your device so distances still show the next time you open the app.</p>
+  <p>You can refuse the location permission, or withdraw it later in iOS Settings. Snowpace works without it; it simply stops showing distances.</p>
+
+  <h2>Network requests Snowpace makes</h2>
+  <p>Snowpace talks to three public services directly from your phone. None of these requests includes your location, your device identifier, or anything about you.</p>
+  <ul>
+    <li><strong>Open-Meteo</strong> (<code>api.open-meteo.com</code>): weather forecasts. The request carries the coordinates and elevations of the ski areas you have saved. Open-Meteo's own privacy policy is at <a href="https://open-meteo.com/en/terms">open-meteo.com/en/terms</a>.</li>
+    <li><strong>OpenSkiData</strong> (<code>tiles.openskimap.org</code>): the list of ski areas, downloaded at most once every 30 days. The request carries no parameters at all.</li>
+    <li><strong>Windy</strong> (<code>api.windy.com</code>): webcam pictures, only while webcams are switched on in the You tab (they are on unless you turn them off). When you look at a place, the request carries that ski area's coordinates, or the number of a camera already chosen for it, and the pictures then load from Windy's servers. Tapping a picture opens the camera's page on windy.com in Safari. Windy's privacy policy is at <a href="https://account.windy.com/agreements/windy-privacy-policy">account.windy.com/agreements/windy-privacy-policy</a>.</li>
+  </ul>
+  <p>All three requests identify the app with the name <code>Snowpace</code> and a link to its public source repository, so the people running those services can get in touch if the traffic ever causes them trouble. Like any web request, they are visible to your internet provider and reach the service with your IP address attached; that is a property of the internet, not something Snowpace adds.</p>
+  <p>Tapping a ski area's web site link opens that site in a browser view. What that site does is covered by its own privacy policy, not this one.</p>
+
+  <h2>Feedback you send</h2>
+  <p>The feedback screen opens a draft email in your own mail app. You choose whether to include diagnostics, you can read and edit everything before sending, and nothing is sent unless you send it yourself. The diagnostics contain the app and iOS versions, your device model, your activities and preferences, whether webcams are switched on and the last error from windy.com, when data was last fetched, and, if you picked a place, that place's forecast and score. They never contain your location or your other saved places.</p>
+  <p>Email you send reaches Cliff Smith at clifford.smith@gmail.com. It is used to answer you and to fix the problem you reported, and it is not shared with anyone else or used for any other purpose. It is kept only as long as it is useful for that, and Cliff Smith will delete your emails if you ask.</p>
+
+  <h2>This website</h2>
+  <p>This website sets no cookies, runs no analytics, and loads nothing from other sites: its fonts and pictures are served from the site itself. The sample days on it run in your browser and send nothing anywhere.</p>
+  <p>It is hosted on GitHub Pages. GitHub may record visitors' IP addresses in its server logs, as described in the <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub General Privacy Statement</a>. Snowpace does not see those logs.</p>
+
+  <h2>Children</h2>
+  <p>Snowpace is not directed at children and collects no information from anyone, including children.</p>
+
+  <h2>Changes</h2>
+  <p>If this policy changes, the updated version will be published here and the date above will change.</p>
+
+  <h2>Contact</h2>
+  <p>Cliff Smith, <a href="mailto:clifford.smith@gmail.com?subject=Snowpace%20privacy">clifford.smith@gmail.com</a>. See also the <a href="../support/">support page</a>.</p>
+</main>
+
+<footer class="foot small">
+  <svg class="ridge" viewBox="0 0 1440 220" preserveAspectRatio="none" aria-hidden="true">
+    <path class="far" d="M0 140C160 120 260 70 400 76C540 82 600 130 760 120C900 110 980 50 1120 60C1260 70 1360 120 1440 110V220H0Z"/>
+    <path class="near" d="M0 190C120 180 220 150 320 120C400 96 450 60 520 64C600 70 660 150 760 160C860 170 940 110 1040 100C1140 92 1220 150 1320 168C1380 178 1420 180 1440 180V220H0Z"/>
+  </svg>
+  <div class="foot-band">
+    <div class="wrap credits">
+      <div class="links"><a href="../">Snowpace</a><a href="../support/">Support</a><a href="./">Privacy policy</a><a href="https://github.com/neptuak17/snowpace">Source on GitHub</a></div>
+      <p>Weather data by <a href="https://open-meteo.com">Open-Meteo.com</a> (CC BY 4.0). Ski areas © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> and Skimap.org (ODbL), via <a href="https://openskimap.org">OpenSkiData</a>. Webcams provided by <a href="https://www.windy.com">windy.com</a>.</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

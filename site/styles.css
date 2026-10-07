@@ -228,6 +228,25 @@ header.top { display: flex; align-items: center; justify-content: space-between;
 .credits { font-size: 0.8rem; display: grid; gap: 0.6rem; color: var(--band-muted); }
 .links { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; font-weight: 700; font-size: 0.9rem; }
 
+/* ── Text pages: support and privacy ────────────────────────────────────── */
+.doc { max-width: 42rem; margin-inline: auto; padding-inline: clamp(1rem, 4vw, 2rem); padding-block: 1.5rem 2rem; display: grid; gap: 1rem; }
+.doc h1 { font-size: clamp(2.2rem, 6vw, 3.2rem); }
+.doc h2 { font-size: 1.55rem; margin-top: 1.75rem; }
+.doc h3 { font-family: var(--body); font-weight: 700; font-size: 1.05rem; line-height: 1.35; margin-top: 0.75rem; }
+.doc ul { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.4rem; }
+.doc code { font-size: 0.9em; background: var(--track); border-radius: 4px; padding: 0.05rem 0.3rem; overflow-wrap: anywhere; }
+.doc a { overflow-wrap: anywhere; }
+.doc .lede { font-size: 1.1rem; }
+.updated { font-size: 0.9rem; color: var(--muted); }
+.contact { background: var(--surface); border-radius: 1.5rem; box-shadow: var(--shadow); padding: 1.35rem 1.5rem; display: grid; gap: 0.6rem; margin-top: 0.5rem; }
+.contact .email { font-size: 1.2rem; font-weight: 800; user-select: all; }
+.contact .email a { color: var(--text); text-decoration-color: var(--accent); }
+.contact p { color: var(--muted); }
+.contact p strong { color: var(--text); }
+.foot.small { margin-top: 3rem; }
+.foot.small .foot-band { padding-block: 1.75rem 2.25rem; }
+.foot.small .credits { max-width: 42rem; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }

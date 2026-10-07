@@ -39,7 +39,7 @@ please get in touch; the fetch policy is documented in `CLAUDE.md` and is easy t
 ## Privacy
 
 No account, no analytics, no tracking. Everything stays on the phone and your location
-is never transmitted — see [PRIVACY.md](PRIVACY.md).
+is never transmitted — see the [privacy policy](https://neptuak17.github.io/snowpace/privacy/).
 
 ## Data credits
 
@@ -68,8 +68,9 @@ Windy's terms forbid publishing the key. EAS builds read it from an EAS environm
 variable of the same name instead. Without a key the app works, with no webcams.
 
 The website is in `site/`: plain HTML that GitHub Pages publishes whenever it changes on
-`main`. Its words are edited directly in `site/index.html`; its sample days and anything
-else about scoring come from the app, via `npm run build-site-demo`.
+`main`, at <https://neptuak17.github.io/snowpace/>, with support and privacy pages under
+`support/` and `privacy/`. Its words are edited directly in the HTML; its sample days and
+anything else about scoring come from the app, via `npm run build-site-demo`.
 
 `CLAUDE.md` holds the project's constraints and data-source decisions.
 
