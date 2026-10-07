@@ -90,9 +90,11 @@ type ProviderProps = {
   initialFavourites?: fav.Favourite[];
   /** Cached forecasts by place key, loaded (and refreshed) during boot. */
   initialForecasts?: Map<string, Forecast[]>;
+  /** The launch refresh, when the app opened before it finished. */
+  pendingForecasts?: Promise<Map<string, Forecast[]>> | null;
 };
 
-export function AppStateProvider({ children, initial, initialFavourites, initialForecasts }: ProviderProps) {
+export function AppStateProvider({ children, initial, initialFavourites, initialForecasts, pendingForecasts }: ProviderProps) {
   const system = useColorScheme();
   const [state, setState] = useState<State>(() => {
     const saved = initial ?? {};
@@ -117,7 +119,19 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
   });
   const [favourites, setFavourites] = useState<fav.Favourite[]>(initialFavourites ?? []);
   const [forecasts, setForecasts] = useState<Map<string, Forecast[]>>(initialForecasts ?? new Map());
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState(!!pendingForecasts);
+
+  // The launch refresh the loading screen stopped waiting for: when it lands,
+  // its forecasts replace the cached ones. Merged, not swapped, so a place
+  // saved in the meantime keeps the forecast it was given.
+  useEffect(() => {
+    if (!pendingForecasts) return;
+    let live = true;
+    pendingForecasts
+      .then((next) => { if (live) setForecasts((prev) => new Map([...prev, ...next])); })
+      .finally(() => { if (live) setRefreshing(false); });
+    return () => { live = false; };
+  }, [pendingForecasts]);
 
   // Write the persisted slice back whenever it changes. Debounced, because a
   // slider fires many changes a second. Skips the very first render (that is

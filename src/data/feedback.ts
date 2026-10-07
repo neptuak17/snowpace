@@ -16,7 +16,7 @@ import { lastWebcamError } from '@/data/webcams';
 import { getMeta } from '@/db/database';
 import { getForecasts } from '@/db/forecasts';
 import { inventoryStatus } from '@/db/inventory';
-import { buildFeedbackMail, type Diagnostics, type FeedbackInput } from '@/lib/diagnostics';
+import { buildFeedbackMail, LAUNCH_META, parseLaunchTimings, type Diagnostics, type FeedbackInput } from '@/lib/diagnostics';
 
 export type SendOutcome = 'sent' | 'saved' | 'cancelled';
 
@@ -36,10 +36,12 @@ export async function sendFeedback(
   input: Omit<FeedbackInput, 'diagnostics' | 'forecasts'>,
   settings: SettingsSlice,
 ): Promise<SendOutcome> {
-  const [inv, lastAttemptAt, lastError, forecasts] = await Promise.all([
+  const [inv, lastAttemptAt, lastError, lastFailure, launch, forecasts] = await Promise.all([
     inventoryStatus().catch(() => ({ count: 0, source: null, fetchedAt: null, lastError: 'unreadable' })),
     getMeta(FORECAST_META.lastAttemptAt).catch(() => null),
     getMeta(FORECAST_META.lastError).catch(() => null),
+    getMeta(FORECAST_META.lastFailure).catch(() => null),
+    getMeta(LAUNCH_META).catch(() => null),
     input.place ? getForecasts([input.place.key]).catch(() => new Map()) : Promise.resolve(new Map()),
   ]);
 
@@ -54,8 +56,9 @@ export async function sendFeedback(
       osVersion: Device.osVersion,
       now: new Date(),
       inventory: { count: inv.count, source: inv.source, fetchedAt: inv.fetchedAt, lastError: inv.lastError },
-      forecast: { lastAttemptAt, lastError },
+      forecast: { lastAttemptAt, lastError, lastFailure },
       webcams: { on: settings.webcamsOn, lastError: lastWebcamError },
+      launch: parseLaunchTimings(launch),
     },
   });
 

@@ -205,6 +205,18 @@ updates every 6). Refreshed at launch behind the loading screen, on foreground w
 immediately for a newly added favourite. Requests carry ski-area coordinates only — the phone's
 location never leaves the device.
 
+**Launch never waits long on the network (Oct 2026).** A stalled request once held the loading
+screen for a minute, iOS's own limit, because nothing else bounded it. Now each forecast request
+gives up after 15 s, the requests run side by side, and only one refresh runs at a time (a second
+waits for it, then fetches only what is still stale). When every saved place already has a cached
+forecast, the loading screen waits at most 5 s for fresh ones, then opens on the cache and the
+app state takes the refresh's forecasts when they land; each place shows its forecast's age, so
+nothing is hidden. With nothing cached it still waits, up to the 15 s limit. The location fix runs
+alongside the forecasts and settles for the phone's last known position after 5 s. Each launch
+records its step timings in the meta table (`launch.last`), and the last forecast failure is kept
+apart from the latest attempt, so the feedback diagnostics show a slow or failed start even after a
+later refresh succeeded.
+
 **Carried over from HazePace:**
 
 * Missing values stay `null`. Never substitute zero. A failed fetch must not render as "0 cm new

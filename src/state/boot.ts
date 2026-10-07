@@ -6,8 +6,15 @@
  * theme before anything is drawn.
  *
  * Phase B runs behind the loading screen and is the work the user is told
- * about, step by step: the monthly ski-area refresh (only when due), the
- * location fix, and the forecasts. Each step's state drives the screen.
+ * about, step by step: the monthly ski-area refresh (only when due), then
+ * the location fix and the forecasts side by side. Each step's state drives
+ * the screen.
+ *
+ * When every saved place already has a cached forecast, the screen waits
+ * only CACHED_WAIT_MS for fresh ones, then opens on the cache and hands the
+ * refresh still in progress to the app state, which takes its forecasts when
+ * they land. Each place shows how old its forecast is, so nothing is hidden;
+ * what this avoids is a slow network holding the whole app on this screen.
  */
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
@@ -15,9 +22,12 @@ import { Platform } from 'react-native';
 import { refreshForecasts } from '@/data/forecast-refresh';
 import { isRefreshDue, refreshInventoryIfDue } from '@/data/inventory-refresh';
 import type { Forecast } from '@/data/open-meteo';
+import { setMeta } from '@/db/database';
 import { listFavourites, type Favourite } from '@/db/favourites';
+import { getForecasts } from '@/db/forecasts';
 import { ensureSeeded, inventoryStatus } from '@/db/inventory';
 import { getSetting } from '@/db/settings';
+import { LAUNCH_META, type LaunchTimings } from '@/lib/diagnostics';
 import { PERSIST_KEY, type PersistedState } from '@/state/app-state';
 import { requestLocation } from '@/state/location';
 import { strings } from '@/strings';
@@ -32,14 +42,22 @@ export type Boot = {
   initial: Partial<PersistedState> | null;
   favourites: Favourite[];
   forecasts: Map<string, Forecast[]>;
+  /** The launch refresh, when the app opened before it finished; it resolves to the fresh forecasts. */
+  pendingForecasts: Promise<Map<string, Forecast[]>> | null;
 };
 
 // Keep the loading screen up at least this long so it reads as a screen,
 // not a flicker, on the (common) days when there is nothing slow to do.
 const MIN_LOADING_MS = 700;
+// With a cached forecast for every place, wait no longer than this for fresh ones.
+const CACHED_WAIT_MS = 5_000;
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 export function useBoot(): Boot {
-  const [boot, setBoot] = useState<Boot>({ phase: 'splash', steps: [], initial: null, favourites: [], forecasts: new Map() });
+  const [boot, setBoot] = useState<Boot>({
+    phase: 'splash', steps: [], initial: null, favourites: [], forecasts: new Map(), pendingForecasts: null,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -85,28 +103,57 @@ export function useBoot(): Boot {
         mark('listing', 'done');
       }
 
+      // Location and forecasts side by side: the forecast requests carry
+      // ski-area coordinates only, so neither waits for the other.
+      const launch: LaunchTimings = {
+        at: new Date().toISOString(), locationMs: null, forecastMs: null, requests: 0, failed: 0, openedMs: 0, openedOnCache: false,
+      };
+      const t0 = Date.now();
       mark('location', 'active');
-      const location = await requestLocation();
-      if (location) initial = { ...(initial ?? {}), location };
-      mark('location', 'done');
+      const locationJob = requestLocation().then((loc) => {
+        launch.locationMs = Date.now() - t0;
+        mark('location', 'done');
+        return loc;
+      });
 
       mark('forecast', 'active');
-      let forecasts = new Map<string, Forecast[]>();
-      if (Platform.OS !== 'web') {
-        try {
-          const areas = favourites.map((f) => f.area).filter((a): a is NonNullable<typeof a> => !!a);
-          const out = await refreshForecasts(areas);
-          forecasts = out.forecasts;
+      const areas = favourites.map((f) => f.area).filter((a): a is NonNullable<typeof a> => !!a);
+      const cached = Platform.OS === 'web' ? new Map<string, Forecast[]>() : await getForecasts(areas.map((a) => a.key)).catch(() => new Map<string, Forecast[]>());
+      // Settles with the fresh forecasts, or with null if the refresh failed outright.
+      const forecastJob: Promise<Map<string, Forecast[]> | null> = Platform.OS === 'web'
+        ? Promise.resolve(null)
+        : refreshForecasts(areas).then((out) => {
+          launch.requests = out.result.requests;
+          launch.failed = out.result.failed.length;
           if (out.result.failed.length) console.warn('forecast refresh:', out.result.failed);
-        } catch (e) {
+          return out.forecasts;
+        }, (e) => {
           console.warn('forecast refresh failed', e);
-        }
-      }
+          return null;
+        }).finally(() => { launch.forecastMs = Date.now() - t0; });
+
+      const allCached = areas.length > 0 && areas.every((a) => (cached.get(a.key) ?? []).length > 0);
+      const first = allCached ? await Promise.race([forecastJob, sleep(CACHED_WAIT_MS).then(() => 'waited' as const)]) : await forecastJob;
+      const forecasts = first === 'waited' ? cached : (first ?? cached);
+      // Still running: the app takes its forecasts when they land.
+      const pendingForecasts = first === 'waited'
+        ? forecastJob.then((m) => m ?? new Map<string, Forecast[]>())
+        : null;
       mark('forecast', 'done');
 
+      const location = await locationJob;
+      if (location) initial = { ...(initial ?? {}), location };
+
       const remaining = MIN_LOADING_MS - (Date.now() - shownAt);
-      if (remaining > 0) await new Promise((r) => setTimeout(r, remaining));
-      set({ phase: 'ready', initial, favourites, forecasts });
+      if (remaining > 0) await sleep(remaining);
+      launch.openedMs = Date.now() - shownAt;
+      launch.openedOnCache = pendingForecasts !== null;
+      set({ phase: 'ready', initial, favourites, forecasts, pendingForecasts });
+
+      // Recorded once the forecasts are in, which may be after the app opened.
+      if (Platform.OS !== 'web') {
+        forecastJob.then(() => setMeta(LAUNCH_META, JSON.stringify(launch))).catch(() => {});
+      }
     })();
 
     return () => { cancelled = true; };

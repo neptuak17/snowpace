@@ -251,7 +251,7 @@ export const strings = {
     placeHint: 'So the forecast behind the score can come along.',
     noPlaces: 'No saved places yet — describe the place in the email instead.',
     diagnosticsLabel: 'Include diagnostics',
-    diagnosticsHint: 'App and iOS versions, your activities and settings (including whether webcams are on), when data was last fetched, and — if you picked a place — its forecast and score. Never your location or your other places.',
+    diagnosticsHint: 'App and iOS versions, your activities and settings (including whether webcams are on), when data was last fetched, how long the app took to start, and — if you picked a place — its forecast and score. Never your location or your other places.',
     howItSends: 'Tapping Send opens Mail with a draft addressed to me. Write what happened, then send it from your own account.',
     send: 'Send',
     unavailableKicker: 'Mail is not set up on this phone',

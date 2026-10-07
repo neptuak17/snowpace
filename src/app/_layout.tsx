@@ -55,7 +55,8 @@ export default function RootLayout() {
   }
 
   return (
-    <AppStateProvider initial={boot.initial} initialFavourites={boot.favourites} initialForecasts={boot.forecasts}>
+    <AppStateProvider
+      initial={boot.initial} initialFavourites={boot.favourites} initialForecasts={boot.forecasts} pendingForecasts={boot.pendingForecasts}>
       <RootNavigator />
     </AppStateProvider>
   );
