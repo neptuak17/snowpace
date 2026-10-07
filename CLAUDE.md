@@ -21,8 +21,9 @@
   privacy-manifest obligations.
 - iOS is the target platform. Write React Native components, not HTML.
   Do not delete the Expo template's React Native Web support — the .web.tsx
-  platform variants are inert on iOS and the web target may be used later
-  for the marketing site.
+  platform variants are inert on iOS. (The marketing site is plain HTML in
+  `site/`, not the Expo web target; these constraints are for app code. See
+  Website below.)
 
 
 ## Data Sources
@@ -403,6 +404,30 @@ The about/credits screen must include:
   - **A snow surface or skin temperature variable** would beat deriving one from air temperature,
     cloud and wind. Whether either model returns a usable one is unverified — GEM returned null for
     freezing level, so check against the live endpoint rather than assume.
+
+## Website
+
+A one-page marketing site in `site/`: plain HTML, CSS and JavaScript, with no build step and no
+npm. `.github/workflows/pages.yml` publishes the folder as it is to GitHub Pages
+(https://neptuak17.github.io/snowpace/) whenever a change under `site/` reaches `main`; app-only
+commits do not trigger it. Built Oct 2026 from "mockup A": a working answer card first, then the
+four sports side by side, how the score is decided, features, privacy, and a footer.
+
+* **Where the words live.** Marketing copy is written in `site/index.html` and edited by hand
+  (the owner edits it directly, sometimes on github.com). Everything that describes how the app
+  scores is generated into `site/demo-data.js` by `node scripts/build-site-demo.mts`: the sample
+  days (made-up weather run through the real engine with `DEFAULT_PREFS`), the factor weights,
+  the score bands, and the factor and snowpack wording copied from `strings.help`. Rerun it and
+  commit after any change to scoring, tuning or that Help wording, so the site cannot contradict
+  the app. Never hand-edit `demo-data.js`.
+* **Same principles as the app.** No analytics, no tracking, no cookies, and no third-party
+  requests: the fonts are self-hosted from the app's own `@expo-google-fonts` packages, with
+  their OFL licences beside them. No live API calls from the site, ever: never Open-Meteo, and
+  never Windy (the Windy key must not reach the site, and no webcam image is republished there).
+* **Download button:** "Coming soon to the App Store" until the app is live; Apple's badge only
+  once it is.
+* Preview by opening `site/index.html` in a browser, or with the `website` entry in
+  `.claude/launch.json`. Test light and dark, and phone width.
 
 ## Conventions
 

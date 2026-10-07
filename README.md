@@ -67,6 +67,10 @@ Copy `.env.example` to `.env.local` and put the key there; it is git-ignored, an
 Windy's terms forbid publishing the key. EAS builds read it from an EAS environment
 variable of the same name instead. Without a key the app works, with no webcams.
 
+The website is in `site/`: plain HTML that GitHub Pages publishes whenever it changes on
+`main`. Its words are edited directly in `site/index.html`; its sample days and anything
+else about scoring come from the app, via `npm run build-site-demo`.
+
 `CLAUDE.md` holds the project's constraints and data-source decisions.
 
 ## Licence
