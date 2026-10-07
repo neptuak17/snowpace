@@ -10,9 +10,9 @@
  */
 import type { ActivityKey } from '@/data/places';
 
-export type FactorKey = 't' | 's' | 'base' | 'ft' | 'w' | 'pr' | 'fall' | 'c' | 'cov';
-/** The factors that go into the weighted blend; coverage multiplies the result instead. */
-export type BlendKey = Exclude<FactorKey, 'cov'>;
+export type FactorKey = 't' | 's' | 'base' | 'ft' | 'w' | 'pr' | 'fall' | 'c' | 'cov' | 'deep';
+/** The factors that go into the weighted blend; coverage and deep snow multiply the result instead. */
+export type BlendKey = Exclude<FactorKey, 'cov' | 'deep'>;
 
 export const TUNING = {
   // ── Score bands — the dial colour and word. Verdict adds one tier above.
@@ -93,6 +93,16 @@ export const TUNING = {
     classic: { noneM: 0.05, fullM: 0.3 },
     skate: { noneM: 0.05, fullM: 0.3 },
   } as Record<ActivityKey, { noneM: number; fullM: number }>,
+
+  // ── Deep new snow caps the skate score the same way: a lane under unpacked
+  // snow is soft, slow going however good the rest of the day is, and the
+  // blend alone let a calm, cold day after 20 cm score Good. Full score up to
+  // `fromCm` of new snow in 24 h (or the user's own tolerance, if higher),
+  // then down to `floor` of the blend `spanCm` later. Guesses until winter
+  // data flows; the surface model should replace this when it is promoted.
+  deepSnow: {
+    skate: { fromCm: 5, spanCm: 15, floor: 0.65 },
+  } as Partial<Record<ActivityKey, { fromCm: number; spanCm: number; floor: number }>>,
 
   // ── Surface firmness (src/lib/surface.ts). SHADOW MODE: shown as a word for
   // classic and skate, never part of the score, until checked against real

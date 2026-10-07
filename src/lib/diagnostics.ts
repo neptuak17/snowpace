@@ -53,7 +53,7 @@ export type FeedbackMail = {
   attachment: { name: string; json: string } | null;
 };
 
-const FACTOR_ORDER: FactorKey[] = ['t', 's', 'base', 'ft', 'w', 'pr', 'fall', 'c', 'cov'];
+const FACTOR_ORDER: FactorKey[] = ['t', 's', 'base', 'ft', 'w', 'pr', 'fall', 'c', 'cov', 'deep'];
 
 export function buildFeedbackMail(input: FeedbackInput): FeedbackMail {
   const f = strings.feedback;

@@ -202,6 +202,18 @@ export function coverageSub(l: Place, di: number, act: ActivityKey): number {
   return clamp((100 * (depth - c.noneM)) / (c.fullM - c.noneM));
 }
 
+/**
+ * The deep-snow ceiling, 0–100: 100 until the day's new snow passes the
+ * activity's threshold (or the user's tolerance, if higher), then down to
+ * the tuned floor. Only skate has one.
+ */
+export function deepSnowSub(cm: number, act: ActivityKey, want: number): number {
+  const d = T.deepSnow[act];
+  if (!d) return 100;
+  const k = Math.min(1, Math.max(0, (cm - Math.max(d.fromCm, want)) / d.spanCm));
+  return 100 * (1 - k * (1 - d.floor));
+}
+
 /** Whether the forecast has a snow depth for the day, i.e. whether coverage says anything. */
 export function hasDepth(l: Place, di: number): boolean {
   return dayAt(l, di).depth !== null;
@@ -229,6 +241,7 @@ export function subs(day: Wx, p: Prefs, l: Place, di: number, act: ActivityKey):
     fall: fallSub(day, p, act),
     c: clamp(100 - day.cloud * T.cloudPenaltyPerPct),
     cov: coverageSub(l, di, act),
+    deep: deepSnowSub(day.snow, act, p.snow),
   };
 }
 
@@ -236,11 +249,11 @@ export function subsFor(l: Place, di: number, act: ActivityKey, prefs: PrefsByAc
   return subs(day || dayAt(l, di), prefs[act], l, di, act);
 }
 
-/** The weighted blend of the eight factors, capped by coverage. */
+/** The weighted blend of the eight factors, capped by coverage and, for skate, deep new snow. */
 export function blend(x: Subs, act: ActivityKey): number {
   const g = T.weights[act];
   const weighted = BLEND_KEYS.reduce((sum, k) => sum + g[k] * x[k], 0);
-  return Math.round((weighted * x.cov) / 100);
+  return Math.round((weighted * x.cov * x.deep) / 10000);
 }
 
 export function score(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct): number | null {
@@ -491,7 +504,8 @@ export type Factor = { label: string; value: string; v: number; note: string; in
 /**
  * The breakdown card on Today: eight rows, plus snowpack when the forecast
  * models a depth. Snowpack leads when it is what is holding the score down,
- * so the reader is not scrolling past seven green bars to find the reason.
+ * so the reader is not scrolling past seven green bars to find the reason;
+ * new snow leads, with its own note, when deep snow is capping a skate score.
  */
 export function breakdown(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units): Factor[] {
   const day = dayAt(l, di);
@@ -502,10 +516,13 @@ export function breakdown(l: Place, di: number, act: ActivityKey, prefs: PrefsBy
   const b = strings.breakdown;
   const snowpack: Factor[] = hasDepth(l, di) ? [{ label: b.snowpack, value: coverageWord(x.cov), v: x.cov, note: b.snowpackNote }] : [];
   const leads = x.cov < T.limiters.severeBelow;
+  const deep = x.deep < 100;
+  const newSnow: Factor = { label: b.newSnow, value: fmtS(day.snow, units), v: x.s, note: deep ? b.deepSnowNote : snowHint(act, p.snow, units) };
   return [
     ...(leads ? snowpack : []),
+    ...(deep ? [newSnow] : []),
     { label: b.temp, value: fmtT(day.t, units), v: x.t, note: b.tempNote(fmtT(p.temp, units), actLabel(act)) },
-    { label: b.newSnow, value: fmtS(day.snow, units), v: x.s, note: snowHint(act, p.snow, units) },
+    ...(deep ? [] : [newSnow]),
     { label: b.threeDay, value: fmtS(snow72(l, di), units), v: x.base, note: b.threeDayNote },
     { label: b.freezeThaw, value: ft.hit ? b.freezeThawYes(fmtT(ft.maxHi, units)) : b.freezeThawNone, v: x.ft,
       note: ft.hit ? b.freezeThawHitNote : ft.thawed ? b.freezeThawThawedNote : b.freezeThawNoneNote },
