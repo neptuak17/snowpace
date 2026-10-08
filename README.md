@@ -31,7 +31,7 @@ leaves the device; the forecast requests carry ski-area coordinates only.
 
 ## Contact
 
-Cliff Smith — support@snowpace.com
+support@snowpace.com
 
 If you run one of the services above and have any concern about Snowpace's traffic,
 please get in touch; the fetch policy is documented in `CLAUDE.md` and is easy to change.

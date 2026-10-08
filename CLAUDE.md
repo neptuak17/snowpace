@@ -438,7 +438,9 @@ four sports side by side, how the score is decided, features, privacy, and a foo
   work. The domain also has Cloudflare's email-forwarding records (MX, SPF, DKIM):
   `support@snowpace.com` forwards to the developer's own mailbox. It is the only public contact
   address: the app's feedback address (`FEEDBACK_EMAIL`), the support and privacy pages, and the
-  README all use it. The developer's personal address appears nowhere public.
+  README all use it. The developer's personal address appears nowhere public, and the website
+  does not name the developer (owner's call, Oct 2026): it says "the developer" or speaks in the
+  first person.
 
 * **Three pages, three App Store Connect fields.** The main page is the Marketing URL;
   `site/support/` (contact email and common questions; Apple requires a real way to get in
