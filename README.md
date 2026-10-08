@@ -31,7 +31,7 @@ leaves the device; the forecast requests carry ski-area coordinates only.
 
 ## Contact
 
-Cliff Smith — clifford.smith@gmail.com
+Cliff Smith — support@snowpace.com
 
 If you run one of the services above and have any concern about Snowpace's traffic,
 please get in touch; the fetch policy is documented in `CLAUDE.md` and is easy to change.
@@ -39,7 +39,7 @@ please get in touch; the fetch policy is documented in `CLAUDE.md` and is easy t
 ## Privacy
 
 No account, no analytics, no tracking. Everything stays on the phone and your location
-is never transmitted — see the [privacy policy](https://neptuak17.github.io/snowpace/privacy/).
+is never transmitted — see the [privacy policy](https://snowpace.com/privacy/).
 
 ## Data credits
 
@@ -68,7 +68,7 @@ Windy's terms forbid publishing the key. EAS builds read it from an EAS environm
 variable of the same name instead. Without a key the app works, with no webcams.
 
 The website is in `site/`: plain HTML that GitHub Pages publishes whenever it changes on
-`main`, at <https://neptuak17.github.io/snowpace/>, with support and privacy pages under
+`main`, at <https://snowpace.com/>, with support and privacy pages under
 `support/` and `privacy/`. Its words are edited directly in the HTML; its sample days and
 anything else about scoring come from the app, via `npm run build-site-demo`.
 

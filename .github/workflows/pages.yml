@@ -1,5 +1,5 @@
 # Publishes the website in site/ to GitHub Pages
-# (https://neptuak17.github.io/snowpace/) whenever a change to it reaches
+# (https://snowpace.com/) whenever a change to it reaches
 # main. Nothing is built: the folder is uploaded as it is. App-only commits
 # do not trigger it. It can also be run by hand from the Actions tab.
 name: Website

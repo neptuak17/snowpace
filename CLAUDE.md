@@ -424,9 +424,21 @@ The about/credits screen must include:
 
 A one-page marketing site in `site/`: plain HTML, CSS and JavaScript, with no build step and no
 npm. `.github/workflows/pages.yml` publishes the folder as it is to GitHub Pages
-(https://neptuak17.github.io/snowpace/) whenever a change under `site/` reaches `main`; app-only
+(https://snowpace.com/) whenever a change under `site/` reaches `main`; app-only
 commits do not trigger it. Built Oct 2026 from "mockup A": a working answer card first, then the
 four sports side by side, how the score is decided, features, privacy, and a footer.
+
+* **The domain.** `snowpace.com` was registered at Cloudflare in Oct 2026 (Cloudflare is the
+  registrar and the DNS host). Its records point at GitHub Pages: four `A` and four `AAAA`
+  records for the domain and a `www` CNAME to `neptuak17.github.io`, all **DNS only, never
+  proxied** (a proxied record stops GitHub confirming the domain and issuing its HTTPS
+  certificate). The custom domain is set in the repo's Pages settings, not by a `CNAME` file,
+  which an Actions-published site ignores; HTTPS is enforced. The old
+  `neptuak17.github.io/snowpace/` addresses redirect to it, so early test builds' links still
+  work. The domain also has Cloudflare's email-forwarding records (MX, SPF, DKIM):
+  `support@snowpace.com` forwards to the developer's own mailbox. It is the only public contact
+  address: the app's feedback address (`FEEDBACK_EMAIL`), the support and privacy pages, and the
+  README all use it. The developer's personal address appears nowhere public.
 
 * **Three pages, three App Store Connect fields.** The main page is the Marketing URL;
   `site/support/` (contact email and common questions; Apple requires a real way to get in
