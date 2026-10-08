@@ -205,7 +205,7 @@ export function coverageSub(l: Place, di: number, act: ActivityKey): number {
 /**
  * The deep-snow ceiling, 0–100: 100 until the day's new snow passes the
  * activity's threshold (or the user's tolerance, if higher), then down to
- * the tuned floor. Only skate has one.
+ * the tuned floor. Only skate and classic have one.
  */
 export function deepSnowSub(cm: number, act: ActivityKey, want: number): number {
   const d = T.deepSnow[act];
@@ -249,7 +249,7 @@ export function subsFor(l: Place, di: number, act: ActivityKey, prefs: PrefsByAc
   return subs(day || dayAt(l, di), prefs[act], l, di, act);
 }
 
-/** The weighted blend of the eight factors, capped by coverage and, for skate, deep new snow. */
+/** The weighted blend of the eight factors, capped by coverage and, for skate and classic, deep new snow. */
 export function blend(x: Subs, act: ActivityKey): number {
   const g = T.weights[act];
   const weighted = BLEND_KEYS.reduce((sum, k) => sum + g[k] * x[k], 0);
@@ -505,7 +505,7 @@ export type Factor = { label: string; value: string; v: number; note: string; in
  * The breakdown card on Today: eight rows, plus snowpack when the forecast
  * models a depth. Snowpack leads when it is what is holding the score down,
  * so the reader is not scrolling past seven green bars to find the reason;
- * new snow leads, with its own note, when deep snow is capping a skate score.
+ * new snow leads, with its own note, when deep snow is capping a nordic score.
  */
 export function breakdown(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units): Factor[] {
   const day = dayAt(l, di);
@@ -517,7 +517,8 @@ export function breakdown(l: Place, di: number, act: ActivityKey, prefs: PrefsBy
   const snowpack: Factor[] = hasDepth(l, di) ? [{ label: b.snowpack, value: coverageWord(x.cov), v: x.cov, note: b.snowpackNote }] : [];
   const leads = x.cov < T.limiters.severeBelow;
   const deep = x.deep < 100;
-  const newSnow: Factor = { label: b.newSnow, value: fmtS(day.snow, units), v: x.s, note: deep ? b.deepSnowNote : snowHint(act, p.snow, units) };
+  const deepNote = act === 'classic' ? b.deepSnowClassic : b.deepSnowSkate;
+  const newSnow: Factor = { label: b.newSnow, value: fmtS(day.snow, units), v: x.s, note: deep ? deepNote : snowHint(act, p.snow, units) };
   return [
     ...(leads ? snowpack : []),
     ...(deep ? [newSnow] : []),

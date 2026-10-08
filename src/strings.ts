@@ -186,7 +186,7 @@ export const strings = {
       { id: 'c', k: 'Cloud cover', v: 'flat light versus a bluebird day' },
     ],
     factorSep: ' — ',
-    decidesSnowpack: 'On top of those, the modelled snowpack caps the score: on bare ground it is 0, however good the weather. For skate skiing, deep new snow caps it too, because the lane stays soft and slow until it has been packed.',
+    decidesSnowpack: 'On top of those, the modelled snowpack caps the score: on bare ground it is 0, however good the weather. For skate and classic skiing, deep new snow caps it too: a skate lane stays soft and slow until it has been packed, and classic tracks fill in until they have been reset.',
     decidesOutro: 'The sentence under the dial names whatever is holding the day back, and Why? shows how each one scored.',
     useKicker: 'How to use it',
     steps: [
@@ -372,7 +372,8 @@ export const strings = {
     tempNote: (temp: string, activity: string) =>
       `Daytime average. You like it around ${temp} for ${activity}.`,
     newSnow: 'New snow, 24 h',
-    deepSnowNote: 'This much new snow also caps the skate score: the lane stays soft and slow until it has been packed.',
+    deepSnowSkate: 'This much new snow also caps the skate score: the lane stays soft and slow until it has been packed.',
+    deepSnowClassic: 'This much new snow also caps the classic score: the tracks fill in and stay soft until they have been reset.',
     threeDay: 'Snowfall, 3 days',
     threeDayNote: 'How much has fallen recently (how fresh the surface is).',
     freezeThaw: 'Freeze–thaw',

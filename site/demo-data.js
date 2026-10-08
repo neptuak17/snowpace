@@ -97,59 +97,59 @@ window.SNOWPACE_DEMO = {
    ],
    "acts": {
     "classic": {
-     "score": 75,
-     "band": "go",
-     "word": "Good",
+     "score": 64,
+     "band": "fair",
+     "word": "Fair",
      "best": "Best 10 AM–1 PM",
      "bands": [
+      "fair",
+      "fair",
       "go",
-      "hi",
-      "hi",
-      "hi",
-      "hi",
-      "hi",
-      "hi",
-      "hi",
-      "hi",
-      "hi",
-      "hi"
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go"
      ],
      "window": {
       "from": 3,
       "to": 5
      },
      "metric": {
-      "verdict": "A good one. It is snowing on the track, but nothing that should keep you home.",
+      "verdict": "Worth it if you are keen — it is snowing on the track.",
       "facts": "-7°C · wind 8 km/h · 22.2 cm new",
       "lines": [
-       "7 AM · Good 79 · -11°C · wind 8 km/h · snow 0.4 mm",
-       "8 AM · Excellent 81 · -9°C · wind 8 km/h · snow 0.4 mm",
-       "9 AM · Excellent 82 · -8°C · wind 8 km/h · snow 0.4 mm",
-       "10 AM · Excellent 85 · -7°C · wind 8 km/h",
-       "11 AM · Excellent 84 · -7°C · wind 8 km/h",
-       "Noon · Excellent 84 · -6°C · wind 8 km/h",
-       "1 PM · Excellent 84 · -6°C · wind 8 km/h",
-       "2 PM · Excellent 84 · -6°C · wind 8 km/h",
-       "3 PM · Excellent 84 · -7°C · wind 8 km/h",
-       "4 PM · Excellent 85 · -7°C · wind 8 km/h",
-       "5 PM · Excellent 83 · -8°C · wind 8 km/h"
+       "7 AM · Fair 68 · -11°C · wind 8 km/h · snow 0.4 mm",
+       "8 AM · Fair 69 · -9°C · wind 8 km/h · snow 0.4 mm",
+       "9 AM · Good 70 · -8°C · wind 8 km/h · snow 0.4 mm",
+       "10 AM · Good 73 · -7°C · wind 8 km/h",
+       "11 AM · Good 72 · -7°C · wind 8 km/h",
+       "Noon · Good 72 · -6°C · wind 8 km/h",
+       "1 PM · Good 72 · -6°C · wind 8 km/h",
+       "2 PM · Good 72 · -6°C · wind 8 km/h",
+       "3 PM · Good 72 · -7°C · wind 8 km/h",
+       "4 PM · Good 73 · -7°C · wind 8 km/h",
+       "5 PM · Good 71 · -8°C · wind 8 km/h"
       ]
      },
      "imperial": {
-      "verdict": "A good one. It is snowing on the track, but nothing that should keep you home.",
+      "verdict": "Worth it if you are keen — it is snowing on the track.",
       "facts": "19°F · wind 5 mph · 8.7\" new",
       "lines": [
-       "7 AM · Good 79 · 13°F · wind 5 mph · snow 0.4 mm",
-       "8 AM · Excellent 81 · 15°F · wind 5 mph · snow 0.4 mm",
-       "9 AM · Excellent 82 · 17°F · wind 5 mph · snow 0.4 mm",
-       "10 AM · Excellent 85 · 19°F · wind 5 mph",
-       "11 AM · Excellent 84 · 20°F · wind 5 mph",
-       "Noon · Excellent 84 · 21°F · wind 5 mph",
-       "1 PM · Excellent 84 · 21°F · wind 5 mph",
-       "2 PM · Excellent 84 · 21°F · wind 5 mph",
-       "3 PM · Excellent 84 · 20°F · wind 5 mph",
-       "4 PM · Excellent 85 · 19°F · wind 5 mph",
-       "5 PM · Excellent 83 · 17°F · wind 5 mph"
+       "7 AM · Fair 68 · 13°F · wind 5 mph · snow 0.4 mm",
+       "8 AM · Fair 69 · 15°F · wind 5 mph · snow 0.4 mm",
+       "9 AM · Good 70 · 17°F · wind 5 mph · snow 0.4 mm",
+       "10 AM · Good 73 · 19°F · wind 5 mph",
+       "11 AM · Good 72 · 20°F · wind 5 mph",
+       "Noon · Good 72 · 21°F · wind 5 mph",
+       "1 PM · Good 72 · 21°F · wind 5 mph",
+       "2 PM · Good 72 · 21°F · wind 5 mph",
+       "3 PM · Good 72 · 20°F · wind 5 mph",
+       "4 PM · Good 73 · 19°F · wind 5 mph",
+       "5 PM · Good 71 · 17°F · wind 5 mph"
       ]
      }
     },
@@ -973,22 +973,22 @@ window.SNOWPACE_DEMO = {
    ],
    "acts": {
     "classic": {
-     "score": 71,
-     "band": "go",
-     "word": "Good",
+     "score": 65,
+     "band": "fair",
+     "word": "Fair",
      "best": "Best 8–11 AM",
      "bands": [
-      "hi",
-      "hi",
+      "go",
       "hi",
       "hi",
       "hi",
       "go",
       "go",
-      "go",
-      "go",
-      "go",
-      "go"
+      "fair",
+      "fair",
+      "fair",
+      "fair",
+      "fair"
      ],
      "window": {
       "from": 1,
@@ -998,34 +998,34 @@ window.SNOWPACE_DEMO = {
       "verdict": "Three things are working against it today.",
       "facts": "-6°C · wind 27 km/h · 16.5 cm new",
       "lines": [
-       "7 AM · Excellent 86 · -9°C · wind 12 km/h",
-       "8 AM · Excellent 88 · -8°C · wind 12 km/h",
-       "9 AM · Excellent 89 · -7°C · wind 12 km/h",
-       "10 AM · Excellent 88 · -6°C · wind 12 km/h",
-       "11 AM · Excellent 87 · -5°C · wind 12 km/h",
-       "Noon · Good 79 · -5°C · wind 25 km/h",
-       "1 PM · Good 75 · -5°C · wind 31 km/h · snow 1.5 mm",
-       "2 PM · Good 72 · -5°C · wind 37 km/h · snow 1.5 mm",
-       "3 PM · Good 71 · -5°C · wind 43 km/h · snow 1.5 mm",
-       "4 PM · Good 71 · -6°C · wind 49 km/h · snow 1.5 mm",
-       "5 PM · Good 73 · -7°C · wind 55 km/h · snow 1.5 mm"
+       "7 AM · Good 79 · -9°C · wind 12 km/h",
+       "8 AM · Excellent 80 · -8°C · wind 12 km/h",
+       "9 AM · Excellent 81 · -7°C · wind 12 km/h",
+       "10 AM · Excellent 80 · -6°C · wind 12 km/h",
+       "11 AM · Good 79 · -5°C · wind 12 km/h",
+       "Noon · Good 72 · -5°C · wind 25 km/h",
+       "1 PM · Fair 68 · -5°C · wind 31 km/h · snow 1.5 mm",
+       "2 PM · Fair 66 · -5°C · wind 37 km/h · snow 1.5 mm",
+       "3 PM · Fair 65 · -5°C · wind 43 km/h · snow 1.5 mm",
+       "4 PM · Fair 65 · -6°C · wind 49 km/h · snow 1.5 mm",
+       "5 PM · Fair 66 · -7°C · wind 55 km/h · snow 1.5 mm"
       ]
      },
      "imperial": {
       "verdict": "Three things are working against it today.",
       "facts": "21°F · wind 17 mph · 6.5\" new",
       "lines": [
-       "7 AM · Excellent 86 · 16°F · wind 7 mph",
-       "8 AM · Excellent 88 · 18°F · wind 7 mph",
-       "9 AM · Excellent 89 · 20°F · wind 7 mph",
-       "10 AM · Excellent 88 · 21°F · wind 7 mph",
-       "11 AM · Excellent 87 · 22°F · wind 7 mph",
-       "Noon · Good 79 · 23°F · wind 16 mph",
-       "1 PM · Good 75 · 23°F · wind 19 mph · snow 1.5 mm",
-       "2 PM · Good 72 · 23°F · wind 23 mph · snow 1.5 mm",
-       "3 PM · Good 71 · 22°F · wind 27 mph · snow 1.5 mm",
-       "4 PM · Good 71 · 21°F · wind 30 mph · snow 1.5 mm",
-       "5 PM · Good 73 · 20°F · wind 34 mph · snow 1.5 mm"
+       "7 AM · Good 79 · 16°F · wind 7 mph",
+       "8 AM · Excellent 80 · 18°F · wind 7 mph",
+       "9 AM · Excellent 81 · 20°F · wind 7 mph",
+       "10 AM · Excellent 80 · 21°F · wind 7 mph",
+       "11 AM · Good 79 · 22°F · wind 7 mph",
+       "Noon · Good 72 · 23°F · wind 16 mph",
+       "1 PM · Fair 68 · 23°F · wind 19 mph · snow 1.5 mm",
+       "2 PM · Fair 66 · 23°F · wind 23 mph · snow 1.5 mm",
+       "3 PM · Fair 65 · 22°F · wind 27 mph · snow 1.5 mm",
+       "4 PM · Fair 65 · 21°F · wind 30 mph · snow 1.5 mm",
+       "5 PM · Fair 66 · 20°F · wind 34 mph · snow 1.5 mm"
       ]
      }
     },
@@ -1723,7 +1723,7 @@ window.SNOWPACE_DEMO = {
    "personal": false
   }
  ],
- "snowpack": "On top of those, the modelled snowpack caps the score: on bare ground it is 0, however good the weather. For skate skiing, deep new snow caps it too, because the lane stays soft and slow until it has been packed.",
+ "snowpack": "On top of those, the modelled snowpack caps the score: on bare ground it is 0, however good the weather. For skate and classic skiing, deep new snow caps it too: a skate lane stays soft and slow until it has been packed, and classic tracks fill in until they have been reset.",
  "bands": [
   {
    "key": "hi",

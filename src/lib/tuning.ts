@@ -94,14 +94,17 @@ export const TUNING = {
     skate: { noneM: 0.05, fullM: 0.3 },
   } as Record<ActivityKey, { noneM: number; fullM: number }>,
 
-  // ── Deep new snow caps the skate score the same way: a lane under unpacked
-  // snow is soft, slow going however good the rest of the day is, and the
-  // blend alone let a calm, cold day after 20 cm score Good. Full score up to
-  // `fromCm` of new snow in 24 h (or the user's own tolerance, if higher),
-  // then down to `floor` of the blend `spanCm` later. Guesses until winter
-  // data flows; the surface model should replace this when it is promoted.
+  // ── Deep new snow caps the nordic scores the same way: a skate lane under
+  // unpacked snow is soft, slow going, and classic tracks fill in, however
+  // good the rest of the day is. The blend alone let a calm, cold day after
+  // 20 cm score Good for both. Full score up to `fromCm` of new snow in 24 h
+  // (or the user's own tolerance, if higher), then down to `floor` of the
+  // blend `spanCm` later. Classic copes better with fresh snow than skate, so
+  // its cap starts later and stops higher. Guesses until winter data flows;
+  // the surface model should replace this when it is promoted.
   deepSnow: {
     skate: { fromCm: 5, spanCm: 15, floor: 0.65 },
+    classic: { fromCm: 8, spanCm: 20, floor: 0.8 },
   } as Partial<Record<ActivityKey, { fromCm: number; spanCm: number; floor: number }>>,
 
   // ── Surface firmness (src/lib/surface.ts). SHADOW MODE: shown as a word for

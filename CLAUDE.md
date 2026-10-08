@@ -236,13 +236,16 @@ no modelled depth gets no ceiling. The depth itself is **not shown** — the UI 
 Thin / Enough — because the model does not know about snowmaking or grooming. Thresholds are
 guesses pending winter data.
 
-**Deep new snow caps skate the same way (Oct 2026).** The weighted blend let a calm, cold day
-after 20 cm of new snow score Good for skate, because new snow and snow falling, both at 0, are
-only 27% of skate's weights. `TUNING.deepSnow` multiplies the skate blend down from 1 at 5 cm of
-new snow in 24 h (or the user's own new-snow tolerance, if higher) to 0.65 fifteen cm later, so
-that day now reads Poor. Skate only; classic in fresh snow on a reset track is often a good day.
-When it bites, the "New snow" row leads the Why breakdown with a note saying so. Thresholds are
-guesses; the surface model below is meant to replace it.
+**Deep new snow caps skate and classic the same way (Oct 2026).** The weighted blend let a calm,
+cold day after 20 cm of new snow score Good for skate, because new snow and snow falling, both at
+0, are only 27% of skate's weights. `TUNING.deepSnow` multiplies the skate blend down from 1 at
+5 cm of new snow in 24 h (or the user's own new-snow tolerance, if higher) to 0.65 fifteen cm
+later, so that day now reads Poor. Classic got a gentler cap the next day, at the owner's call
+that set tracks fill in while it snows: from 8 cm down to 0.8 twenty cm later, which takes the
+same day from Good 75 to Fair 64 and leaves days without much snow untouched. Raising classic's
+weight on falling snow was tried and rejected: it lifted every snow-free day, and rain on snow
+went from Poor to Fair. When a cap bites, the "New snow" row leads the Why breakdown with a note
+saying so. Thresholds are guesses; the surface model below is meant to replace both caps.
 
 
 ### Surface firmness — shadow mode
@@ -269,7 +272,7 @@ coloured — a colour is a verdict. Do not promote it into the score until its c
 * A day is summarised as its 10:00 word, plus its 14:00 word when different: "Firm → Slushy".
 
 **Promotion plan**, during the winter retune: for classic and skate it **replaces** freeze–thaw,
-the "too much fresh snow" half of new snow (and skate's deep-snow ceiling, above) and probably
+the "too much fresh snow" half of new snow (and the deep-snow caps, above) and probably
 the 3-day snowfall factor, rather than
 being added on top of them, which would double-count. Skate's score rises with firmness and drops
 sharply at ice; classic peaks in the middle — ice kills kick, and very soft snow breaks down a set
