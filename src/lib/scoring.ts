@@ -373,6 +373,30 @@ export function windowLabel(g: HourGrid): string | null {
   return strings.today.bestLabel(sameHalf ? clockHour(startH) + '–' + hourLabel(endH) : hourLabel(startH) + '–' + hourLabel(endH));
 }
 
+/** What the answer card shows for one place, day and activity. */
+export type ShownAnswer = {
+  score: number;
+  bare: boolean;
+  /** Today's hours; null on other days and on bare ground, where every hour scores 0. */
+  grid: HourGrid | null;
+  best: string | null;
+  verdict: string;
+  facts: string;
+};
+
+/**
+ * The answer card's contents, or null when there is nothing to score. Today,
+ * the place screen, the Forecast detail and a "Not right?" report all read
+ * it here, so a report describes exactly what was on screen.
+ */
+export function shownAnswer(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units): ShownAnswer | null {
+  const sc = score(l, di, act, prefs);
+  if (sc === null) return null;
+  const bare = isBare(l, di, act);
+  const grid = di === 0 && !bare ? hourGrid(l, act, prefs) : null;
+  return { score: sc, bare, grid, best: grid ? windowLabel(grid) : null, verdict: verdict(l, di, act, prefs, units), facts: dayFacts(l, di, units) };
+}
+
 export type BandKey = 'hi' | 'go' | 'fair' | 'poor' | 'skip' | 'none';
 export type Band = { key: BandKey; word: string };
 
@@ -514,7 +538,10 @@ export function breakdown(l: Place, di: number, act: ActivityKey, prefs: PrefsBy
   const rain = rainSub(l, di, day);
   const p = prefs[act];
   const b = strings.breakdown;
-  const snowpack: Factor[] = hasDepth(l, di) ? [{ label: b.snowpack, value: coverageWord(x.cov), v: x.cov, note: b.snowpackNote }] : [];
+  // On bare ground the other bars can be green beside a score of 0, so the snowpack row says why.
+  const snowpack: Factor[] = hasDepth(l, di)
+    ? [{ label: b.snowpack, value: coverageWord(x.cov), v: x.cov, note: x.cov <= 0 ? b.snowpackBareNote : b.snowpackNote }]
+    : [];
   const leads = x.cov < T.limiters.severeBelow;
   const deep = x.deep < 100;
   const deepNote = act === 'classic' ? b.deepSnowClassic : b.deepSnowSkate;

@@ -1,9 +1,10 @@
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText } from './ui/app-text';
 import { ScoreDial } from './ui/score-dial';
 
 import { band } from '@/lib/scoring';
+import { strings } from '@/strings';
 import { bandColors } from '@/theme/band-colors';
 import { useTheme } from '@/theme/use-theme';
 
@@ -18,14 +19,17 @@ type Props = {
   facts?: string | null;
   /** A small closing line, e.g. how old the forecast is. */
   foot?: string | null;
+  /** Opens "Not right?" for this day; the link is left out without it. */
+  onReport?: (() => void) | null;
 };
 
 /**
  * The answer for one place on one day: the dial and its band word, the best
  * hours, the day in three numbers, and the verdict in a sentence. Today, the
- * place screen and the Forecast detail all show a day this way.
+ * place screen and the Forecast detail all show a day this way, with
+ * "Not right? ›" at the foot for telling the developer the verdict is off.
  */
-export function DayAnswer({ score, verdict, best, facts, foot }: Props) {
+export function DayAnswer({ score, verdict, best, facts, foot, onReport }: Props) {
   const theme = useTheme();
   const b = band(score);
   return (
@@ -51,17 +55,37 @@ export function DayAnswer({ score, verdict, best, facts, foot }: Props) {
       <AppText size={14} lh={1.45}>
         {verdict}
       </AppText>
-      {foot && (
-        <AppText size={10.5} muted>
-          {foot}
-        </AppText>
+      {(foot || onReport) && (
+        <View style={styles.foot}>
+          <AppText size={10.5} muted style={styles.flex}>
+            {foot ?? ''}
+          </AppText>
+          {onReport && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={strings.verdictFeedback.linkLabel}
+              onPress={onReport}
+              hitSlop={HIT}
+              style={({ pressed }) => pressed && styles.pressed}>
+              <AppText size={11.5} weight={700} color={theme.accent}>
+                {strings.verdictFeedback.link}
+              </AppText>
+            </Pressable>
+          )}
+        </View>
       )}
     </View>
   );
 }
 
+// The link is small text; this stretches its touch area to the 44pt minimum.
+const HIT = { top: 14, bottom: 14, left: 12, right: 12 };
+
 const styles = StyleSheet.create({
   wrap: { gap: 12 },
   top: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   side: { flex: 1, gap: 4 },
+  foot: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  flex: { flex: 1 },
+  pressed: { opacity: 0.6 },
 });

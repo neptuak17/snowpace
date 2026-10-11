@@ -11,8 +11,9 @@ import { ScorePill } from '@/components/ui/score-pill';
 import { Screen, ScreenTitle } from '@/components/ui/screen';
 import { dayIndexFor, dayLabel, gridDates } from '@/data/places';
 import { fmtForecastAge } from '@/lib/format';
+import { toRouteId } from '@/lib/geo';
 import { placeMetaAway } from '@/lib/place-text';
-import { actLabel, canScore, dayFacts, hourGrid, isBare, score, verdict, windowLabel } from '@/lib/scoring';
+import { actLabel, score, shownAnswer } from '@/lib/scoring';
 import { TUNING } from '@/lib/tuning';
 import { useAppState } from '@/state/app-state';
 import { useTheme } from '@/theme/use-theme';
@@ -22,6 +23,7 @@ const NAME_COL = 96;
 
 export default function ForecastScreen() {
   const s = useAppState();
+  const router = useRouter();
   const theme = useTheme();
   const act = s.activity;
   const home = s.home;
@@ -38,11 +40,9 @@ export default function ForecastScreen() {
 
   const selCol = Math.min(cell.day, dates.length - 1);
   const selDay = dayIndexFor(selLoc, dates[selCol]);
-  const scoreable = selDay >= 0 && canScore(selLoc, selDay);
-  const selScore = scoreable ? score(selLoc, selDay, act, s.prefs) : null;
-  // The same answer as Today: on bare ground it is the whole story.
-  const bare = selScore !== null && isBare(selLoc, selDay, act);
-  const grid = selScore !== null && !bare && selDay === 0 ? hourGrid(selLoc, act, s.prefs) : null;
+  // The same answer card as Today, for whichever day is picked.
+  const shown = selDay >= 0 ? shownAnswer(selLoc, selDay, act, s.prefs, s.units) : null;
+  const selScore = shown?.score ?? null;
   const f = strings.forecast;
 
   const scoreAt = (l: typeof selLoc, date: string) => { const i = dayIndexFor(l, date); return i >= 0 ? score(l, i, act, s.prefs) : null; };
@@ -58,7 +58,8 @@ export default function ForecastScreen() {
   if (selScore === null) {
     vs = f.noDay;
   } else if (!worthRanking) {
-    vs = bare ? f.bareWeek : f.noGoodDay;
+    // On bare ground too: the verdict already says there is no snow.
+    vs = f.noGoodDay;
   } else if (bestDay) {
     if (bestDay.i === selCol) vs = f.bestOfFive;
     else if (selCol === 0) vs = f.looksBetter(labels[bestDay.i].label, bestDay.sc, todayScore ?? 0);
@@ -132,9 +133,10 @@ export default function ForecastScreen() {
           </View>
           <DayAnswer
             score={selScore}
-            verdict={selScore === null ? strings.verdict.noForecast : verdict(selLoc, selDay, act, s.prefs, s.units)}
-            best={grid ? windowLabel(grid) : null}
-            facts={selScore === null || bare ? null : dayFacts(selLoc, selDay, s.units)}
+            verdict={shown?.verdict ?? strings.verdict.noForecast}
+            best={shown?.best}
+            facts={shown?.facts}
+            onReport={shown ? () => router.push({ pathname: '/verdict/[id]', params: { id: toRouteId(selLoc.key), date: dates[selCol] } }) : null}
           />
           <View style={[styles.selFoot, { borderTopColor: theme.divider }]}>
             <AppText size={10.5} muted style={styles.flex}>
@@ -145,7 +147,7 @@ export default function ForecastScreen() {
             </AppText>
           </View>
         </Card>
-        {selScore !== null && !bare && (
+        {selScore !== null && (
           <View style={styles.why}>
             <WhyToggle />
             {s.showBreakdown && <DayBreakdown place={selLoc} di={selDay} />}

@@ -13,7 +13,8 @@ import { Card, Kicker } from './ui/card';
 
 import type { Place } from '@/data/places';
 import { fmtForecastAge } from '@/lib/format';
-import { actLabel, canScore, dayFacts, hourGrid, isBare, score, verdict, windowLabel } from '@/lib/scoring';
+import { toRouteId } from '@/lib/geo';
+import { actLabel, canScore, score, shownAnswer, verdict } from '@/lib/scoring';
 import { useAppState } from '@/state/app-state';
 import { strings } from '@/strings';
 import { gutter } from '@/theme/tokens';
@@ -30,8 +31,8 @@ type Props = {
  * hill and the place screen for any other, so the two cannot drift apart.
  *
  * What is shown follows the answer. With no forecast, or the sport not offered
- * here, a card says so. On bare ground the answer is the whole story, so the
- * hours and the detail are left out.
+ * here, a card says so. On bare ground the hour strip is left out (every hour
+ * would score 0), but the day's conditions and the detail stay.
  */
 export function PlaceToday({ place, afterAnswer }: Props) {
   const s = useAppState();
@@ -41,9 +42,9 @@ export function PlaceToday({ place, afterAnswer }: Props) {
   const offers = place.acts.includes(act);
   // No forecast (yet, or too old to cover today): nothing to score, say so.
   const hasToday = canScore(place, 0);
-  const sc = offers && hasToday ? score(place, 0, act, s.prefs) : null;
-  const bare = sc !== null && isBare(place, 0, act);
-  const grid = sc !== null && !bare ? hourGrid(place, act, s.prefs) : null;
+  const shown = offers && hasToday ? shownAnswer(place, 0, act, s.prefs, s.units) : null;
+  const grid = shown?.grid ?? null;
+  const today = place.days[0]?.date;
 
   return (
     <>
@@ -79,16 +80,17 @@ export function PlaceToday({ place, afterAnswer }: Props) {
         </View>
       )}
 
-      {sc !== null && (
+      {shown && (
         <>
           <View style={styles.pad16}>
             <Card style={styles.answerCard}>
               <DayAnswer
-                score={sc}
-                verdict={verdict(place, 0, act, s.prefs, s.units)}
-                best={grid ? windowLabel(grid) : null}
-                facts={bare ? null : dayFacts(place, 0, s.units)}
+                score={shown.score}
+                verdict={shown.verdict}
+                best={shown.best}
+                facts={shown.facts}
                 foot={strings.common.forecastAge(fmtForecastAge(place.forecastAt))}
+                onReport={today ? () => router.push({ pathname: '/verdict/[id]', params: { id: toRouteId(place.key), date: today } }) : null}
               />
             </Card>
           </View>
@@ -104,17 +106,13 @@ export function PlaceToday({ place, afterAnswer }: Props) {
           {/* Evidence for the answer: after the hours, or straight under the answer on bare ground. */}
           <WebcamSection place={place} style={styles.pad18} />
 
-          {!bare && (
-            <>
-              <View style={styles.pad10}>
-                <WhyToggle />
-              </View>
-              {s.showBreakdown && (
-                <View style={styles.pad6}>
-                  <DayBreakdown place={place} di={0} />
-                </View>
-              )}
-            </>
+          <View style={styles.pad10}>
+            <WhyToggle />
+          </View>
+          {s.showBreakdown && (
+            <View style={styles.pad6}>
+              <DayBreakdown place={place} di={0} />
+            </View>
           )}
         </>
       )}

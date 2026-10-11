@@ -1565,12 +1565,12 @@ window.SNOWPACE_DEMO = {
      "window": null,
      "metric": {
       "verdict": "No snow on the ground to speak of.",
-      "facts": null,
+      "facts": "4°C · wind 8 km/h · 0 cm new",
       "lines": null
      },
      "imperial": {
       "verdict": "No snow on the ground to speak of.",
-      "facts": null,
+      "facts": "39°F · wind 5 mph · 0.0\" new",
       "lines": null
      }
     },
@@ -1583,12 +1583,12 @@ window.SNOWPACE_DEMO = {
      "window": null,
      "metric": {
       "verdict": "No snow on the ground to speak of.",
-      "facts": null,
+      "facts": "4°C · wind 8 km/h · 0 cm new",
       "lines": null
      },
      "imperial": {
       "verdict": "No snow on the ground to speak of.",
-      "facts": null,
+      "facts": "39°F · wind 5 mph · 0.0\" new",
       "lines": null
      }
     },
@@ -1601,12 +1601,12 @@ window.SNOWPACE_DEMO = {
      "window": null,
      "metric": {
       "verdict": "No snow on the ground to speak of.",
-      "facts": null,
+      "facts": "4°C · wind 8 km/h · 0 cm new",
       "lines": null
      },
      "imperial": {
       "verdict": "No snow on the ground to speak of.",
-      "facts": null,
+      "facts": "39°F · wind 5 mph · 0.0\" new",
       "lines": null
      }
     },
@@ -1619,12 +1619,12 @@ window.SNOWPACE_DEMO = {
      "window": null,
      "metric": {
       "verdict": "No snow on the ground to speak of.",
-      "facts": null,
+      "facts": "4°C · wind 8 km/h · 0 cm new",
       "lines": null
      },
      "imperial": {
       "verdict": "No snow on the ground to speak of.",
-      "facts": null,
+      "facts": "39°F · wind 5 mph · 0.0\" new",
       "lines": null
      }
     }

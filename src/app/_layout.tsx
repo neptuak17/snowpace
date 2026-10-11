@@ -85,6 +85,10 @@ function RootNavigator() {
         <Stack.Screen name="search" />
         <Stack.Screen name="place/[id]" />
         <Stack.Screen name="webcams/[id]" />
+        {/* "Not right?" slides up as an iOS page sheet over the verdict it is about; swipe down to close.
+            Not a part-height formSheet: iOS sizes those from their content, which a scrolling screen
+            (flex: 1) does not have, so it rendered blank, and the content is nearly a screen tall anyway. */}
+        <Stack.Screen name="verdict/[id]" options={{ presentation: 'modal' }} />
         <Stack.Screen name="help" />
         <Stack.Screen name="feedback" />
         <Stack.Screen name="credits" />

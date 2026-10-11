@@ -234,7 +234,10 @@ modelled depth (`TUNING.coverage`: zero below 15 cm / full from 60 cm for downhi
 for nordic and snowshoe), so a bluebird day on bare ground scores 0 rather than "Fair". A day with
 no modelled depth gets no ceiling. The depth itself is **not shown** — the UI says only Bare /
 Thin / Enough — because the model does not know about snowmaking or grooming. Thresholds are
-guesses pending winter data.
+guesses pending winter data. On bare ground the answer card still shows the day's conditions and
+"Why? ›" (Oct 2026, at the owner's call: the card looked empty); the Snowpack row leads the detail
+and says the score is 0 whatever the weather. Only the hour strip is left out, since every hour
+scores 0.
 
 **Deep new snow caps skate and classic the same way (Oct 2026).** The weighted blend let a calm,
 cold day after 20 cm of new snow score Good for skate, because new snow and snow falling, both at
@@ -419,6 +422,19 @@ The about/credits screen must include:
   - **A snow surface or skin temperature variable** would beat deriving one from air temperature,
     cloud and wind. Whether either model returns a usable one is unverified — GEM returned null for
     freezing level, so check against the live endpoint rather than assume.
+
+## Feedback
+
+Feedback is email the user sends from their own Mail app (`expo-mail-composer`); Snowpace never
+sends anything itself. There are two ways in. Help → Send feedback (`src/app/feedback.tsx`) is
+for bugs, ideas and anything else. **"Not right? ›"** at the foot of every answer card (Today,
+the place screen, the Forecast detail; added Oct 2026) opens a sheet (`src/app/verdict/[id].tsx`)
+where the user taps what is off. Its email names the place, day and verdict above the divider,
+because that is what the report is about. With diagnostics on, it adds the Why rows with each
+factor's 0–100, the usual diagnostics and the forecast attachment. The email is built from the
+same `shownAnswer()` the card uses, so it describes exactly what was on screen. The diagnostics
+switch stays on both screens, because the privacy policy promises the user chooses. When either
+email's contents change, update the policy's "Feedback you send" section and its date.
 
 ## Website
 

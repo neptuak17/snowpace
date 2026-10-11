@@ -64,11 +64,21 @@ function HelpButton({ top }: { top: number }) {
 
 /** "‹ Back" text button used by the pushed screens. */
 export function BackButton({ label, onPress }: { label: string; onPress: () => void }) {
+  return <TopLink text={strings.common.backTo(label)} onPress={onPress} />;
+}
+
+/** "Cancel" for a sheet: closes it without doing anything, as swiping it down does. */
+export function CancelButton({ onPress }: { onPress: () => void }) {
+  return <TopLink text={strings.common.cancel} onPress={onPress} />;
+}
+
+/** The text button at the top left of a pushed screen or sheet. */
+function TopLink({ text, onPress }: { text: string; onPress: () => void }) {
   const theme = useTheme();
   return (
     <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [styles.back, pressed && styles.pressed]}>
       <AppText size={13} weight={700} color={theme.accent}>
-        {strings.common.backTo(label)}
+        {text}
       </AppText>
     </Pressable>
   );

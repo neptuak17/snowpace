@@ -142,7 +142,7 @@ const samples = SAMPLES.map((s) => {
     const g = sc !== null && !bare ? hourGrid(p, act, DEFAULT_PREFS) : null;
     const text = (units: 'metric' | 'imperial') => ({
       verdict: verdict(p, 0, act, DEFAULT_PREFS, units),
-      facts: bare ? null : dayFacts(p, 0, units),
+      facts: dayFacts(p, 0, units),
       lines: g ? g.hours.map((h) => hourLine(g, h, units)) : null,
     });
     return [act, {

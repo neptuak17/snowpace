@@ -81,7 +81,6 @@ export const strings = {
       `${day} looks better — ${best} against today’s ${today}.`,
     betterBet: (day: string, best: number) => `${day} is the better bet at ${best}.`,
     withinFew: 'Close to the best day here.',
-    bareWeek: 'No snow on the ground here yet.',
     noGoodDay: 'None of the next five days look good here.',
     forecastLabel: 'Forecast',
     noDay: 'No forecast for this day.',
@@ -193,7 +192,7 @@ export const strings = {
       { t: 'Turn on your activities', d: 'On the You tab, enable the ones you do. Everything else in the app filters to those.' },
       { t: 'Set what good feels like', d: 'Your ideal temperature, how much wind you will put up with, how much fresh snow you want, and how far you will travel.' },
       { t: 'Add your places', d: 'My places → Add. Pick the centres and hills you go to, and set one as your home hill. That is the one Today opens on.' },
-      { t: 'Check Today', d: 'The big dial is how today looks at your home hill, with its best hours and the reason in a sentence. Tap an hour on the strip for that hour, and tap Why? to see what is behind the score. On a poor day, better places nearby are listed right under it.' },
+      { t: 'Check Today', d: 'The big dial is how today looks at your home hill, with its best hours and the reason in a sentence. Tap an hour on the strip for that hour, tap Why? to see what is behind the score, and tap Not right? to tell me when it does not match the day. On a poor day, better places nearby are listed right under it.' },
       { t: 'See it for yourself', d: 'Under the hours, a recent webcam picture from windy.com shows the place itself. Tap it to see it larger on windy.com, tap Refresh for a newer one, or tap Other cameras to choose a different view. A place with no camera of its own shows none, and you can switch webcams off on the You tab.' },
       { t: 'Look ahead', d: 'Forecast lays out every saved place against the next five days. Tap any square for the detail on that day.' },
     ],
@@ -201,7 +200,7 @@ export const strings = {
     creditsLink: 'Credits and data sources',
     data: "Scores come from mountain weather forecasts, so treat them as a forecast, not a report. Each place shows how old its forecast is, and each webcam how recent its picture is. Webcam pictures come from windy.com; they are there to look at and never change a score. Remember to check the operator's snow report before a long drive.",
     feedbackKicker: 'Something to tell me?',
-    feedbackBody: 'A score that looked wrong, something broken, or an idea for the app. Feedback goes straight to the developer.',
+    feedbackBody: 'A score that looked wrong, something broken, or an idea for the app. Feedback goes straight to the developer. For a score, Not right? under its verdict is quicker: it brings the day along.',
     feedbackButton: 'Send feedback',
   },
 
@@ -263,6 +262,35 @@ export const strings = {
     bodyPrompt: (kind: 'bug' | 'score' | 'idea' | 'other') =>
       kind === 'idea' || kind === 'other' ? '(What is on your mind?)' : '(What happened? What did you expect, and what did you see?)',
     divider: '—————— Diagnostics (delete this block if you would rather not send it) ——————',
+  },
+
+  // "Not right? ›" under a verdict, the sheet it opens, and the email it drafts.
+  verdictFeedback: {
+    link: 'Not right? ›',
+    linkLabel: 'Not right? Send feedback on this verdict',
+    title: 'Not right?',
+    issuesKicker: 'What’s off?',
+    issuesHint: 'Tap any that apply.',
+    issues: {
+      high: 'Score too high',
+      low: 'Score too low',
+      reason: 'The reason doesn’t fit',
+      snow: 'There’s snow here',
+      hours: 'Best hours are off',
+      weather: 'The weather was different',
+      other: 'Something else',
+    },
+    diagnosticsHint: 'This day’s forecast and what is behind its score, the app and iOS versions, and your activities and settings. Never your location or your other places.',
+    howItSends: 'Send feedback opens Mail with a draft addressed to me. Say what you saw at the hill, then send it from your own account.',
+    send: 'Send feedback',
+    // The email itself.
+    subject: (place: string, activity: string, day: string) => `Snowpace feedback: Not right — ${place}, ${activity}, ${day}`,
+    bodyPrompt: '(What did you see at the hill?)',
+    issuesLine: (issues: string[]) => `What’s off: ${issues.join(' · ')}`,
+    dayLine: (place: string, activity: string, day: string, date: string) => `${place} · ${activity} · ${day} (${date})`,
+    verdictLine: (score: number, word: string, verdict: string) => `Verdict shown: ${score} ${word} — “${verdict}”`,
+    shownLine: (parts: string[]) => `Shown with it: ${parts.join(' · ')}`,
+    behindLine: (rows: string[]) => `Behind the score: ${rows.join(' · ')}`,
   },
 
   // ── Formatting phrases (lib/format.ts) ──────────────────────────────────
@@ -390,6 +418,7 @@ export const strings = {
     cloudNote: 'Light quality, weighted lightly.',
     snowpack: 'Snowpack',
     snowpackNote: 'Modelled depth, not a measurement (it does not account for snowmaking).',
+    snowpackBareNote: 'No snow on the ground, so the score is 0 whatever the weather. The depth is modelled, not measured, and does not know about snowmaking.',
     surface: 'Surface',
     surfaceNote: 'An estimate of what the weather is doing to the snow, assuming normal overnight grooming. Shown for information; not yet part of the score.',
   },
