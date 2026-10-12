@@ -34,6 +34,8 @@ export type DayWx = {
   /** Day's high and low, °C. */
   hi: number;
   lo: number;
+  /** Degree-hours above 0 °C over the day (an hour at +2 °C is 2): how much the warmth could melt. */
+  thawDegH: number;
   /** New snow over the 24 h, cm. */
   snow: number;
   /** Daytime mean wind, km/h. */
@@ -50,8 +52,13 @@ export type DayWx = {
   depth: number | null;
 };
 
-/** The three days before day 0, condensed to what the engine needs. */
-export type Prior = { snow72: number; temps: [number, number]; rain72: number };
+/**
+ * The three days before day 0, condensed to what the engine needs: snow and
+ * rain totals, and the two days before today as measured for freeze–thaw.
+ */
+export type Prior = { snow72: number; thaw: [ThawDay, ThawDay]; rain72: number };
+
+export type ThawDay = Pick<DayWx, 'hi' | 'lo' | 'thawDegH'>;
 
 export type Place = {
   /** Inventory key: osm:way/123, osm:relation/123 or skimap:123. */
@@ -185,7 +192,7 @@ function weatherFrom(forecasts: Forecast[]): Weather {
   const p3 = dayAt(t0 - 3), p2 = dayAt(t0 - 2), p1 = dayAt(t0 - 1);
   const prior: Prior | null =
     p3 && p2 && p1
-      ? { snow72: round1(p3.snow + p2.snow + p1.snow), temps: [p2.t, p1.t], rain72: round1(p3.rain + p2.rain + p1.rain) }
+      ? { snow72: round1(p3.snow + p2.snow + p1.snow), thaw: [thawDay(p2), thawDay(p1)], rain72: round1(p3.rain + p2.rain + p1.rain) }
       : null;
 
   // The surface model runs over the whole series, history included, so its
@@ -229,10 +236,15 @@ function aggregateDay(date: string, hours: HourWx[]): DayWx | null {
   return {
     date,
     t: round1(t), hi: round1(Math.max(...allT)), lo: round1(Math.min(...allT)),
+    thawDegH: round1(allT.reduce((acc, v) => acc + Math.max(0, v), 0)),
     snow: round1(snow), wind: round1(wind), gust: gusts.length ? round1(Math.max(...gusts)) : round1(wind),
     cloud: Math.round(cloud), precip: round1(precip), rain: round1(rain),
     depth: noon?.depth ?? null,
   };
+}
+
+function thawDay({ hi, lo, thawDegH }: DayWx): ThawDay {
+  return { hi, lo, thawDegH };
 }
 
 function round1(x: number): number {

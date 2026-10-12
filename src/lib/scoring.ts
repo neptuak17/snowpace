@@ -109,26 +109,34 @@ export function snow72(l: Place, di: number): number {
   return Math.round(total);
 }
 
-// Any thaw in the last 48 h followed by a refreeze wrecks a set track.
-// `thawed` without `hit` is the third state: above freezing and never refroze.
-export function freezeThaw(l: Place, di: number): { hit: boolean; thawed: boolean; severity: number; maxHi: number } {
+export type FreezeThaw = {
+  /** A real melt and a refreeze: expect crust. */
+  hit: boolean;
+  /** Warm enough, for long enough, to melt the surface. */
+  thawed: boolean;
+  /** Cold enough to refreeze anything wet. */
+  refroze: boolean;
+  severity: number;
+  /** The range over the three days, °C. */
+  maxHi: number;
+  minLo: number;
+};
+
+// A real melt (see TUNING.freezeThaw) and a refreeze within the day and the
+// two before it wreck a set track. The two days before today come from the
+// hourly history, as measured, like the rest.
+export function freezeThaw(l: Place, di: number): FreezeThaw {
   const f = T.freezeThaw;
-  let maxHi = -99, minLo = 99;
+  let maxHi = -99, minLo = 99, melt = 0;
   for (let k = 0; k <= 2; k++) {
     const j = di - k;
-    if (j >= 0) {
-      const d = dayAt(l, j);
-      maxHi = Math.max(maxHi, d.hi);
-      minLo = Math.min(minLo, d.lo);
-    } else {
-      const temps = priorOf(l).temps;
-      const t = temps[j + 2] !== undefined ? temps[j + 2] : f.priorTempFallback;
-      maxHi = Math.max(maxHi, t + f.priorTempSwing);
-      minLo = Math.min(minLo, t - f.priorTempSwing);
-    }
+    const d = j >= 0 ? dayAt(l, j) : priorOf(l).thaw[j + 2];
+    maxHi = Math.max(maxHi, d.hi);
+    minLo = Math.min(minLo, d.lo);
+    melt = Math.max(melt, d.thawDegH);
   }
-  const thawed = maxHi > f.thawAbove, refroze = minLo < f.refreezeBelow;
-  return { hit: thawed && refroze, thawed, severity: thawed ? Math.min(f.maxSeverityDeg, maxHi) : 0, maxHi };
+  const thawed = melt >= f.meltDegH, refroze = minLo < f.refreezeBelow;
+  return { hit: thawed && refroze, thawed, refroze, severity: thawed ? Math.min(f.maxSeverityDeg, maxHi) : 0, maxHi, minLo };
 }
 
 // Rain that fell in the previous three days, weighted by age; a refreeze after
@@ -144,7 +152,8 @@ export function rainPrior(l: Place, di: number): { mm: number; iced: boolean } {
       mm += priorOf(l).rain72 * r.priorRainWeight;
     }
   }
-  return { mm, iced: mm > r.floorMm && freezeThaw(l, di).hit };
+  // Rain wets the surface itself, so a refreeze is enough to ice it; no melt needed.
+  return { mm, iced: mm > r.floorMm && freezeThaw(l, di).refroze };
 }
 
 export type Rain = { v: number; nowMm: number; laterMm: number; prior: { mm: number; iced: boolean } };
@@ -552,8 +561,9 @@ export function breakdown(l: Place, di: number, act: ActivityKey, prefs: PrefsBy
     { label: b.temp, value: fmtT(day.t, units), v: x.t, note: b.tempNote(fmtT(p.temp, units), actLabel(act)) },
     ...(deep ? [] : [newSnow]),
     { label: b.threeDay, value: fmtS(snow72(l, di), units), v: x.base, note: b.threeDayNote },
-    { label: b.freezeThaw, value: ft.hit ? b.freezeThawYes(fmtT(ft.maxHi, units)) : b.freezeThawNone, v: x.ft,
-      note: ft.hit ? b.freezeThawHitNote : ft.thawed ? b.freezeThawThawedNote : b.freezeThawNoneNote },
+    // On bare ground there is nothing to crust, so the row reports the range without a bar.
+    { label: b.freezeThaw, value: b.freezeThawRange(fmtT(ft.minLo, units), fmtT(ft.maxHi, units)), v: x.ft, note: freezeThawNote(ft, x.cov),
+      info: x.cov <= 0 },
     { label: b.wind, value: fmtW(day.wind, units), v: x.w, note: b.windNote(fmtW(p.wind, units)) },
     { label: b.rain, value: fmtRain(rain), v: x.pr, note: rainCopy(rain) },
     { label: b.snowFalling, value: strings.format.mm(snowFallingMm(day).toFixed(1)), v: x.fall, note: fallCopy(act, p.precipTol) },
@@ -561,6 +571,19 @@ export function breakdown(l: Place, di: number, act: ActivityKey, prefs: PrefsBy
     ...(leads ? [] : snowpack),
     ...surfaceRow(l, di, act),
   ];
+}
+
+/**
+ * What the freeze–thaw row's range means for the snow. A full bar only says
+ * there is no crust; on a warm spell the note says so and points to
+ * Temperature, which is where the warmth is counted.
+ */
+function freezeThawNote(ft: FreezeThaw, cov: number): string {
+  const b = strings.breakdown;
+  if (cov <= 0) return b.freezeThawBareNote;
+  if (ft.hit) return b.freezeThawHitNote;
+  if (ft.thawed) return b.freezeThawThawedNote;
+  return ft.maxHi > 0 ? b.freezeThawSlightNote : b.freezeThawNoneNote;
 }
 
 /** The shadow-mode surface row, for nordic activities only. Never scored. */

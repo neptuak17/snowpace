@@ -39,13 +39,19 @@ export const TUNING = {
   // Weight given to the pre-forecast prior when the window reaches back before day 0.
   priorSnowWeight: { day0: 1, day1: 0.5 },
 
-  // ── Freeze–thaw: a thaw above `thawAbove` followed by a refreeze below `refreezeBelow`.
+  // ── Freeze–thaw: crust needs a real melt and a refreeze below `refreezeBelow`,
+  // within the day and the two before it. A brief peak just above 0 °C melts
+  // little or nothing (a clear, calm surface stays colder than the air), so
+  // melt is counted in degree-hours above 0 °C on the warmest of those days.
+  // Temperature-index melt models put snowmelt at about 3–6 mm of water per °C
+  // per day, roughly 0.2 mm per degree-hour; `meltDegH` of 6 is about 1 mm of
+  // meltwater, enough to wet the top few cm — a high near +2 °C held for a few
+  // hours. The surface model's wetting rate (below) reads it as soft and wet.
+  // Chosen Oct 2026; a guess pending winter data.
   freezeThaw: {
-    thawAbove: 0.5,
+    meltDegH: 6,
     refreezeBelow: -1,
     maxSeverityDeg: 6,
-    priorTempSwing: 3,
-    priorTempFallback: -6,
     // Points off per °C of thaw, by activity. Worst on skate skis (icy edges),
     // classic can still wax for grip.
     penaltyPerDeg: { skate: 13, classic: 9, downhill: 6, snowshoe: 4 } as Record<ActivityKey, number>,

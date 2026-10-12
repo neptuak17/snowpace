@@ -1689,7 +1689,7 @@ window.SNOWPACE_DEMO = {
   {
    "key": "ft",
    "name": "Freeze–thaw",
-   "what": "Whether it went above zero and refroze, which means crust",
+   "what": "Whether it got warm enough to melt the surface and then refroze, which means crust",
    "personal": false
   },
   {

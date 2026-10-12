@@ -251,6 +251,22 @@ went from Poor to Fair. When a cap bites, the "New snow" row leads the Why break
 saying so. Thresholds are guesses; the surface model below is meant to replace both caps.
 
 
+### Freeze–thaw
+
+Crust needs a real melt and then a refreeze within the day and the two before it (Oct 2026, at
+the owner's call that a rise to +0.5 °C does not melt enough to crust). Melt is counted in
+degree-hours above 0 °C on the warmest of those days. `TUNING.freezeThaw.meltDegH` is 6 °C·h,
+roughly a high near +2 °C held for a few hours, because a brief peak just above freezing melts
+little or nothing: a clear, calm surface stays colder than the air. Temperature-index melt models
+put melt at about 0.2 mm of water per degree-hour, so 6 is about 1 mm, enough to wet the top few
+cm. The refreeze is any hour below −1 °C. All three days come from the hourly data as measured;
+the two days before today were once estimated as their daytime mean ± 3 °C, which missed
+clear-night frosts. The Why row shows the low and high over the three days and a note for each
+case: crust; melted but never refroze (soft and wet, with the warmth counted under Temperature,
+not here); too little melt; frozen throughout; or bare ground. Rain followed by a refreeze ices
+the surface without any melt, which the rain factor counts. The order of melt and refreeze is not
+checked: the surface model below is meant to replace this factor for classic and skate.
+
 ### Surface firmness — shadow mode
 
 `src/lib/surface.ts` estimates what the weather is doing to the snow surface, hour by hour, and
