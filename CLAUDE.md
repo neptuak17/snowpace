@@ -235,9 +235,16 @@ for nordic and snowshoe), so a bluebird day on bare ground scores 0 rather than 
 no modelled depth gets no ceiling. The depth itself is **not shown** — the UI says only Bare /
 Thin / Enough — because the model does not know about snowmaking or grooming. Thresholds are
 guesses pending winter data. On bare ground the answer card still shows the day's conditions and
-"Why? ›" (Oct 2026, at the owner's call: the card looked empty); the Snowpack row leads the detail
-and says the score is 0 whatever the weather. Only the hour strip is left out, since every hour
-scores 0.
+"Why? ›" (Oct 2026, at the owner's call: the card looked empty), with the Snowpack row leading the
+detail. Only the hour strip is left out, since every hour scores 0. That the depth is modelled and
+blind to snowmaking is said once, on the Help screen, not on the card.
+
+**The "Why?" detail is rows only (Oct 2026, owner's call: too much to read).** Each row is the
+factor, its value and its 0–100 bar, with no explanation under it; anything that needs explaining
+goes on the Help screen. What a note used to carry lives in the row itself: rain that refroze
+reads "10.1 mm, 3 d · ice", the deep-snow cap is a row of its own, and the shadow-mode surface row
+is labelled "Surface (not scored)". VoiceOver reads each row with its score ("Temperature, 3°C,
+18 out of 100"), since a bar says nothing to a screen reader.
 
 **Deep new snow caps skate and classic the same way (Oct 2026).** The weighted blend let a calm,
 cold day after 20 cm of new snow score Good for skate, because new snow and snow falling, both at
@@ -247,8 +254,9 @@ later, so that day now reads Poor. Classic got a gentler cap the next day, at th
 that set tracks fill in while it snows: from 8 cm down to 0.8 twenty cm later, which takes the
 same day from Good 75 to Fair 64 and leaves days without much snow untouched. Raising classic's
 weight on falling snow was tried and rejected: it lifted every snow-free day, and rain on snow
-went from Poor to Fair. When a cap bites, the "New snow" row leads the Why breakdown with a note
-saying so. Thresholds are guesses; the surface model below is meant to replace both caps.
+went from Poor to Fair. When a cap bites, a "Deep new snow" row with the cap as its bar leads the
+Why breakdown, as Snowpack does for coverage. Thresholds are guesses; the surface model below is
+meant to replace both caps.
 
 
 ### Freeze–thaw
@@ -261,19 +269,23 @@ little or nothing: a clear, calm surface stays colder than the air. Temperature-
 put melt at about 0.2 mm of water per degree-hour, so 6 is about 1 mm, enough to wet the top few
 cm. The refreeze is any hour below −1 °C. All three days come from the hourly data as measured;
 the two days before today were once estimated as their daytime mean ± 3 °C, which missed
-clear-night frosts. The Why row shows the low and high over the three days and a note for each
-case: crust; melted but never refroze (soft and wet, with the warmth counted under Temperature,
-not here); too little melt; frozen throughout; or bare ground. Rain followed by a refreeze ices
-the surface without any melt, which the rain factor counts. The order of melt and refreeze is not
-checked: the surface model below is meant to replace this factor for classic and skate.
+clear-night frosts. Crust costs points by how warm the thaw got. **Slush scores 0** — a real melt
+and never a refreeze over the three days — and so does bare ground, where there is no snow to
+freeze or thaw (owner's call, Oct 2026: both have no firm surface, so the bar is empty like
+Snowpack's). That overlaps the Temperature factor on warm days, knowingly: a warm, snowy day loses
+the factor's weight (skate 16 points, classic 11, downhill 6, snowshoe 5), and the verdict names
+it as "expect slush". The Why row's value is the low and high over the three days. Rain followed
+by a refreeze ices the surface without any melt, which the rain factor counts. The order of melt
+and refreeze is not checked: the surface model below is meant to replace this factor for classic
+and skate.
 
 ### Surface firmness — shadow mode
 
 `src/lib/surface.ts` estimates what the weather is doing to the snow surface, hour by hour, and
 names it: **Fresh, Soft, Packed, Firm, Icy or Slushy**. Added Oct 2026, in **shadow mode**: shown
-for classic and skate (a row in the "Why?" detail on Today, the place screen and the Forecast
-detail, and a line in the feedback diagnostics), but **never part of the score** and never
-coloured — a colour is a verdict. Do not promote it into the score until its calls have been compared with real winter days.
+for classic and skate (a row labelled "Surface (not scored)" in the "Why?" detail on Today, the
+place screen and the Forecast detail, explained on the Help screen, and a line in the feedback
+diagnostics), but **never part of the score** and never coloured — a colour is a verdict. Do not promote it into the score until its calls have been compared with real winter days.
 
 * It carries three 0–1 quantities — firmness, wetness and ice — through the whole hourly series,
   so the week of history has washed out the starting state by today. New snow buries the

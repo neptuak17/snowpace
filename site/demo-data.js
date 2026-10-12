@@ -1689,7 +1689,7 @@ window.SNOWPACE_DEMO = {
   {
    "key": "ft",
    "name": "Freeze–thaw",
-   "what": "Whether it got warm enough to melt the surface and then refroze, which means crust",
+   "what": "Whether it melted and refroze into crust, or melted and stayed above freezing as slush",
    "personal": false
   },
   {
@@ -1723,7 +1723,7 @@ window.SNOWPACE_DEMO = {
    "personal": false
   }
  ],
- "snowpack": "On top of those, the modelled snowpack caps the score: on bare ground it is 0, however good the weather. For skate and classic skiing, deep new snow caps it too: a skate lane stays soft and slow until it has been packed, and classic tracks fill in until they have been reset.",
+ "snowpack": "On top of those, the modelled snowpack caps the score: on bare ground it is 0, however good the weather. The snowpack is a weather model’s estimate, not a measurement, and it does not know about snowmaking, so a hill making snow can still show as bare. For skate and classic skiing, deep new snow caps it too: a skate lane stays soft and slow until it has been packed, and classic tracks fill in until they have been reset.",
  "bands": [
   {
    "key": "hi",

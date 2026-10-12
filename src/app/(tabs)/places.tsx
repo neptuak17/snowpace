@@ -92,7 +92,7 @@ export default function PlacesScreen() {
         <View key={l.key} style={[styles.unlisted, { backgroundColor: theme.surface, borderColor: theme.divider }]}>
           <View style={styles.flex}>
             <AppText size={13.5} weight={700} muted>
-              {l.name}
+              {l.shortName}
             </AppText>
             <AppText size={10.5} muted>
               {strings.common.unlisted} · {strings.places.unlistedNote}

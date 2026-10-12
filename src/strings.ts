@@ -177,7 +177,7 @@ export const strings = {
     factors: [
       { id: 's', k: 'New snow, 24 hours', v: 'how much has fallen since yesterday' },
       { id: 'base', k: 'Snowfall, 3 days', v: 'a stand-in for coverage and how fresh the surface is' },
-      { id: 'ft', k: 'Freeze–thaw', v: 'whether it got warm enough to melt the surface and then refroze, which means crust' },
+      { id: 'ft', k: 'Freeze–thaw', v: 'whether it melted and refroze into crust, or melted and stayed above freezing as slush' },
       { id: 't', k: 'Temperature', v: 'measured against the temperature you said you prefer' },
       { id: 'w', k: 'Wind', v: 'exposure and windchill up high' },
       { id: 'pr', k: 'Rain', v: 'recent or forecast rain is always bad, for every activity' },
@@ -185,8 +185,8 @@ export const strings = {
       { id: 'c', k: 'Cloud cover', v: 'flat light versus a bluebird day' },
     ],
     factorSep: ' — ',
-    decidesSnowpack: 'On top of those, the modelled snowpack caps the score: on bare ground it is 0, however good the weather. For skate and classic skiing, deep new snow caps it too: a skate lane stays soft and slow until it has been packed, and classic tracks fill in until they have been reset.',
-    decidesOutro: 'The sentence under the dial names whatever is holding the day back, and Why? shows how each one scored.',
+    decidesSnowpack: 'On top of those, the modelled snowpack caps the score: on bare ground it is 0, however good the weather. The snowpack is a weather model’s estimate, not a measurement, and it does not know about snowmaking, so a hill making snow can still show as bare. For skate and classic skiing, deep new snow caps it too: a skate lane stays soft and slow until it has been packed, and classic tracks fill in until they have been reset.',
+    decidesOutro: 'The sentence under the dial names whatever is holding the day back, and Why? shows how each one scored, as a bar from 0 to 100. For skate and classic, Why? also names the snow surface the weather is likely leaving (Fresh, Soft, Packed, Firm, Icy or Slushy), assuming normal overnight grooming. It is an estimate, and not yet part of the score.',
     useKicker: 'How to use it',
     steps: [
       { t: 'Turn on your activities', d: 'On the You tab, enable the ones you do. Everything else in the app filters to those.' },
@@ -373,6 +373,8 @@ export const strings = {
     hide: 'Hide the detail ›',
     kicker: 'Behind the score',
     hours: 'Hour by hour',
+    // What VoiceOver reads for a row: "Temperature, 3°C, 18 out of 100".
+    rowLabel: (label: string, value: string, v: number | null) => (v === null ? `${label}, ${value}` : `${label}, ${value}, ${v} out of 100`),
   },
 
   // Today's hours, under the answer, and the condition rows in the detail.
@@ -394,35 +396,24 @@ export const strings = {
     snow: (mm: string) => `snow ${mm} mm`,
   },
 
-  // The rows of the Today breakdown card.
+  // The rows of the breakdown card ("Behind the score"). No explanations
+  // under the rows: Help explains the factors.
   breakdown: {
     temp: 'Temperature',
-    tempNote: (temp: string, activity: string) =>
-      `Daytime average. You like it around ${temp} for ${activity}.`,
     newSnow: 'New snow, 24 h',
-    deepSnowSkate: 'This much new snow also caps the skate score: the lane stays soft and slow until it has been packed.',
-    deepSnowClassic: 'This much new snow also caps the classic score: the tracks fill in and stay soft until they have been reset.',
+    deepSnow: 'Deep new snow',
     threeDay: 'Snowfall, 3 days',
-    threeDayNote: 'How much has fallen recently (how fresh the surface is).',
     freezeThaw: 'Freeze–thaw',
     // The value is the low and high over the day and the two before it.
     freezeThawRange: (lo: string, hi: string) => `${lo} to ${hi}`,
-    freezeThawHitNote: 'Warm enough to melt the surface and cold enough to refreeze it in the last three days: expect crust while it is cold, softening as it warms.',
-    freezeThawThawedNote: 'Warm enough to melt the surface and never cold enough to refreeze it in the last three days: no crust, but expect soft, wet snow. The warmth itself counts under Temperature.',
-    freezeThawSlightNote: 'Above freezing only briefly or slightly in the last three days: not enough melt to form a crust.',
-    freezeThawNoneNote: 'Below freezing for the last three days, so no melt and no crust.',
-    freezeThawBareNote: 'No snow on the ground, so nothing to melt into crust.',
     wind: 'Wind',
-    windNote: (limit: string) => `You call it off past ${limit}.`,
     rain: 'Rain',
+    // Rain that refroze: "10.1 mm, 3 d · ice".
+    rainIced: (value: string) => `${value} · ice`,
     snowFalling: 'Snow falling',
     cloud: 'Cloud cover',
-    cloudNote: 'Light quality, weighted lightly.',
     snowpack: 'Snowpack',
-    snowpackNote: 'Modelled depth, not a measurement (it does not account for snowmaking).',
-    snowpackBareNote: 'No snow on the ground, so the score is 0 whatever the weather. The depth is modelled, not measured, and does not know about snowmaking.',
-    surface: 'Surface',
-    surfaceNote: 'An estimate of what the weather is doing to the snow, assuming normal overnight grooming. Shown for information; not yet part of the score.',
+    surface: 'Surface (not scored)',
   },
 
   verdict: {
@@ -447,6 +438,7 @@ export const strings = {
     nothingNew: 'not much new snow has fallen',
     tooMuchUnpacked: 'there is more unpacked snow than you might want to push through',
     crust: 'it thawed and refroze (expect crust)',
+    slush: 'it has stayed above freezing (expect slush)',
     wind: 'the wind is the one knock',
     notMuchFalling: 'not much snow is falling',
     tooMuchFalling: 'more snow is falling than you like',
@@ -468,11 +460,6 @@ export const strings = {
     recent: 'rain in the last three days has hurt the surface',
     later: 'rain is in the forecast for later today',
     movingIn: 'there is weather moving in',
-    copyNow: 'Rain is forecast: it is warm enough to fall as rain rather than snow.',
-    copyLater: 'Dry now, but rain is forecast later today.',
-    copyNone: 'No rain forecast.',
-    copyIced: (mm: string) => `${mm} mm fell in the last three days and refroze (expect ice).`,
-    copyRecent: (mm: string) => `${mm} mm of rain in the last three days has degraded the surface.`,
   },
 
   fall: {

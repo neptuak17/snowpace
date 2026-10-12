@@ -26,8 +26,10 @@ export function WhyToggle() {
 }
 
 /**
- * What is behind a day's score: each factor as a bar, and for today the
- * conditions hour by hour. Shown under WhyToggle when it is open.
+ * What is behind a day's score: each factor's value and its 0–100 as a bar,
+ * and for today the conditions hour by hour. Shown under WhyToggle when it is
+ * open. VoiceOver reads each row as one item, with its score, since the bar
+ * itself says nothing to a screen reader.
  */
 export function DayBreakdown({ place, di }: { place: Place; di: number }) {
   const s = useAppState();
@@ -38,7 +40,11 @@ export function DayBreakdown({ place, di }: { place: Place; di: number }) {
     <Card style={styles.card}>
       <Kicker>{strings.why.kicker}</Kicker>
       {factors.map((f) => (
-        <View key={f.label} style={styles.factor}>
+        <View
+          key={f.label}
+          style={styles.factor}
+          accessible
+          accessibilityLabel={strings.why.rowLabel(f.label, f.value, f.info ? null : Math.round(f.v))}>
           <View style={styles.factorHead}>
             <AppText size={12.5} weight={600}>
               {f.label}
@@ -52,9 +58,6 @@ export function DayBreakdown({ place, di }: { place: Place; di: number }) {
               <View style={[styles.fill, { width: `${Math.round(f.v)}%`, backgroundColor: bandColors(theme, band(f.v)).ring }]} />
             </View>
           )}
-          <AppText size={10.5} muted>
-            {f.note}
-          </AppText>
         </View>
       ))}
       {grid && (

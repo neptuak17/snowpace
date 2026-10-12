@@ -7,7 +7,7 @@ import { SectionLabel } from '@/components/ui/card';
 import { HomeTag } from '@/components/ui/place-row';
 import { BackButton, Screen, ScreenTitle } from '@/components/ui/screen';
 import type { SkiArea } from '@/data/openskidata';
-import { activitiesOf } from '@/data/places';
+import { activitiesOf, shortNameOf } from '@/data/places';
 import { searchAreas } from '@/db/inventory';
 import { fmtDistance } from '@/lib/format';
 import { distanceKm } from '@/lib/geo';
@@ -99,7 +99,7 @@ export default function SearchScreen() {
                   <View style={styles.itemText}>
                     <View style={styles.nameRow}>
                       <AppText size={13.5} weight={700} style={styles.name}>
-                        {a.name}
+                        {shortNameOf(a.name)}
                       </AppText>
                       {isHome && <HomeTag />}
                     </View>

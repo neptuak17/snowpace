@@ -43,7 +43,7 @@ function PlaceDetail({ l, from }: { l: Place; from?: string }) {
       </View>
       <View style={[styles.gutter, styles.title]}>
         <AppText heading size={26} lh={1.15}>
-          {l.name}
+          {l.shortName}
         </AppText>
         <AppText size={11.5} muted>
           {placeMetaAway(l, s.units)}

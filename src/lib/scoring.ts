@@ -116,6 +116,8 @@ export type FreezeThaw = {
   thawed: boolean;
   /** Cold enough to refreeze anything wet. */
   refroze: boolean;
+  /** Melted and never refroze: slush. */
+  slush: boolean;
   severity: number;
   /** The range over the three days, °C. */
   maxHi: number;
@@ -136,7 +138,7 @@ export function freezeThaw(l: Place, di: number): FreezeThaw {
     melt = Math.max(melt, d.thawDegH);
   }
   const thawed = melt >= f.meltDegH, refroze = minLo < f.refreezeBelow;
-  return { hit: thawed && refroze, thawed, refroze, severity: thawed ? Math.min(f.maxSeverityDeg, maxHi) : 0, maxHi, minLo };
+  return { hit: thawed && refroze, thawed, refroze, slush: thawed && !refroze, severity: thawed ? Math.min(f.maxSeverityDeg, maxHi) : 0, maxHi, minLo };
 }
 
 // Rain that fell in the previous three days, weighted by age; a refreeze after
@@ -238,18 +240,22 @@ export function subs(day: Wx, p: Prefs, l: Place, di: number, act: ActivityKey):
   const base = snow72(l, di);
   const halfLife = act === 'downhill' ? T.baseHalfLifeCm.downhill : T.baseHalfLifeCm.nordic;
   const ft = freezeThaw(l, di);
+  const cov = coverageSub(l, di, act);
   const windFree = p.wind * T.wind.freeFraction;
   const windZero = p.wind * T.wind.zeroFraction;
   return {
     t: clamp(100 - Math.abs(day.t - p.temp) * T.tempPenaltyPerDeg),
     s: snowSub(day.snow, act, p.snow),
     base: clamp(100 * (1 - Math.exp(-base / halfLife))),
-    ft: ft.hit ? clamp(100 - ft.severity * T.freezeThaw.penaltyPerDeg[act]) : 100,
+    // Crust costs more the warmer the thaw got. Slush (melted and never
+    // refroze) and bare ground have no firm surface at all, so they are the
+    // factor's worst (owner's call, Oct 2026), as bare ground is snowpack's.
+    ft: cov <= 0 || ft.slush ? 0 : ft.hit ? clamp(100 - ft.severity * T.freezeThaw.penaltyPerDeg[act]) : 100,
     w: clamp(100 - Math.max(0, day.wind - windFree) * (100 / windZero)),
     pr: rainSub(l, di, day).v,
     fall: fallSub(day, p, act),
     c: clamp(100 - day.cloud * T.cloudPenaltyPerPct),
-    cov: coverageSub(l, di, act),
+    cov,
     deep: deepSnowSub(day.snow, act, p.snow),
   };
 }
@@ -465,7 +471,7 @@ function weakest(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, unit
     { k: 't', v: x.t, note: d.t < p.temp ? w.colder : w.warmer },
     { k: 's', v: x.s, note: snowNote },
     { k: 'base', v: x.base, note: baseNote(snow72(l, di), units) },
-    { k: 'ft', v: x.ft, note: w.crust },
+    { k: 'ft', v: x.ft, note: freezeThaw(l, di).slush ? w.slush : w.crust },
     { k: 'w', v: x.w, note: w.wind },
     { k: 'pr', v: x.pr, note: rainNote(l, di, d) },
     { k: 'fall', v: x.fall, note: fallNote },
@@ -495,16 +501,6 @@ export function verdict(l: Place, di: number, act: ActivityKey, prefs: PrefsByAc
   }
 }
 
-export function rainCopy(r: Rain): string {
-  const parts: string[] = [];
-  const c = strings.rain;
-  if (r.nowMm > T.rain.floorMm) parts.push(c.copyNow);
-  else if (r.laterMm > T.rain.floorMm) parts.push(c.copyLater);
-  else parts.push(c.copyNone);
-  if (r.prior.mm > T.rain.floorMm) parts.push(r.prior.iced ? c.copyIced(r.prior.mm.toFixed(1)) : c.copyRecent(r.prior.mm.toFixed(1)));
-  return parts.join(' ');
-}
-
 export function fallCopy(act: ActivityKey, tol: number): string {
   if (act === 'downhill') return strings.fall.downhill(tol);
   if (act === 'snowshoe') return strings.fall.snowshoe(tol);
@@ -532,63 +528,45 @@ export function snowHint(act: ActivityKey, want: number, units: Units): string {
  * A breakdown row. `info` rows carry no score — they are shown for context
  * and drawn without a bar (the surface model, while in shadow mode).
  */
-export type Factor = { label: string; value: string; v: number; note: string; info?: boolean };
+/** A row of the breakdown: the factor, its value, and its 0–100 as a bar (none when `info`). */
+export type Factor = { label: string; value: string; v: number; info?: boolean };
 
 /**
- * The breakdown card on Today: eight rows, plus snowpack when the forecast
- * models a depth. Snowpack leads when it is what is holding the score down,
- * so the reader is not scrolling past seven green bars to find the reason;
- * new snow leads, with its own note, when deep snow is capping a nordic score.
+ * The breakdown card ("Behind the score"): a row per factor, its value and its
+ * bar, and no explanation under it; Help explains the factors (owner's call,
+ * Oct 2026: too much to read). The two ceilings get rows of their own:
+ * snowpack when the forecast models a depth, and deep new snow while it is
+ * capping a skate or classic score. Either leads when it is what is holding
+ * the score down, so the reader is not scrolling past green bars to find it.
  */
 export function breakdown(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units): Factor[] {
   const day = dayAt(l, di);
   const x = subsFor(l, di, act, prefs, day);
   const ft = freezeThaw(l, di);
   const rain = rainSub(l, di, day);
-  const p = prefs[act];
   const b = strings.breakdown;
-  // On bare ground the other bars can be green beside a score of 0, so the snowpack row says why.
-  const snowpack: Factor[] = hasDepth(l, di)
-    ? [{ label: b.snowpack, value: coverageWord(x.cov), v: x.cov, note: x.cov <= 0 ? b.snowpackBareNote : b.snowpackNote }]
-    : [];
+  const snowpack: Factor[] = hasDepth(l, di) ? [{ label: b.snowpack, value: coverageWord(x.cov), v: x.cov }] : [];
   const leads = x.cov < T.limiters.severeBelow;
-  const deep = x.deep < 100;
-  const deepNote = act === 'classic' ? b.deepSnowClassic : b.deepSnowSkate;
-  const newSnow: Factor = { label: b.newSnow, value: fmtS(day.snow, units), v: x.s, note: deep ? deepNote : snowHint(act, p.snow, units) };
+  const deep: Factor[] = x.deep < 100 ? [{ label: b.deepSnow, value: fmtS(day.snow, units), v: x.deep }] : [];
   return [
     ...(leads ? snowpack : []),
-    ...(deep ? [newSnow] : []),
-    { label: b.temp, value: fmtT(day.t, units), v: x.t, note: b.tempNote(fmtT(p.temp, units), actLabel(act)) },
-    ...(deep ? [] : [newSnow]),
-    { label: b.threeDay, value: fmtS(snow72(l, di), units), v: x.base, note: b.threeDayNote },
-    // On bare ground there is nothing to crust, so the row reports the range without a bar.
-    { label: b.freezeThaw, value: b.freezeThawRange(fmtT(ft.minLo, units), fmtT(ft.maxHi, units)), v: x.ft, note: freezeThawNote(ft, x.cov),
-      info: x.cov <= 0 },
-    { label: b.wind, value: fmtW(day.wind, units), v: x.w, note: b.windNote(fmtW(p.wind, units)) },
-    { label: b.rain, value: fmtRain(rain), v: x.pr, note: rainCopy(rain) },
-    { label: b.snowFalling, value: strings.format.mm(snowFallingMm(day).toFixed(1)), v: x.fall, note: fallCopy(act, p.precipTol) },
-    { label: b.cloud, value: day.cloud + '%', v: x.c, note: b.cloudNote },
+    ...deep,
+    { label: b.temp, value: fmtT(day.t, units), v: x.t },
+    { label: b.newSnow, value: fmtS(day.snow, units), v: x.s },
+    { label: b.threeDay, value: fmtS(snow72(l, di), units), v: x.base },
+    { label: b.freezeThaw, value: b.freezeThawRange(fmtT(ft.minLo, units), fmtT(ft.maxHi, units)), v: x.ft },
+    { label: b.wind, value: fmtW(day.wind, units), v: x.w },
+    { label: b.rain, value: rain.prior.iced ? b.rainIced(fmtRain(rain)) : fmtRain(rain), v: x.pr },
+    { label: b.snowFalling, value: strings.format.mm(snowFallingMm(day).toFixed(1)), v: x.fall },
+    { label: b.cloud, value: day.cloud + '%', v: x.c },
     ...(leads ? [] : snowpack),
     ...surfaceRow(l, di, act),
   ];
 }
 
-/**
- * What the freeze–thaw row's range means for the snow. A full bar only says
- * there is no crust; on a warm spell the note says so and points to
- * Temperature, which is where the warmth is counted.
- */
-function freezeThawNote(ft: FreezeThaw, cov: number): string {
-  const b = strings.breakdown;
-  if (cov <= 0) return b.freezeThawBareNote;
-  if (ft.hit) return b.freezeThawHitNote;
-  if (ft.thawed) return b.freezeThawThawedNote;
-  return ft.maxHi > 0 ? b.freezeThawSlightNote : b.freezeThawNoneNote;
-}
-
-/** The shadow-mode surface row, for nordic activities only. Never scored. */
+/** The shadow-mode surface row, for nordic activities only. Never scored, so no bar. */
 function surfaceRow(l: Place, di: number, act: ActivityKey): Factor[] {
   if (!showsSurface(act)) return [];
   const b = strings.breakdown;
-  return [{ label: b.surface, value: daySurfaceText(l.surface, dayAt(l, di).date) ?? strings.common.dash, v: 0, note: b.surfaceNote, info: true }];
+  return [{ label: b.surface, value: daySurfaceText(l.surface, dayAt(l, di).date) ?? strings.common.dash, v: 0, info: true }];
 }
