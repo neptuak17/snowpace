@@ -2,14 +2,14 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { AppButton } from '@/components/ui/app-button';
+import { AppButton, LinkButton } from '@/components/ui/app-button';
 import { AppText } from '@/components/ui/app-text';
 import { Card, Kicker } from '@/components/ui/card';
 import { Chip } from '@/components/ui/chip';
 import { BackButton, Screen, ScreenTitle } from '@/components/ui/screen';
 import { ToggleSwitch } from '@/components/ui/toggle-switch';
 import { canSendMail, sendFeedback } from '@/data/feedback';
-import { FEEDBACK_EMAIL } from '@/data/project';
+import { FEEDBACK_EMAIL, guideUrl } from '@/data/project';
 import { FEEDBACK_KINDS, type FeedbackKind } from '@/lib/diagnostics';
 import { useAppState } from '@/state/app-state';
 import { gutter } from '@/theme/tokens';
@@ -66,6 +66,16 @@ export default function FeedbackScreen() {
     <Screen contentStyle={styles.content}>
       <BackButton label={strings.common.help} onPress={() => router.back()} />
       <ScreenTitle>{f.title}</ScreenTitle>
+
+      {/* The guide first: most questions are answered there, before anyone has to write. */}
+      <Card style={styles.gap6}>
+        <Kicker>{strings.guide.beforeKicker}</Kicker>
+        <AppText size={13} lh={1.45}>
+          {strings.guide.beforeBody}
+        </AppText>
+        <LinkButton href={guideUrl('troubleshooting')}>{strings.guide.troubleshooting}</LinkButton>
+        <LinkButton href={guideUrl('home')}>{strings.guide.home}</LinkButton>
+      </Card>
 
       <Card style={styles.gap11}>
         <Kicker>{f.kindKicker}</Kicker>
@@ -140,6 +150,7 @@ export default function FeedbackScreen() {
 const styles = StyleSheet.create({
   content: { paddingHorizontal: gutter, gap: 13 },
   flex: { flex: 1 },
+  gap6: { gap: 6 },
   gap11: { gap: 11 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
   toggleRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },

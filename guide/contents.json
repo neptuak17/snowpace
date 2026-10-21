@@ -1,0 +1,10 @@
+[
+  { "title": "Start here", "pages": ["getting-started"] },
+  { "title": "Reading the answer", "pages": ["the-score", "the-verdict", "best-hours", "why", "snowpack-and-deep-snow", "surface"] },
+  { "title": "Around the app", "pages": ["today", "forecast-tab", "my-places", "you-tab", "webcams", "not-right"] },
+  { "title": "How scores work", "pages": ["how-scores-work", "your-settings", "freeze-thaw", "rain-and-ice", "what-snowpace-cant-see"] },
+  { "title": "Where the data comes from", "pages": ["ski-areas", "weather-forecasts"] },
+  { "title": "Privacy and your data", "pages": ["privacy-and-data"] },
+  { "title": "Troubleshooting", "pages": ["troubleshooting", "no-forecast", "score-looks-wrong", "place-missing", "no-webcam", "no-distances", "slow-start", "cant-send-feedback"] },
+  { "title": "More", "pages": ["faq", "glossary", "contact"] }
+]

@@ -1,18 +1,26 @@
 import { useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { AppButton } from '@/components/ui/app-button';
+import { AppButton, LinkButton } from '@/components/ui/app-button';
 import { AppText } from '@/components/ui/app-text';
 import { Card, Kicker } from '@/components/ui/card';
 import { BackButton, Screen, ScreenTitle } from '@/components/ui/screen';
-import { gutter, radius } from '@/theme/tokens';
+import { guideUrl } from '@/data/project';
+import { gutter } from '@/theme/tokens';
 import { strings } from '@/strings';
 import { useTheme } from '@/theme/use-theme';
 
+/**
+ * Help: a short quick start, then the way into the full guide on the website,
+ * then feedback. The guide holds everything else (how scores work, the data,
+ * privacy, troubleshooting), so the app and the website cannot disagree and
+ * there is one set of documentation to keep current.
+ */
 export default function HelpScreen() {
   const theme = useTheme();
   const router = useRouter();
   const h = strings.help;
+  const g = strings.guide;
 
   return (
     <Screen contentStyle={styles.content}>
@@ -25,55 +33,8 @@ export default function HelpScreen() {
         </AppText>
       </View>
 
-      <Card>
-        <Kicker>{h.whatKicker}</Kicker>
-        <AppText size={13.5} lh={1.5}>
-          {h.what}
-        </AppText>
-      </Card>
-
       <Card style={styles.gap11}>
-        <Kicker>{h.scoreKicker}</Kicker>
-        {h.bands.map((b) => (
-          <View key={b.key} style={styles.bandRow}>
-            <View style={[styles.bandPill, { backgroundColor: theme.score[b.key].bg }]}>
-              <AppText size={12} weight={700} color={theme.score[b.key].fg} center>
-                {b.range}
-              </AppText>
-            </View>
-            <AppText size={13} lh={1.4} style={styles.flex}>
-              {b.text}
-            </AppText>
-          </View>
-        ))}
-      </Card>
-
-      <Card>
-        <Kicker>{h.decidesKicker}</Kicker>
-        <AppText size={13.5} lh={1.5}>
-          {h.decidesIntro}
-        </AppText>
-        {h.factors.map((f) => (
-          <View key={f.k} style={styles.factorRow}>
-            <View style={[styles.bullet, { backgroundColor: theme.accent }]} />
-            <AppText size={13} lh={1.45} style={styles.flex}>
-              <AppText size={13} lh={1.45} weight={700}>
-                {f.k}
-              </AppText>
-              {h.factorSep + f.v}
-            </AppText>
-          </View>
-        ))}
-        <AppText size={13.5} lh={1.5}>
-          {h.decidesSnowpack}
-        </AppText>
-        <AppText size={13.5} lh={1.5}>
-          {h.decidesOutro}
-        </AppText>
-      </Card>
-
-      <Card style={styles.gap11}>
-        <Kicker>{h.useKicker}</Kicker>
+        <Kicker>{h.quickKicker}</Kicker>
         {h.steps.map((st, i) => (
           <View key={st.t} style={styles.stepRow}>
             <View style={[styles.stepNum, { backgroundColor: theme.ramps.accent[200] }]}>
@@ -93,14 +54,15 @@ export default function HelpScreen() {
         ))}
       </Card>
 
-      <Card>
-        <Kicker>{h.dataKicker}</Kicker>
+      <Card style={styles.gap6}>
+        <Kicker>{g.kicker}</Kicker>
         <AppText size={13.5} lh={1.5}>
-          {h.data}
+          {g.body}
         </AppText>
-        <AppButton variant="ghost" size={12.5} style={styles.creditsBtn} onPress={() => router.push('/credits')}>
-          {h.creditsLink}
-        </AppButton>
+        <LinkButton href={guideUrl('home')}>{g.home}</LinkButton>
+        <LinkButton href={guideUrl('troubleshooting')}>{g.troubleshooting}</LinkButton>
+        <LinkButton href={guideUrl('scores')}>{g.scores}</LinkButton>
+        <LinkButton href={guideUrl('privacy')}>{g.privacy}</LinkButton>
       </Card>
 
       <Card style={styles.gap11}>
@@ -112,6 +74,10 @@ export default function HelpScreen() {
           {h.feedbackButton}
         </AppButton>
       </Card>
+
+      <AppButton variant="ghost" size={12.5} style={styles.creditsBtn} onPress={() => router.push('/credits')}>
+        {h.creditsLink}
+      </AppButton>
     </Screen>
   );
 }
@@ -120,12 +86,9 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   content: { paddingHorizontal: gutter, gap: 13 },
   warning: { paddingVertical: 13, paddingHorizontal: 15, borderRadius: 16, borderWidth: 2 },
+  gap6: { gap: 6 },
   gap11: { gap: 11 },
   creditsBtn: { alignSelf: 'flex-start', marginLeft: -10, marginTop: -2 },
-  bandRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  bandPill: { minWidth: 76, paddingVertical: 6, paddingHorizontal: 10, borderRadius: radius.pill },
-  factorRow: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
-  bullet: { width: 6, height: 6, borderRadius: 3, marginTop: 6 },
   stepRow: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
   stepNum: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 });

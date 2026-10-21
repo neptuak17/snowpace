@@ -237,11 +237,11 @@ Thin / Enough — because the model does not know about snowmaking or grooming. 
 guesses pending winter data. On bare ground the answer card still shows the day's conditions and
 "Why? ›" (Oct 2026, at the owner's call: the card looked empty), with the Snowpack row leading the
 detail. Only the hour strip is left out, since every hour scores 0. That the depth is modelled and
-blind to snowmaking is said once, on the Help screen, not on the card.
+blind to snowmaking is said once, in the guide (and the website's "How it decides"), not on the card.
 
 **The "Why?" detail is rows only (Oct 2026, owner's call: too much to read).** Each row is the
 factor, its value and its 0–100 bar, with no explanation under it; anything that needs explaining
-goes on the Help screen. What a note used to carry lives in the row itself: rain that refroze
+goes in the guide (see Guide below). What a note used to carry lives in the row itself: rain that refroze
 reads "10.1 mm, 3 d · ice", the deep-snow cap is a row of its own, and the shadow-mode surface row
 is labelled "Surface (not scored)". VoiceOver reads each row with its score ("Temperature, 3°C,
 18 out of 100"), since a bar says nothing to a screen reader.
@@ -284,7 +284,7 @@ and skate.
 `src/lib/surface.ts` estimates what the weather is doing to the snow surface, hour by hour, and
 names it: **Fresh, Soft, Packed, Firm, Icy or Slushy**. Added Oct 2026, in **shadow mode**: shown
 for classic and skate (a row labelled "Surface (not scored)" in the "Why?" detail on Today, the
-place screen and the Forecast detail, explained on the Help screen, and a line in the feedback
+place screen and the Forecast detail, explained in the guide, and a line in the feedback
 diagnostics), but **never part of the score** and never coloured — a colour is a verdict. Do not promote it into the score until its calls have been compared with real winter days.
 
 * It carries three 0–1 quantities — firmness, wetness and ice — through the whole hourly series,
@@ -466,10 +466,10 @@ email's contents change, update the policy's "Feedback you send" section and its
 
 ## Website
 
-A one-page marketing site in `site/`: plain HTML, CSS and JavaScript, with no build step and no
-npm. `.github/workflows/pages.yml` publishes the folder as it is to GitHub Pages
-(https://snowpace.com/) whenever a change under `site/` reaches `main`; app-only
-commits do not trigger it. Built Oct 2026 from "mockup A": a working answer card first, then the
+A one-page marketing site in `site/`: plain HTML, CSS and JavaScript, edited by hand, plus the
+help guide (`site/guide/`), which is generated (see Guide below). `.github/workflows/pages.yml`
+builds the guide and publishes `site/` to GitHub Pages (https://snowpace.com/) whenever a change
+to the site, the guide or the app's source reaches `main`. Built Oct 2026 from "mockup A": a working answer card first, then the
 four sports side by side, how the score is decided, features, privacy, and a footer.
 
 * **The domain.** `snowpace.com` was registered at Cloudflare in Oct 2026 (Cloudflare is the
@@ -487,13 +487,14 @@ four sports side by side, how the score is decided, features, privacy, and a foo
   first person.
 
 * **Three pages, three App Store Connect fields.** The main page is the Marketing URL;
-  `site/support/` (contact email and common questions; Apple requires a real way to get in
-  touch) is the Support URL; `site/privacy/` is the Privacy Policy URL. The privacy page is the
+  `site/support/` is the Support URL: the guide's front door (its search, the troubleshooter,
+  common questions linking into the guide), then the contact email Apple requires; `site/privacy/` is the Privacy Policy URL. The privacy page is the
   **one official copy of the privacy policy**: the app's Credits screen links to it
   (`PRIVACY_URL` in `src/data/project.ts`), and `PRIVACY.md` only points to it, so links in
   test builds 1–3 still work. When the app's data handling changes, update that page and its
-  "Last updated" date. The header and footer are repeated on all three pages (no build step,
-  so no templates): a change to a footer link goes in all three.
+  "Last updated" date. The header and footer are repeated on all three pages and in the guide's
+  shell, `guide/template.html` (the hand-written pages have no templates): a change to a header
+  or footer link goes in all four.
 
 * **Where the words live.** Marketing copy is written in `site/index.html` and edited by hand
   (the owner edits it directly, sometimes on github.com). Everything that describes how the app
@@ -510,6 +511,70 @@ four sports side by side, how the score is decided, features, privacy, and a foo
   once it is.
 * Preview by opening `site/index.html` in a browser, or with the `website` entry in
   `.claude/launch.json`. Test light and dark, and phone width.
+
+## Guide
+
+The help guide at https://snowpace.com/guide/ is Snowpace's documentation: how the app works,
+what scores mean, the data, privacy, and troubleshooting. Designed and built Oct 2026 at the
+owner's call, because a solo developer cannot field support email: **the goal is that a user
+finds the answer before writing.** It is self-contained (no backend) and kept current
+automatically as the app changes.
+
+**The app's code is the guide's source of truth.** Whatever can come from the code does:
+
+* **Words:** `{{ui.…}}` placeholders take any string from `src/strings.ts` ("Not right?",
+  "Other cameras"), with a button's trailing "›" dropped. Rename a button and the guide follows.
+* **Numbers:** `{{policy.…}}` (`src/data/policy.ts`: refresh intervals and timeouts, moved there
+  so Node can read them), `{{tune.…}}` (`TUNING`), `{{derived.…}}` (the same, converted: cm,
+  percentages, clock times), `{{weather.…}}`, `{{hosts.…}}`, `{{contact.…}}`, `{{app.version}}`.
+* **Generated blocks:** `{{table:bands}}`, `{{table:weights}}`, `{{table:defaults}}`,
+  `{{list:factors}}`, `{{widget:search}}`, `{{widget:troubleshooter}}`, `{{widget:contents}}`,
+  `{{diagram:name}}` (an SVG in `guide/diagrams/`, inlined and coloured from the site's tokens).
+
+**The build is the safety net.** `scripts/build-guide.mts` (`npm run build-guide`) turns
+`guide/pages/*.md` into `site/guide/` and **fails** on: a placeholder that no longer resolves; a
+page missing from `guide/contents.json`, or listed without a file; a link to a guide page or
+heading that does not exist (from guide pages, the troubleshooter, and the hand-written
+`site/` pages); a troubleshooter step that leads nowhere or is never reached; or a page the app
+links to (`GUIDE_PAGES` in `src/data/project.ts`) that is gone. GitHub Actions runs it before
+every publish, so a failure publishes nothing and the site stays as it was. The output is
+git-ignored; run the build to preview it locally with the `website` launch entry.
+
+**Explanations are hand-written, and kept current in the same commit.** When behaviour a user
+can see changes, update the guide pages that describe it alongside the code, as the privacy
+policy and the website demo are. Facts and words update themselves; explanations of *why* do
+not.
+
+* **Sources:** `guide/pages/*.md` (one page per topic: front matter `title` and `description`,
+  then Markdown, converted by `marked`, a build-time-only dev dependency approved Oct 2026);
+  `guide/contents.json` (sections and order); `guide/troubleshooter.json` (the question tree:
+  each answer is a next question or a page, rendered as nested `<details>`, so it works without
+  JavaScript); `guide/template.html` (the page shell); `guide/assets/` (`guide.css`, and
+  `guide.js` for search).
+* **Search** runs in the browser over `site/guide/search-index.json`, written by the build:
+  filler words dropped, rough stems, every word first and any word if nothing matches all.
+  Nothing is sent anywhere. The support page searches the same index.
+* **Writing style:** plain and short, second person, one question per page, a heading for each
+  answer (headings get ids, so the troubleshooter and the app can link to a part of a page).
+  Name buttons with placeholders, in bold. Every page ends with "Still stuck?": an email link
+  whose subject names the page, so the inbox shows which pages fail, without analytics.
+* **Same principles as the rest of the site:** no analytics, no cookies, nothing loaded from
+  other sites. The guide describes the latest code; a page footer names the app version.
+
+**In the app,** Help is a short quick start, then links into the guide (front page,
+troubleshooting, how scores work, privacy); the Feedback screen opens with "Before you write"
+and links to the troubleshooter and the guide. Links open in the in-app browser and go through
+`guideUrl()`, so the build can check them. The website's header and footer link to the guide,
+and the home page's "How it decides" links to how scores work.
+
+**Phases (owner's decisions, Oct 2026).** Phase 1, built: the structure and build, search, the
+troubleshooter, the privacy and data pages, the support page as front door, and links from Help
+and Feedback. Phase 2: a score explorer running the app's own scoring in the browser (the
+scoring modules import nothing from React Native, so the TypeScript compiler can convert them),
+and live illustrations of the app's screens drawn from the engine and `strings.ts` instead of
+screenshots, which go stale. Phase 3: a "What's new" page, and a check that flags a guide page
+whose source files changed without the page changing. Not yet built: links from the app at the
+moment of confusion (an empty webcam spot, the "Not right?" sheet, "No forecast").
 
 ## Conventions
 

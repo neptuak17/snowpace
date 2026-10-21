@@ -1,0 +1,56 @@
+{
+  "start": "start",
+  "nodes": {
+    "start": {
+      "q": "What's going on?",
+      "options": [
+        { "label": "A score or verdict looks wrong", "next": "score" },
+        { "label": "A place shows no forecast, or an old one", "next": "forecast" },
+        { "label": "I can't find a place, or it's listed wrong", "next": "place" },
+        { "label": "Webcams: none, the wrong one, or a blank picture", "next": "webcam" },
+        { "label": "No distances, or the wrong ones", "page": "no-distances" },
+        { "label": "The app is slow to start", "page": "slow-start" },
+        { "label": "I can't send feedback", "page": "cant-send-feedback" },
+        { "label": "Something else", "page": "contact" }
+      ]
+    },
+    "score": {
+      "q": "What looks wrong?",
+      "options": [
+        { "label": "It says there's no snow, but the hill has snow", "page": "score-looks-wrong#there-is-snow-but-it-says-bare" },
+        { "label": "The score is lower or higher than the day felt", "page": "score-looks-wrong" },
+        { "label": "It mentions crust or slush", "page": "freeze-thaw" },
+        { "label": "It mentions rain or ice", "page": "rain-and-ice" },
+        { "label": "The best hours look wrong", "page": "best-hours" },
+        { "label": "Skate or classic scores low after a big snowfall", "page": "snowpack-and-deep-snow#deep-new-snow" },
+        { "label": "The Surface word doesn't match", "page": "surface" }
+      ]
+    },
+    "forecast": {
+      "q": "What do you see?",
+      "options": [
+        { "label": "\"No forecast yet\", or a dash instead of a score", "page": "no-forecast" },
+        { "label": "The forecast age is in gold, or many hours old", "page": "no-forecast#an-old-forecast" },
+        { "label": "The forecast didn't match the weather on the day", "page": "weather-forecasts#how-accurate-is-it" }
+      ]
+    },
+    "place": {
+      "q": "Which is it?",
+      "options": [
+        { "label": "Search can't find it", "page": "place-missing" },
+        { "label": "It's listed with the wrong activities", "page": "place-missing#wrong-activities" },
+        { "label": "It says \"No longer listed\"", "page": "place-missing#no-longer-listed" },
+        { "label": "It isn't on Today or in the Forecast grid", "page": "my-places#where-your-places-show-up" }
+      ]
+    },
+    "webcam": {
+      "q": "What's happening?",
+      "options": [
+        { "label": "There's no webcam for my place", "page": "no-webcam" },
+        { "label": "It shows the wrong camera", "page": "no-webcam#choose-a-camera-yourself" },
+        { "label": "The picture is blank, or says it's old", "page": "no-webcam#a-blank-or-old-picture" },
+        { "label": "I don't want webcams", "page": "webcams#switching-webcams-off" }
+      ]
+    }
+  }
+}

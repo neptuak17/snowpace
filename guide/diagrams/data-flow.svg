@@ -1,0 +1,27 @@
+<svg viewBox="0 0 360 444" role="img" aria-labelledby="dg-data-t dg-data-d" xmlns="http://www.w3.org/2000/svg">
+<title id="dg-data-t">Where your data goes</title>
+<desc id="dg-data-d">Your places, settings, location and cached data stay on your phone, and your location is never sent. The phone asks Open-Meteo for forecasts, sending ski-area coordinates; asks OpenSkiData for the ski-area list, sending nothing else, at most monthly; and, while webcams are on, asks windy.com for pictures, sending a place's coordinates or a camera's number.</desc>
+<defs><marker id="dg-data-a" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="d-arrow" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="d-phone" x="20" y="10" width="320" height="100" rx="18"/>
+<text x="40" y="36" class="d-title">Your phone</text>
+<text x="40" y="58" class="d-small">Your places, settings and location</text>
+<text x="40" y="77" class="d-small">Cached forecasts and the ski-area list</text>
+<text x="40" y="96" class="d-small">Everything Snowpace knows about you</text>
+<text x="180" y="136" text-anchor="middle" class="d-accent">Your location is never sent</text>
+<line class="d-line" x1="34" y1="110" x2="34" y2="392"/>
+<line class="d-line" x1="34" y1="192" x2="58" y2="192" marker-start="url(#dg-data-a)" marker-end="url(#dg-data-a)"/>
+<rect class="d-box" x="62" y="152" width="278" height="80" rx="12"/>
+<text x="78" y="175" class="d-title">Open-Meteo · forecasts</text>
+<text x="78" y="197" class="d-small">Sends: ski-area coordinates, elevations</text>
+<text x="78" y="216" class="d-small">Back: hourly mountain forecasts</text>
+<line class="d-line" x1="34" y1="292" x2="58" y2="292" marker-start="url(#dg-data-a)" marker-end="url(#dg-data-a)"/>
+<rect class="d-box" x="62" y="252" width="278" height="80" rx="12"/>
+<text x="78" y="275" class="d-title">OpenSkiData · ski areas</text>
+<text x="78" y="297" class="d-small">Sends: nothing but the request, monthly</text>
+<text x="78" y="316" class="d-small">Back: the list of ski areas</text>
+<line class="d-line" x1="34" y1="392" x2="58" y2="392" marker-start="url(#dg-data-a)" marker-end="url(#dg-data-a)"/>
+<rect class="d-box" x="62" y="352" width="278" height="80" rx="12"/>
+<text x="78" y="375" class="d-title">windy.com · webcams</text>
+<text x="78" y="397" class="d-small">Sends: a place's coordinates, or a camera</text>
+<text x="78" y="416" class="d-small">Back: pictures, while webcams are on</text>
+</svg>

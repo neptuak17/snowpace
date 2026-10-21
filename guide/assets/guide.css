@@ -1,0 +1,116 @@
+/* The Snowpace guide (site/guide/, built by scripts/build-guide.mts).
+   Builds on ../styles.css: the same tokens, fonts, header and footer. */
+
+/* ── Layout: contents beside the page on wide screens, above it on phones ─ */
+.g-layout { display: grid; gap: 1.5rem; padding-block: 0.5rem 1rem; align-items: start; }
+.g-side { display: grid; gap: 1.25rem; min-width: 0; }
+.g-nav { display: none; }
+.g-main { min-width: 0; max-width: 44rem; display: grid; gap: 1rem; }
+@media (min-width: 60rem) {
+  .g-layout { grid-template-columns: 15.5rem minmax(0, 1fr); gap: 3rem; }
+  .g-side { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; padding-bottom: 1rem; scrollbar-width: thin; }
+  .g-nav { display: block; }
+  .g-toc { display: none; }
+}
+.g-main h1 { font-size: clamp(2rem, 5.5vw, 3rem); }
+.g-main > .lede { font-size: 1.1rem; color: var(--muted); }
+
+/* ── Contents (sidebar, and the fold-out on phones) ─────────────────────── */
+.g-nav-h { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin: 1rem 0 0.35rem; }
+.g-nav ul, .g-toc ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.1rem; }
+.g-nav a, .g-toc a { display: block; padding: 0.3rem 0.6rem; border-radius: 0.5rem; color: var(--text); text-decoration: none; font-size: 0.92rem; line-height: 1.35; }
+.g-nav a:hover, .g-toc a:hover { background: var(--track); }
+.g-nav a[aria-current="page"], .g-toc a[aria-current="page"] { background: var(--tag-bg); color: var(--tag-fg); font-weight: 700; }
+.g-toc { background: var(--surface); border-radius: 1rem; box-shadow: var(--shadow); padding: 0.2rem 0.9rem; }
+.g-toc summary { cursor: pointer; font-weight: 700; padding: 0.7rem 0; color: var(--accent); }
+.g-toc[open] { padding-bottom: 0.8rem; }
+
+/* ── Body text ──────────────────────────────────────────────────────────── */
+.g-body { display: grid; gap: 0.9rem; }
+.g-body h2 { font-size: 1.5rem; margin-top: 1.4rem; scroll-margin-top: 1rem; }
+.g-body h3 { font-family: var(--body); font-weight: 700; font-size: 1.05rem; line-height: 1.35; margin-top: 0.6rem; scroll-margin-top: 1rem; }
+.g-body ul, .g-body ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 0.4rem; }
+.g-body li > p { margin: 0; }
+.g-body code { font-size: 0.9em; background: var(--track); border-radius: 4px; padding: 0.05rem 0.3rem; overflow-wrap: anywhere; }
+.g-body a { overflow-wrap: anywhere; }
+.g-body strong { font-weight: 700; }
+/* A blockquote is a callout: "Good to know", a caution, a tip. */
+.g-body blockquote { margin: 0; background: var(--tag-bg); color: var(--tag-fg); border-radius: 1rem; padding: 0.85rem 1.1rem; display: grid; gap: 0.5rem; }
+.g-body blockquote a { color: inherit; }
+.g-body hr { border: 0; border-top: 1px solid var(--divider); margin: 0.5rem 0; }
+
+/* ── Tables (wide ones scroll on their own at phone width) ──────────────── */
+.g-table { overflow-x: auto; background: var(--surface); border-radius: 1rem; box-shadow: var(--shadow); }
+.g-table table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.g-table th, .g-table td { text-align: left; padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--divider); vertical-align: top; }
+.g-table tr:last-child th, .g-table tr:last-child td { border-bottom: 0; }
+.g-table thead th { font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.g-table tbody th { font-weight: 700; }
+.g-num td { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.g-band { display: inline-block; font-weight: 700; padding: 0.15rem 0.6rem; border-radius: 999px; background: var(--fill); color: var(--text); }
+.g-factors { list-style: none; padding: 0 !important; }
+.g-factors li { padding-left: 1rem; position: relative; }
+.g-factors li::before { content: ''; position: absolute; left: 0; top: 0.6em; width: 0.4rem; height: 0.4rem; border-radius: 50%; background: var(--accent); }
+
+/* ── Diagrams (inline SVG, coloured from the tokens so they follow dark mode) */
+.g-diagram { margin: 0.25rem 0; background: var(--surface); border-radius: 1.25rem; box-shadow: var(--shadow); padding: 1rem; }
+.g-diagram svg { display: block; width: 100%; max-width: 30rem; height: auto; margin-inline: auto; }
+.g-diagram .d-box { fill: var(--bg); stroke: var(--divider); stroke-width: 1.5; }
+.g-diagram .d-strong { fill: var(--tag-bg); stroke: var(--accent); stroke-width: 1.5; }
+.g-diagram .d-phone { fill: var(--surface); stroke: var(--text); stroke-width: 2; }
+.g-diagram .d-line { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+.g-diagram .d-arrow { fill: var(--muted); }
+.g-diagram .d-no { stroke: var(--ring-skip); stroke-width: 2; fill: none; }
+.g-diagram text { fill: var(--text); font-family: var(--body); font-size: 14px; }
+.g-diagram .d-small { fill: var(--muted); font-size: 12px; }
+.g-diagram .d-title { font-weight: 700; }
+.g-diagram .d-accent { fill: var(--accent); font-weight: 700; }
+
+/* ── Search ─────────────────────────────────────────────────────────────── */
+.g-search { position: relative; display: grid; gap: 0.35rem; }
+.g-search-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.g-search input { width: 100%; font: inherit; font-size: 1rem; color: var(--text); background: var(--surface); border: 1.5px solid var(--divider); border-radius: 0.8rem; padding: 0.6rem 0.8rem; box-shadow: var(--shadow); }
+.g-search input:focus { outline: none; border-color: var(--accent); }
+.g-search.big input { font-size: 1.1rem; padding: 0.85rem 1rem; border-radius: 1rem; }
+.g-search .g-results { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.g-results:empty { display: none; }
+.g-results li a { display: grid; gap: 0.1rem; background: var(--surface); border-radius: 0.8rem; padding: 0.6rem 0.8rem; text-decoration: none; color: var(--text); box-shadow: var(--shadow); }
+.g-results li a:hover, .g-results li a:focus-visible { outline: 2px solid var(--accent); }
+.g-results small { color: var(--muted); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.g-results b { font-weight: 700; }
+.g-results span { color: var(--muted); font-size: 0.88rem; line-height: 1.4; }
+.g-results mark { background: var(--fair-bg); color: inherit; border-radius: 3px; padding: 0 0.1rem; }
+.g-results .g-none { color: var(--muted); font-size: 0.9rem; padding: 0.2rem 0.1rem; }
+
+/* ── Troubleshooter: each answer opens the next question in place ───────── */
+.g-ts { background: var(--surface); border-radius: 1.25rem; box-shadow: var(--shadow); padding: 1.1rem 1.2rem; }
+.g-ts-q { display: grid; gap: 0.6rem; }
+.g-ts-ask { font-weight: 800; font-size: 1.05rem; }
+.g-ts-opts { list-style: none; margin: 0; padding: 0 !important; display: grid; gap: 0.45rem; }
+.g-ts-step > summary, .g-ts-leaf { display: block; cursor: pointer; list-style: none; border: 1.5px solid var(--divider); border-radius: 0.8rem; padding: 0.6rem 0.85rem; font-weight: 700; color: var(--text); text-decoration: none; background: var(--bg); }
+.g-ts-step > summary::-webkit-details-marker { display: none; }
+.g-ts-step > summary::after { content: '›'; float: right; color: var(--accent); transition: transform 0.15s; }
+.g-ts-step[open] > summary { background: var(--tag-bg); color: var(--tag-fg); border-color: var(--accent); }
+.g-ts-step[open] > summary::after { transform: rotate(90deg); }
+.g-ts-step > .g-ts-q { margin: 0.7rem 0 0.3rem 0.9rem; padding-left: 0.9rem; border-left: 2px solid var(--divider); }
+.g-ts-leaf::after { content: '→'; float: right; color: var(--accent); }
+.g-ts-leaf:hover, .g-ts-step > summary:hover { border-color: var(--accent); }
+
+/* ── Front page: the sections as cards ──────────────────────────────────── */
+.g-sections { display: grid; gap: 1rem; }
+@media (min-width: 48rem) { .g-sections { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.g-section-card { background: var(--surface); border-radius: 1.25rem; box-shadow: var(--shadow); padding: 1.1rem 1.2rem; display: grid; gap: 0.5rem; align-content: start; }
+.g-section-card h2 { font-size: 1.3rem; margin: 0; }
+.g-section-card ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.55rem; }
+.g-section-card li { display: grid; gap: 0.05rem; }
+.g-section-card li a { font-weight: 700; text-decoration: none; }
+.g-section-card li span { font-size: 0.86rem; color: var(--muted); line-height: 1.4; }
+
+/* ── End of page: still stuck, previous and next ────────────────────────── */
+.g-stuck { margin-top: 1.25rem; border-top: 1px solid var(--divider); padding-top: 1rem; font-size: 0.95rem; color: var(--muted); }
+.g-stuck b { color: var(--text); }
+.g-pager { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.g-pager a { display: grid; gap: 0.1rem; background: var(--surface); border-radius: 1rem; box-shadow: var(--shadow); padding: 0.75rem 1rem; text-decoration: none; font-weight: 700; color: var(--text); }
+.g-pager small { color: var(--muted); font-weight: 600; font-size: 0.78rem; }
+.g-pager .g-pager-next { text-align: right; grid-column: 2; }
+.g-version { font-size: 0.8rem; color: var(--muted); }

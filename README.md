@@ -70,7 +70,10 @@ variable of the same name instead. Without a key the app works, with no webcams.
 The website is in `site/`: plain HTML that GitHub Pages publishes whenever it changes on
 `main`, at <https://snowpace.com/>, with support and privacy pages under
 `support/` and `privacy/`. Its words are edited directly in the HTML; its sample days and
-anything else about scoring come from the app, via `npm run build-site-demo`.
+anything else about scoring come from the app, via `npm run build-site-demo`. The help guide,
+<https://snowpace.com/guide/>, is written in Markdown in `guide/` and built into `site/guide/` by
+`npm run build-guide`, which takes the app's own wording and numbers; GitHub Actions builds it
+on every publish.
 
 `CLAUDE.md` holds the project's constraints and data-source decisions.
 

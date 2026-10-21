@@ -1,0 +1,30 @@
+---
+title: Freeze–thaw, crust and slush
+description: How Snowpace decides whether melting and refreezing has left crust, or slush.
+---
+When snow melts and then refreezes, it turns to crust. When it melts and stays warm, it turns to slush. The freeze–thaw factor looks at the day and the two days before it.
+
+## What counts as a melt
+
+A brief rise just above freezing melts little or nothing: on a calm, clear day the snow surface stays colder than the air. So Snowpace adds up **degree-hours** above 0°C on the warmest of the three days (an hour at +2°C counts 2) and calls it a melt from {{tune.freezeThaw.meltDegH}}. That's roughly a high near +2°C held for a few hours: about 1 mm of meltwater, enough to wet the top few centimetres.
+
+A refreeze is any hour below {{tune.freezeThaw.refreezeBelow}}°C.
+
+## What the bar shows
+
+| What happened | The bar | What to expect |
+| --- | --- | --- |
+| A melt, then a refreeze | Part full: the warmer the melt, the emptier | Crust while it's cold, softening as it warms. The sentence may say "{{ui.weakest.crust}}". |
+| A melt, and no refreeze | Empty | Slush. The sentence may say "{{ui.weakest.slush}}". |
+| Little or no melt | Full | No crust. |
+| No snow on the ground | Empty | Nothing to freeze or thaw. |
+
+Crust costs skate the most and snowshoeing the least. The row's value is the lowest and highest temperature over the three days, such as "−4°C to 6°C".
+
+## What it doesn't know
+
+- **The order.** A frost before the melt counts the same as one after it.
+- **The sun.** On a sunny slope the surface can melt, and crust, while the air stays below freezing.
+- **Grooming,** which breaks crust up overnight.
+
+For classic and skate, the [Surface row](/guide/surface/) follows melt and refreeze hour by hour, assuming normal grooming. Once it has been checked against real days, it's planned to replace this factor for them.

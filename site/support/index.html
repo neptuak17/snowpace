@@ -1,7 +1,11 @@
 <!doctype html>
 <!--
-  Snowpace support page: the App Store's Support URL. Edit the words between
-  the tags, save, commit and push; see the note at the top of ../index.html.
+  Snowpace support page: the App Store's Support URL, and the front door to
+  the guide (site/guide, built from guide/). Answers live in the guide, not
+  here: this page searches it and links into it, then gives the contact
+  details Apple requires. Edit the words between the tags, save, commit and
+  push; see the note at the top of ../index.html. The guide build checks that
+  every guide link on this page still leads somewhere.
   The header and footer are repeated on every page, so a change to a footer
   link belongs in all three: index.html, support/index.html, privacy/index.html.
 -->
@@ -10,13 +14,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Snowpace support</title>
-  <meta name="description" content="How to get in touch about Snowpace, and answers to common questions.">
+  <meta name="description" content="Answers about Snowpace: search the guide, try the troubleshooter, or get in touch.">
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#edf2f7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0b1626" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="../img/icon.png">
   <link rel="apple-touch-icon" href="../img/icon.png">
   <link rel="stylesheet" href="../styles.css">
+  <!-- The guide's search (built from guide/ by scripts/build-guide.mts). -->
+  <link rel="stylesheet" href="../guide/guide.css">
+  <script src="../guide/guide.js" defer></script>
 </head>
 <body>
 
@@ -25,46 +32,45 @@
     <svg viewBox="0 0 1024 1024" aria-hidden="true"><rect width="1024" height="1024" fill="#eef3fa"/><rect y="424" width="1024" height="600" fill="#7a9cc0"/><path fill="#232d3a" d="M0 656H128C175 620 205 590 238 566C300 520 330 300 404 258C460 300 540 520 616 536C680 545 712 420 766 396C840 440 930 580 1024 606V1024H0Z"/></svg>
     <b>Snowpace</b>
   </a>
-  <a class="soon-link" href="../#get">Coming soon</a>
+  <nav class="top-links" aria-label="Site"><a href="../guide/">Guide</a><a class="soon-link" href="../#get">Coming soon</a></nav>
 </header>
 
 <main class="doc">
   <p class="kicker">Support</p>
-  <h1>Get in touch</h1>
-  <p class="lede">Something broken, a score that looks wrong, a place that's missing, or an idea: I'd like to hear about it.</p>
+  <h1>How can I help?</h1>
+  <p class="lede">Most answers are already in the Snowpace guide. Search it, or let the troubleshooter find the right page in a tap or two.</p>
 
+  <form class="g-search big" role="search" action="../guide/search/">
+    <label class="g-search-label" for="q-main">Search the guide</label>
+    <input id="q-main" name="q" type="search" placeholder="What do you need to know?" autocomplete="off">
+    <ul class="g-results" aria-live="polite"></ul>
+  </form>
+
+  <div class="support-cards">
+    <a class="support-card" href="../guide/troubleshooting/"><b>The troubleshooter</b><span>Answer a question or two and get to the page that solves it.</span></a>
+    <a class="support-card" href="../guide/"><b>The whole guide</b><span>Every screen, how scores work, where the data comes from, and your privacy.</span></a>
+  </div>
+
+  <h2>Common questions</h2>
+  <ul class="support-questions">
+    <li><a href="../guide/score-looks-wrong/">A score doesn't match how the day skied</a></li>
+    <li><a href="../guide/score-looks-wrong/#there-is-snow-but-it-says-bare">The hill has snow, but Snowpace says it's bare</a></li>
+    <li><a href="../guide/place-missing/">My ski area is missing, or listed with the wrong activities</a></li>
+    <li><a href="../guide/no-webcam/">There's no webcam for my place, or the wrong one</a></li>
+    <li><a href="../guide/no-forecast/">A place shows no forecast, or an old one</a></li>
+    <li><a href="../guide/your-settings/">Can I change what counts as a good day?</a></li>
+    <li><a href="../guide/what-snowpace-cant-see/">Does Snowpace know whether the hill is open or groomed?</a></li>
+    <li><a href="../guide/privacy-and-data/">What does Snowpace do with my data, and how do I delete it?</a></li>
+    <li><a href="../guide/faq/">More questions and answers</a></li>
+  </ul>
+
+  <h2>Get in touch</h2>
   <div class="contact">
     <p class="email"><a href="mailto:support@snowpace.com?subject=Snowpace">support@snowpace.com</a></p>
     <p><strong>For a score that looks wrong, send it from the app.</strong> Tap <strong>Not right?</strong> under the verdict, on Today, on any place, or on any day in Forecast. Pick what's off, and the app can attach that day's forecast and score, so I can see exactly what you saw. You read the email before it goes, and it's sent from your own Mail app.</p>
     <p>For anything else, tap the <strong>?</strong> at the top of Today or any other main tab, then <strong>Send feedback</strong> at the bottom.</p>
     <p>Snowpace is a one-person project. I read everything, but a reply can take a few days.</p>
   </div>
-
-  <h2>Common questions</h2>
-
-  <h3>My ski area is missing, or it's listed with the wrong activities</h3>
-  <p>Snowpace's list of ski areas comes from <a href="https://openskimap.org">OpenSkiData</a>, which builds it from <a href="https://www.openstreetmap.org">OpenStreetMap</a> and <a href="https://skimap.org">Skimap.org</a>. It covers named, operating areas in North America. Snowpace can't edit the list itself, but anyone can correct it at the source, and a fix reaches the app within about a month. If you're not sure how, email me and I'll help.</p>
-
-  <h3>Does Snowpace know whether the hill is open or the trails are groomed?</h3>
-  <p>No. Snowpace only scores the weather. Every place links to its operator's own web site, which is the place to check hours, grooming and lift status. Check the avalanche forecast for the area too.</p>
-
-  <h3>The score didn't match how it skied</h3>
-  <p>Scores come from mountain weather forecasts, so they're a forecast, not a report, and the snow depth behind them is modelled, not measured. If a day skied very differently from its score, please tap <strong>Not right?</strong> under that day's verdict. Reports like that are how the scoring gets better.</p>
-
-  <h3>Can I change what counts as a good day?</h3>
-  <p>Yes. On the You tab, set your ideal temperature, how much wind you'll put up with, how much fresh snow you want, how you feel about snow falling while you're out, and how far you'll travel. The temperature, wind and snow settings are separate for each activity.</p>
-
-  <h3>Why is there no webcam for my place?</h3>
-  <p>Snowpace shows a webcam from windy.com only when a nearby camera's name matches the place, so it never passes off a neighbour's view as yours. Tap <strong>Other cameras</strong> to choose one yourself. Webcams can be switched off on the You tab.</p>
-
-  <h3>Why does Snowpace ask for my location?</h3>
-  <p>Only to show how far away each place is and to list search results nearest first. Your location never leaves your phone, and the app works without it; it just stops showing distances.</p>
-
-  <h3>How do I delete my data?</h3>
-  <p>Delete the app. Everything Snowpace knows about you is stored on your phone and nowhere else. See the <a href="../privacy/">privacy policy</a> for the details.</p>
-
-  <h3>Does it cost anything?</h3>
-  <p>No. Snowpace is free, with no ads, no account and no in-app purchases.</p>
 </main>
 
 <footer class="foot small">
@@ -74,7 +80,7 @@
   </svg>
   <div class="foot-band">
     <div class="wrap credits">
-      <div class="links"><a href="../">Snowpace</a><a href="./">Support</a><a href="../privacy/">Privacy policy</a><a href="https://github.com/neptuak17/snowpace">Source on GitHub</a></div>
+      <div class="links"><a href="../">Snowpace</a><a href="../guide/">Guide</a><a href="./">Support</a><a href="../privacy/">Privacy policy</a><a href="https://github.com/neptuak17/snowpace">Source on GitHub</a></div>
       <p>Weather data by <a href="https://open-meteo.com">Open-Meteo.com</a> (CC BY 4.0). Ski areas © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> and Skimap.org (ODbL), via <a href="https://openskimap.org">OpenSkiData</a>. Webcams provided by <a href="https://www.windy.com">windy.com</a>.</p>
     </div>
   </div>

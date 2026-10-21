@@ -41,3 +41,6 @@ example
 # generated native folders
 /ios
 /android
+
+# the help guide, built from guide/ by scripts/build-guide.mts (GitHub Actions builds it to publish)
+/site/guide/

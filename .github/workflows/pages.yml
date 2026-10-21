@@ -1,7 +1,12 @@
-# Publishes the website in site/ to GitHub Pages
-# (https://snowpace.com/) whenever a change to it reaches
-# main. Nothing is built: the folder is uploaded as it is. App-only commits
-# do not trigger it. It can also be run by hand from the Actions tab.
+# Publishes the website in site/ to GitHub Pages (https://snowpace.com/).
+#
+# The help guide, site/guide/, is built here first (scripts/build-guide.mts)
+# from the Markdown pages in guide/ and from the app's own words and numbers
+# in src/. So it runs whenever any of those change, not just the site, and
+# the guide never falls behind the app. If the build finds a problem (a
+# placeholder that no longer matches the app, a broken link), nothing is
+# published and the site stays as it was. It can also be run by hand from the
+# Actions tab.
 name: Website
 
 on:
@@ -9,6 +14,12 @@ on:
     branches: [main]
     paths:
       - 'site/**'
+      - 'guide/**'
+      - 'src/**'
+      - 'app.json'
+      - 'scripts/build-guide.mts'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -30,6 +41,13 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      # Exactly the locked packages; no install scripts, since only the guide build runs.
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run build-guide
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

@@ -15,6 +15,26 @@ export const SITE_URL = 'https://snowpace.com/';
 /** The privacy policy, as the App Store listing and the credits screen link to it. */
 export const PRIVACY_URL = `${SITE_URL}privacy/`;
 
+/** The help guide: site/guide, built from guide/ by scripts/build-guide.mts. */
+export const GUIDE_URL = `${SITE_URL}guide/`;
+
+/**
+ * Guide pages the app links to, by slug ('' is the guide's front page). The
+ * guide build fails if one of them does not exist, so renaming a page cannot
+ * leave the app with a dead link.
+ */
+export const GUIDE_PAGES = {
+  home: '',
+  troubleshooting: 'troubleshooting',
+  scores: 'how-scores-work',
+  privacy: 'privacy-and-data',
+} as const;
+
+export function guideUrl(page: keyof typeof GUIDE_PAGES): string {
+  const slug = GUIDE_PAGES[page];
+  return slug ? `${GUIDE_URL}${slug}/` : GUIDE_URL;
+}
+
 export const USER_AGENT = `Snowpace/1.0 (+${PROJECT_URL})`;
 
 /**

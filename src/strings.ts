@@ -159,20 +159,19 @@ export const strings = {
     disclaimer: "Snowpace only scores the weather. Before you go, check the location's web site for hours, grooming and lift status, and the avalanche forecast for the area.",
   },
 
+  // The Help screen is a short quick start; the full guide is on the website
+  // (guide/, built into site/guide/). `bands`, `factors` and
+  // `decidesSnowpack` are not shown in the app any more: the website's home
+  // page and the guide copy them from here, so they stay the one wording.
   help: {
-    title: 'How Snowpace works',
+    title: 'Help',
     warning: "Snowpace only scores the weather. Before you go, check the location's web site for hours, grooming and lift status, and the avalanche forecast for the area.",
-    whatKicker: 'What it is for',
-    what: 'Snowpace answers one question: is it worth going out today, and where should I go? It gathers past, current and forecast weather information for the places you have saved and calculates a score out of 100 based on the characteristics of the activities you participate in. Good conditions for skate skiing are not necessarily good conditions for downhill skiing, so every place gets a different score for each activity.',
-    scoreKicker: 'What the score means',
     bands: [
       { key: 'hi', range: '80+', text: 'Conditions should be ideal.' },
       { key: 'go', range: '70–79', text: 'A good day out, with one small catch.' },
       { key: 'fair', range: '55–69', text: 'Fine if you are keen, but manage your expectations.' },
       { key: 'poor', range: 'Under 55', text: 'Save your legs or look for another day or location.' },
     ] as const,
-    decidesKicker: 'How it decides',
-    decidesIntro: 'Eight things go into every score, weighted differently for each activity:',
     // `id` is the engine's factor key; the website's factor list matches weights to rows by it.
     factors: [
       { id: 's', k: 'New snow, 24 hours', v: 'how much has fallen since yesterday' },
@@ -184,24 +183,32 @@ export const strings = {
       { id: 'fall', k: 'Snow falling', v: 'welcome for downhill or snowshoeing, slow going on skinny skis' },
       { id: 'c', k: 'Cloud cover', v: 'flat light versus a bluebird day' },
     ],
-    factorSep: ' — ',
     decidesSnowpack: 'On top of those, the modelled snowpack caps the score: on bare ground it is 0, however good the weather. The snowpack is a weather model’s estimate, not a measurement, and it does not know about snowmaking, so a hill making snow can still show as bare. For skate and classic skiing, deep new snow caps it too: a skate lane stays soft and slow until it has been packed, and classic tracks fill in until they have been reset.',
-    decidesOutro: 'The sentence under the dial names whatever is holding the day back, and Why? shows how each one scored, as a bar from 0 to 100. For skate and classic, Why? also names the snow surface the weather is likely leaving (Fresh, Soft, Packed, Firm, Icy or Slushy), assuming normal overnight grooming. It is an estimate, and not yet part of the score.',
-    useKicker: 'How to use it',
+    quickKicker: 'Quick start',
     steps: [
-      { t: 'Turn on your activities', d: 'On the You tab, enable the ones you do. Everything else in the app filters to those.' },
-      { t: 'Set what good feels like', d: 'Your ideal temperature, how much wind you will put up with, how much fresh snow you want, and how far you will travel.' },
-      { t: 'Add your places', d: 'My places → Add. Pick the centres and hills you go to, and set one as your home hill. That is the one Today opens on.' },
-      { t: 'Check Today', d: 'The big dial is how today looks at your home hill, with its best hours and the reason in a sentence. Tap an hour on the strip for that hour, tap Why? to see what is behind the score, and tap Not right? to tell me when it does not match the day. On a poor day, better places nearby are listed right under it.' },
-      { t: 'See it for yourself', d: 'Under the hours, a recent webcam picture from windy.com shows the place itself. Tap it to see it larger on windy.com, tap Refresh for a newer one, or tap Other cameras to choose a different view. A place with no camera of its own shows none, and you can switch webcams off on the You tab.' },
-      { t: 'Look ahead', d: 'Forecast lays out every saved place against the next five days. Tap any square for the detail on that day.' },
+      { t: 'Turn on your activities', d: 'On the You tab, switch on the ones you do.' },
+      { t: 'Say what a good day feels like', d: 'Also on You: your ideal temperature, your wind limit, how much new snow you want, and how far you will travel.' },
+      { t: 'Add your places', d: 'My places → + Add. Save the places you go to and set one as your home hill; Today opens on it.' },
+      { t: 'Read the answer', d: 'A score out of 100, the best hours, and the reason in a sentence. Why? shows what is behind it; Not right? tells me when it is wrong.' },
+      { t: 'Look ahead', d: 'Forecast lays out every saved place against the next five days. Tap a square for that day.' },
     ],
-    dataKicker: 'A word on the data',
     creditsLink: 'Credits and data sources',
-    data: "Scores come from mountain weather forecasts, so treat them as a forecast, not a report. Each place shows how old its forecast is, and each webcam how recent its picture is. Webcam pictures come from windy.com; they are there to look at and never change a score. Remember to check the operator's snow report before a long drive.",
     feedbackKicker: 'Something to tell me?',
     feedbackBody: 'A score that looked wrong, something broken, or an idea for the app. Feedback goes straight to the developer. For a score, Not right? under its verdict is quicker: it brings the day along.',
     feedbackButton: 'Send feedback',
+  },
+
+  // Links from the app into the guide on the website. The pages are
+  // GUIDE_PAGES in src/data/project.ts, which the guide build checks.
+  guide: {
+    kicker: 'The full guide',
+    body: 'Every screen, how scores are worked out, where the data comes from, your privacy, and answers when something looks wrong.',
+    home: 'Snowpace guide ↗',
+    troubleshooting: 'Troubleshooting ↗',
+    scores: 'How scores work ↗',
+    privacy: 'Privacy and your data ↗',
+    beforeKicker: 'Before you write',
+    beforeBody: 'Most questions are already answered in the guide, including why a score can look off. The troubleshooter finds the right page in a tap or two.',
   },
 
   credits: {
