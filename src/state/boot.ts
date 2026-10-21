@@ -22,6 +22,7 @@ import { Platform } from 'react-native';
 import { refreshForecasts } from '@/data/forecast-refresh';
 import { isRefreshDue, refreshInventoryIfDue } from '@/data/inventory-refresh';
 import type { Forecast } from '@/data/open-meteo';
+import { POLICY } from '@/data/policy';
 import { setMeta } from '@/db/database';
 import { listFavourites, type Favourite } from '@/db/favourites';
 import { getForecasts } from '@/db/forecasts';
@@ -50,7 +51,7 @@ export type Boot = {
 // not a flicker, on the (common) days when there is nothing slow to do.
 const MIN_LOADING_MS = 700;
 // With a cached forecast for every place, wait no longer than this for fresh ones.
-const CACHED_WAIT_MS = 5_000;
+const CACHED_WAIT_MS = POLICY.launchCachedWaitS * 1000;
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 

@@ -8,14 +8,13 @@
  *   - conditional request, so an unchanged file costs a 304;
  *   - on any failure keep what we have and record why.
  */
-import { parseSkiAreas } from '@/data/openskidata';
+import { parseSkiAreas, SOURCE_URL } from '@/data/openskidata';
+import { POLICY } from '@/data/policy';
 import { USER_AGENT } from '@/data/project';
 import { confirmCurrent, inventoryStatus, recordAttempt, replaceInventory } from '@/db/inventory';
 
-export const SOURCE_URL = 'https://tiles.openskimap.org/geojson/ski_areas.geojson';
-
-export const REFRESH_AFTER_DAYS = 30;
-export const RETRY_AFTER_HOURS = 24;
+export const REFRESH_AFTER_DAYS = POLICY.inventoryRefreshDays;
+export const RETRY_AFTER_HOURS = POLICY.inventoryRetryHours;
 
 const DAY = 24 * 60 * 60 * 1000;
 

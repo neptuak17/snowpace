@@ -9,6 +9,9 @@
  * the whole parse rather than producing records full of nulls.
  */
 
+/** The one file Snowpace requests from openskimap.org (CLAUDE.md: fetch policy). */
+export const SOURCE_URL = 'https://tiles.openskimap.org/geojson/ski_areas.geojson';
+
 export type SkiArea = {
   /** `osm:way/123`, `osm:relation/123`, or `skimap:123`. Stable across refreshes. */
   key: string;

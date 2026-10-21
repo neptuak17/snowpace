@@ -8,11 +8,12 @@
 import * as Location from 'expo-location';
 import { Platform } from 'react-native';
 
+import { POLICY } from '@/data/policy';
 import type { LatLon } from '@/lib/geo';
 
 // A fresh fix can take a long time indoors, and the launch waits for it. Past
 // this, settle for the last fix the phone has, however old, or go without.
-const FIX_TIMEOUT_MS = 5_000;
+const FIX_TIMEOUT_MS = POLICY.locationWaitS * 1000;
 
 export async function requestLocation(): Promise<LatLon | null> {
   if (Platform.OS === 'web') return null;
