@@ -1,5 +1,5 @@
 // The interactive parts of the page: the demo card, the four sports, the
-// factor weights and the score bands. Every score, sentence and weight comes
+// eight factors and the score bands. Every score and sentence comes
 // from demo-data.js, which scripts/build-site-demo.mts writes from the app's
 // own scoring engine. The words around them are in index.html.
 (() => {
@@ -66,7 +66,6 @@
   const sportItems = D.activities.map((a) => [a.key, a.label]);
   chips($('days'), D.samples.map((s) => [s.id, s.name]), 'sample', { hour: null });
   chips($('acts'), sportItems, 'act', { hour: null });
-  chips($('acts2'), sportItems, 'act', { hour: null });
   chips($('units'), [['metric', '°C'], ['imperial', '°F']], 'units');
 
   // ── The demo card ─────────────────────────────────────────────────────────
@@ -130,24 +129,16 @@
     $('sports-day').textContent = `${s.name}: ${s.blurb.charAt(0).toLowerCase() + s.blurb.slice(1)}.`;
   });
 
-  // ── The eight factors and their weights ───────────────────────────────────
-  // Bars are drawn against the largest weight any sport gives any factor.
-  const most = Math.max(...Object.values(D.weights).flatMap((w) => Object.values(w)));
+  // ── The eight factors (what they are, not how much each counts) ───────────
   const youSet = $('factors').dataset.youSet;
   for (const f of D.factors) {
     const row = document.createElement('div');
     row.className = 'factor';
-    row.innerHTML = `<b></b>${f.personal ? '<span class="you"></span>' : '<span></span>'}<span class="pct"></span>` +
-      '<span class="bar"><i></i></span><span class="what"></span>';
+    row.innerHTML = `<b></b>${f.personal ? '<span class="you"></span>' : '<span></span>'}<span class="what"></span>`;
     row.querySelector('b').textContent = f.name;
     row.querySelector('.what').textContent = f.what;
     if (f.personal) row.querySelector('.you').textContent = youSet;
     $('factors').append(row);
-    listeners.push(() => {
-      const w = D.weights[state.act][f.key];
-      row.querySelector('.pct').textContent = Math.round(w * 100) + '%';
-      row.querySelector('.bar i').style.width = (w / most) * 100 + '%';
-    });
   }
   $('snowpack').textContent = D.snowpack;
 

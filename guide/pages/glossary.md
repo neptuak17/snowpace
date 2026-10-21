@@ -10,11 +10,7 @@ description: The words Snowpace and this guide use, in plain terms.
 
 **Best hours.** The best-scoring {{tune.hourly.windowHours}} hours in a row today. See [Best hours](/guide/best-hours/).
 
-**Ceiling.** A factor that caps the whole score instead of being averaged in: the snowpack, and deep new snow for skate and classic.
-
 **Crust.** Snow that melted and refroze hard. See [Freeze–thaw](/guide/freeze-thaw/).
-
-**Degree-hours.** How much warmth there was to melt snow: each hour above 0°C counts its temperature, so an hour at +2°C counts 2.
 
 **Factor.** One of the eight weather measures behind a score, such as wind or new snow.
 

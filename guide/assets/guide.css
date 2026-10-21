@@ -8,7 +8,6 @@
 .g-main { min-width: 0; max-width: 44rem; display: grid; gap: 1rem; }
 @media (min-width: 60rem) {
   .g-layout { grid-template-columns: 15.5rem minmax(0, 1fr); gap: 3rem; }
-  .g-side { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; padding-bottom: 1rem; scrollbar-width: thin; }
   .g-nav { display: block; }
   .g-toc { display: none; }
 }

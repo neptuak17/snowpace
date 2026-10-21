@@ -8,21 +8,21 @@ Each activity has four settings of its own, on the **{{ui.tabs.you}}** tab. Snow
 
 ## {{ui.you.idealTemp}}
 
-The day's daytime average is compared with your ideal. Every degree away, warmer or colder, costs the temperature factor {{tune.tempPenaltyPerDeg}} points.
+The day's daytime average is compared with your ideal. The further it is, warmer or colder, the lower the temperature factor.
 
 ## {{ui.you.windLimit}}
 
-Wind costs nothing up to {{derived.windFreePct}}% of your limit. Past that, the wind factor falls, reaching 0 at {{derived.windZeroPct}}% of your limit.
+A light breeze costs nothing. As the wind picks up towards your limit the wind factor starts to drop, and past your limit it falls away fast.
 
 ## New snow
 
 - **Downhill and snowshoeing** (**{{ui.snowPref.labelDownhill}}**, **{{ui.snowPref.labelSnowshoe}}**): more is better. The factor climbs to full as the day's new snow reaches your amount.
-- **Classic and skate** (**{{ui.snowPref.labelNordic}}**): your amount is the ideal. Less costs a little, and more costs more, skate especially, because unpacked snow is slow going on a skate lane. A lot more also triggers the [deep-snow cap](/guide/snowpack-and-deep-snow/#deep-new-snow).
+- **Classic and skate** (**{{ui.snowPref.labelNordic}}**): your amount is the ideal. A little less is fine; much more is slow going in a set track or on a skate lane, and a big snowfall also [holds the score down](/guide/snowpack-and-deep-snow/#deep-new-snow).
 
 ## Snow falling
 
 - **Downhill and snowshoeing** (**{{ui.fall.labelOut}}**): snow coming down while you're out is a bonus. Your setting decides how much counts as too much.
-- **Classic and skate** (**{{ui.fall.labelTolerance}}**): snow filling the track is slow going. The higher your tolerance, the less it costs.
+- **Classic and skate** (**{{ui.fall.labelTolerance}}**): snow filling the track is slow going. The higher your tolerance, the less it bothers the score.
 
 ## {{ui.you.maxDistance}}
 

@@ -47,7 +47,9 @@ jobs:
           cache: npm
       # Exactly the locked packages; no install scripts, since only the guide build runs.
       - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: npm run build-guide
+      # --stamp fingerprints the stylesheet and script links, so a visitor never
+      # gets new pages with a stylesheet their browser kept from before.
+      - run: npm run build-guide -- --stamp
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

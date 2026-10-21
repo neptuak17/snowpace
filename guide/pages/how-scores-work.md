@@ -1,34 +1,32 @@
 ---
 title: How scores work
-description: From the mountain forecast to a score out of 100, step by step.
+description: What Snowpace looks at to score a day, and how your own settings come into it.
 ---
 {{diagram:score}}
 
 ## 1. The forecast
 
-For each place, Snowpace fetches an hourly mountain forecast: {{weather.pastDays}} days back and {{weather.forecastDays}} days ahead. Downhill areas get two, at the base and at the summit, averaged into one for mid-mountain; nordic centres get one at mid elevation. See [Weather forecasts](/guide/weather-forecasts/).
+For each place, Snowpace fetches an hourly mountain forecast: {{weather.pastDays}} days back and {{weather.forecastDays}} days ahead. Downhill areas get two, at the base and at the summit, combined into one for mid-mountain; nordic centres get one at mid elevation. See [Weather forecasts](/guide/weather-forecasts/).
 
-## 2. Eight factors
+## 2. Eight weather factors
 
-From the forecast, each day gets eight factors, each scored from 0 to 100 for your activity:
+From the forecast, Snowpace looks at eight things for each day:
 
 {{list:factors}}
 
 Four of them are measured against your own settings: temperature, wind, new snow, and snow falling. See [Your settings](/guide/your-settings/).
 
-## 3. Weighted for the activity
+## 3. Judged for your activity
 
-The eight are combined as a weighted average. The weights differ by activity; these are the ones the app uses today:
+The same weather means different things on different gear: wind matters more on an open skate lane than on a sheltered snowshoe trail, and fresh snow is a gift on a downhill run but slow going in a set track. So each activity weighs the eight factors in its own way.
 
-{{table:weights}}
+## 4. Is there snow?
 
-## 4. The ceilings
-
-The average is then capped by the snowpack and, for skate and classic, by deep new snow. That's how a perfect bluebird day on bare ground scores 0. See [Snowpack and deep new snow](/guide/snowpack-and-deep-snow/).
+No amount of sunshine makes up for no snow, so the snowpack holds the whole score down when it's thin, and a bare hill scores 0 whatever the weather. For skate and classic, a big dump of new snow holds the score down too, until the trails are packed and reset. See [Snowpack and deep new snow](/guide/snowpack-and-deep-snow/).
 
 ## 5. The score, and its sentence
 
-What's left is the score, shown with its [band](/guide/the-score/) and [the sentence](/guide/the-verdict/) naming the weakest factor. **{{ui.why.show}}** shows every factor's bar for the day.
+What comes out is the score, shown with its [band](/guide/the-score/) and [the sentence](/guide/the-verdict/) naming what's holding the day back most. **{{ui.why.show}}** shows how each factor did that day.
 
 ## See it in action
 

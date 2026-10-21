@@ -11,7 +11,9 @@
   function load() {
     if (index) return Promise.resolve(index);
     if (!loading) {
-      loading = fetch('/guide/search-index.json')
+      // no-cache: check with the server each time (a quick "not changed"), so search
+      // never runs on an index from before the last publish.
+      loading = fetch('/guide/search-index.json', { cache: 'no-cache' })
         .then(function (r) { return r.json(); })
         .then(function (d) { index = d; return d; });
     }

@@ -10,8 +10,8 @@
   - The support and privacy pages are support/index.html and
     privacy/index.html. The header and footer are repeated on all three
     pages, so a change to a footer link belongs in all three.
-  - The sample days, the eight factors and their weights, and the score
-    bands are not written here. They come from the app itself, through
+  - The sample days, the eight factors and the score bands are not
+    written here. They come from the app itself, through
     demo-data.js. To change those, change the app and run
       node scripts/build-site-demo.mts
 -->
@@ -113,9 +113,8 @@
       <div class="section-head">
         <p class="kicker">How it decides</p>
         <h2 id="h-score">Eight things go into every score</h2>
-        <p>Each one is weighted for the activity. Four of them are measured against what you tell the app: your ideal temperature, how much wind you'll put up with, how much fresh snow you want, and how you feel about snow falling while you're out.</p>
+        <p>Each activity weighs them in its own way. Four of them are measured against what you tell the app: your ideal temperature, how much wind you'll put up with, how much fresh snow you want, and how you feel about snow falling while you're out.</p>
       </div>
-      <div class="weights-for"><span>Weights for</span><div class="chips" id="acts2"></div></div>
       <!-- data-you-set is the tag on the four factors you set yourself. -->
       <div class="factors" id="factors" data-you-set="You set this"></div>
       <p class="snowpack" id="snowpack"></p>

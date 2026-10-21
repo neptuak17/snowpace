@@ -2,7 +2,7 @@
 title: The sentence under the dial
 description: How Snowpace picks the one thing to tell you about the day.
 ---
-Under the score, one sentence names what's holding the day back. Snowpace looks at the factors behind the score and picks the weakest one, in words for your activity. The opening depends on the band:
+Under the score, one sentence names what's holding the day back most, in words for your activity. The opening depends on the band:
 
 - **{{ui.bands.hi}}:** "A really good one. The only note: {{ui.weakest.flatLight}}."
 - **{{ui.bands.go}}:** "A good one. The wind is the one knock, but nothing that should keep you home."
@@ -12,7 +12,7 @@ Under the score, one sentence names what's holding the day back. Snowpace looks 
 
 ## When several things are wrong
 
-If {{tune.limiters.pluralFrom}} or more factors score below {{tune.limiters.severeBelow}}, naming one would mislead, so the sentence counts them instead: "Three things are working against it today." Tap **{{ui.why.show}}** to see which: they're the emptiest bars.
+When several factors are well off at once, naming one would mislead, so the sentence counts them instead: "Three things are working against it today." Tap **{{ui.why.show}}** to see which: they're the emptiest bars.
 
 ## Special cases
 

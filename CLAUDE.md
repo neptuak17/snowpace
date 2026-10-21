@@ -499,10 +499,10 @@ four sports side by side, how the score is decided, features, privacy, and a foo
 * **Where the words live.** Marketing copy is written in `site/index.html` and edited by hand
   (the owner edits it directly, sometimes on github.com). Everything that describes how the app
   scores is generated into `site/demo-data.js` by `node scripts/build-site-demo.mts`: the sample
-  days (made-up weather run through the real engine with `DEFAULT_PREFS`), the factor weights,
-  the score bands, and the factor and snowpack wording copied from `strings.help`. Rerun it and
-  commit after any change to scoring, tuning or that Help wording, so the site cannot contradict
-  the app. Never hand-edit `demo-data.js`.
+  days (made-up weather run through the real engine with `DEFAULT_PREFS`), the score bands,
+  and the factor and snowpack wording copied from `strings.help`; never the factor weights.
+  Rerun it and commit after any change to scoring, tuning or that Help wording, so the site
+  cannot contradict the app. Never hand-edit `demo-data.js`.
 * **Same principles as the app.** No analytics, no tracking, no cookies, and no third-party
   requests: the fonts are self-hosted from the app's own `@expo-google-fonts` packages, with
   their OFL licences beside them. No live API calls from the site, ever: never Open-Meteo, and
@@ -527,7 +527,7 @@ automatically as the app changes.
 * **Numbers:** `{{policy.…}}` (`src/data/policy.ts`: refresh intervals and timeouts, moved there
   so Node can read them), `{{tune.…}}` (`TUNING`), `{{derived.…}}` (the same, converted: cm,
   percentages, clock times), `{{weather.…}}`, `{{hosts.…}}`, `{{contact.…}}`, `{{app.version}}`.
-* **Generated blocks:** `{{table:bands}}`, `{{table:weights}}`, `{{table:defaults}}`,
+* **Generated blocks:** `{{table:bands}}`, `{{table:defaults}}`,
   `{{list:factors}}`, `{{widget:search}}`, `{{widget:troubleshooter}}`, `{{widget:contents}}`,
   `{{diagram:name}}` (an SVG in `guide/diagrams/`, inlined and coloured from the site's tokens).
 
@@ -538,7 +538,20 @@ heading that does not exist (from guide pages, the troubleshooter, and the hand-
 `site/` pages); a troubleshooter step that leads nowhere or is never reached; or a page the app
 links to (`GUIDE_PAGES` in `src/data/project.ts`) that is gone. GitHub Actions runs it before
 every publish, so a failure publishes nothing and the site stays as it was. The output is
-git-ignored; run the build to preview it locally with the `website` launch entry.
+git-ignored; run the build to preview it locally with the `website` launch entry. When
+publishing, the workflow passes `--stamp`, which adds a fingerprint of each stylesheet and script
+to every page's links (`styles.css?v=3f2a1c9b`), so browsers never pair new pages with a cached
+old stylesheet (GitHub Pages lets them keep files ten minutes). It rewrites `site/` in place, so
+never run it locally.
+
+**The guide says what goes into a score, never how it is calculated** (owner's call, Oct 2026:
+the scoring is Snowpace's secret sauce). It names the factors, what each one means, and that
+your settings, the activity and the snowpack shape the score; it never gives weights,
+thresholds, penalties or formulas. The score bands and the default settings are fine: the app
+shows both. The same goes for the website's home page, which lists the factors without their
+weights, and `site/demo-data.js`, which no longer carries them. The code (`TUNING` included) is
+still public on GitHub; whether to make the repository private is an open question for the owner
+(GitHub Pages on a private repository needs a paid plan, and the app's User-Agent points at it).
 
 **Explanations are hand-written, and kept current in the same commit.** When behaviour a user
 can see changes, update the guide pages that describe it alongside the code, as the privacy

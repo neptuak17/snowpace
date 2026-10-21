@@ -13,7 +13,7 @@ Start with **{{ui.why.show}}** under the answer: the emptiest bar is usually the
 
 ## There is snow, but it says bare
 
-The snowpack comes from a weather model's estimate, and the model doesn't know about snowmaking or grooming. Early and late in the season, a hill making snow can show "{{ui.verdict.bareGround}}" while its runs are open. Look at the webcam, if there is one, and the place's web site. Then tap **{{ui.verdictFeedback.title}}** and choose "{{ui.verdictFeedback.issues.snow}}": those reports are how the snowpack thresholds get tuned.
+The snowpack comes from a weather model's estimate, and the model doesn't know about snowmaking or grooming. Early and late in the season, a hill making snow can show "{{ui.verdict.bareGround}}" while its runs are open. Look at the webcam, if there is one, and the place's web site. Then tap **{{ui.verdictFeedback.title}}** and choose "{{ui.verdictFeedback.issues.snow}}": those reports are how Snowpace's snowpack readings get tuned.
 
 ## It felt better, or worse, than the score
 
@@ -21,7 +21,7 @@ The snowpack comes from a weather model's estimate, and the model doesn't know a
 - **The forecast was off.** See [How accurate is it?](/guide/weather-forecasts/#how-accurate-is-it)
 - **Elevation.** Downhill scores use the average of base and summit; your runs may be colder or warmer.
 - **Crust, slush or ice.** See [Freeze–thaw](/guide/freeze-thaw/) and [Rain and ice](/guide/rain-and-ice/).
-- **A big snowfall on skate or classic.** Deep new snow caps the score until the trails are packed. See [Deep new snow](/guide/snowpack-and-deep-snow/#deep-new-snow).
+- **A big snowfall on skate or classic.** Deep new snow holds the score down until the trails are packed. See [Deep new snow](/guide/snowpack-and-deep-snow/#deep-new-snow).
 
 ## Tell me
 

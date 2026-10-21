@@ -8,7 +8,7 @@
  * Run by hand after changing the scoring, the tuning or the Help wording it
  * copies, and commit the result. Everything on the site that describes how
  * the app scores comes from here, so the site cannot contradict the app: the
- * sample days, the factor weights, the score bands, and the factor and
+ * sample days, the score bands, and the factor and
  * snowpack wording from the Help screen. Marketing copy lives in
  * site/index.html and is edited by hand.
  *
@@ -159,6 +159,9 @@ const samples = SAMPLES.map((s) => {
 // ── Wording copied from the app ─────────────────────────────────────────
 
 const help = strings.help;
+// The factor list must match the engine's factors. Their weights are checked
+// here but never published: how the score is calculated stays out of the site
+// (owner's call, Oct 2026).
 const weightKeys = Object.keys(TUNING.weights.classic);
 if (help.factors.length !== weightKeys.length || help.factors.some((f) => !weightKeys.includes(f.id))) {
   throw new Error('Help factors and TUNING.weights disagree; check the ids in strings.help.factors.');
@@ -169,7 +172,6 @@ const data = {
   hours: [...TUNING.hourly.hours],
   activities: ACTS.map((a) => ({ key: a.key, label: a.label })),
   samples,
-  weights: TUNING.weights,
   factors: help.factors.map((f) => ({ key: f.id, name: f.k, what: capital(f.v), personal: PERSONAL.includes(f.id as FactorKey) })),
   snowpack: help.decidesSnowpack,
   bands: help.bands.map((b) => ({ key: b.key, word: strings.bands[b.key], range: b.range, text: b.text })),

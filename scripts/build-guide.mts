@@ -12,7 +12,7 @@
  * Pages are Markdown with {{placeholders}} for anything the app already
  * knows: its button names ({{ui.why.show}}), its numbers
  * ({{policy.forecastStaleHours}}), its contact details ({{contact.email}}),
- * and generated blocks such as {{table:weights}}. A placeholder that no
+ * and generated blocks such as {{table:bands}}. A placeholder that no
  * longer resolves stops the build, so a renamed button or a changed number
  * cannot leave the guide quietly wrong. So does a page missing from
  * guide/contents.json (or listed there without a file), a link to a guide
@@ -65,8 +65,7 @@ const ACT_KEYS = Object.keys(strings.activities) as ActivityKey[];
 // ── What pages can refer to ────────────────────────────────────────────────
 
 const T = TUNING;
-const cm = (m: number) => Math.round(m * 100);
-const pct = (x: number) => Math.round(x * 100);
+
 const clock = (h: number) => (h === 12 ? strings.format.noon : h < 12 ? strings.format.am(h) : strings.format.pm(h - 12));
 const host = (url: string) => new URL(url).host;
 
@@ -75,6 +74,9 @@ const facts = {
   contact: { email: FEEDBACK_EMAIL, site: SITE_URL, privacy: PRIVACY_URL, source: PROJECT_URL },
   // Every string in the app, by its path in src/strings.ts: {{ui.tabs.today}}.
   ui: strings,
+  // For behaviour people can see (the 3-hour best window, webcam timings). Never for
+  // how the score is calculated: weights, thresholds and penalties stay out of the
+  // guide (owner's call, Oct 2026).
   tune: T,
   policy: POLICY,
   defaults: DEFAULT_PREFS,
@@ -82,20 +84,10 @@ const facts = {
   weather: { pastDays: PAST_DAYS, forecastDays: FORECAST_DAYS, variables: HOURLY_VARS.length },
   // Values the pages want in a different unit or shape from the code's.
   derived: {
-    bands: { excellent: T.bands.hi, good: T.bands.go, fair: T.bands.fair, poor: T.bands.poor, everything: T.verdictExcellent },
-    coverage: {
-      downhillNoneCm: cm(T.coverage.downhill.noneM), downhillFullCm: cm(T.coverage.downhill.fullM),
-      nordicNoneCm: cm(T.coverage.classic.noneM), nordicFullCm: cm(T.coverage.classic.fullM),
-    },
-    deepSnow: {
-      skateFromCm: T.deepSnow.skate!.fromCm, skateFloorCm: T.deepSnow.skate!.fromCm + T.deepSnow.skate!.spanCm,
-      skateFloorPct: pct(T.deepSnow.skate!.floor),
-      classicFromCm: T.deepSnow.classic!.fromCm, classicFloorCm: T.deepSnow.classic!.fromCm + T.deepSnow.classic!.spanCm,
-      classicFloorPct: pct(T.deepSnow.classic!.floor),
-    },
+    // The score bands are shown in the app (the Forecast legend), so they are no secret.
+    bands: { excellent: T.bands.hi, good: T.bands.go, fair: T.bands.fair, poor: T.bands.poor },
     staleForecastHours: T.staleForecastMin / 60,
     hourStrip: { from: clock(T.hourly.hours[0]), to: clock(T.hourly.hours[T.hourly.hours.length - 1] + 1) },
-    windFreePct: pct(T.wind.freeFraction), windZeroPct: pct(T.wind.zeroFraction),
     distance: T.distance,
     webcamRadiusNordicKm: T.webcam.radiusKm.nordic, webcamRadiusDownhillKm: T.webcam.radiusKm.downhill,
     gridDays: FORECAST_DAYS,
@@ -130,15 +122,6 @@ function bandsTable(): string {
   return `<div class="g-table"><table><thead><tr><th>Score</th><th>Shown as</th></tr></thead><tbody>${rows
     .map(([k, range, word]) => `<tr><td>${range}</td><td><span class="g-band b-${k}">${esc(word)}</span></td></tr>`)
     .join('')}</tbody></table></div>`;
-}
-
-function weightsTable(): string {
-  const head = ACT_KEYS.map((a) => `<th>${esc(strings.activities[a])}</th>`).join('');
-  const rows = strings.help.factors.map((f) => {
-    const cells = ACT_KEYS.map((a) => `<td>${pct(T.weights[a][f.id as keyof (typeof T.weights)[typeof a]])}%</td>`).join('');
-    return `<tr><th scope="row">${esc(f.k)}</th>${cells}</tr>`;
-  });
-  return `<div class="g-table"><table class="g-num"><thead><tr><th>Factor</th>${head}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
 }
 
 function defaultsTable(): string {
@@ -253,7 +236,6 @@ function render(slug: string, body: string): string {
   // Placeholders first: values are escaped; blocks are HTML on lines of their own.
   const withFacts = body.replace(/\{\{\s*([\w.:-]+)\s*\}\}/g, (_, key: string) => {
     if (key === 'table:bands') return bandsTable();
-    if (key === 'table:weights') return weightsTable();
     if (key === 'table:defaults') return defaultsTable();
     if (key === 'list:factors') return factorList();
     if (key === 'widget:search') return searchBox(true);
@@ -386,3 +368,32 @@ const index = pages.filter((p) => p.slug !== 'search').map((p) => ({
 writeFileSync(join(OUT, 'search-index.json'), JSON.stringify(index));
 
 console.log(`Wrote ${pages.length} pages to site/guide/ (Snowpace ${app.version}); search index ${Math.round(JSON.stringify(index).length / 1024)} KB.`);
+
+// ── Publishing only: fingerprint the stylesheets and scripts ───────────────
+// GitHub Pages lets browsers keep a file for ten minutes, so after a publish a
+// visitor could get new pages with an old stylesheet (the header once lost its
+// spacing that way). With --stamp, which only the publish workflow passes,
+// every page's links to them gain a fingerprint of the file's contents
+// (styles.css?v=3f2a1c9b): a changed file gets a new address, so it is
+// fetched fresh. It rewrites site/ in place, so it is never run locally,
+// where it would change the hand-written pages.
+if (process.argv.includes('--stamp')) {
+  const { createHash } = await import('node:crypto');
+  const site = join(ROOT, 'site');
+  const assets: Record<string, string> = {
+    'styles.css': join(site, 'styles.css'), 'demo.js': join(site, 'demo.js'), 'demo-data.js': join(site, 'demo-data.js'),
+    'guide.css': join(OUT, 'guide.css'), 'guide.js': join(OUT, 'guide.js'),
+  };
+  const hash = Object.fromEntries(Object.entries(assets).map(([name, file]) =>
+    [name, createHash('sha256').update(readFileSync(file)).digest('hex').slice(0, 8)]));
+  const htmlFiles = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+    e.isDirectory() ? htmlFiles(join(dir, e.name)) : e.name.endsWith('.html') ? [join(dir, e.name)] : []);
+  let stamped = 0;
+  for (const file of htmlFiles(site)) {
+    const before = readFileSync(file, 'utf8');
+    const after = before.replace(/(href|src)="((?:\.\.\/|\/)?(?:guide\/)?(styles\.css|demo\.js|demo-data\.js|guide\.css|guide\.js))"/g,
+      (_, attr: string, url: string, name: string) => `${attr}="${url}?v=${hash[name]}"`);
+    if (after !== before) { writeFileSync(file, after); stamped++; }
+  }
+  console.log(`Fingerprinted the stylesheet and script links in ${stamped} pages.`);
+}

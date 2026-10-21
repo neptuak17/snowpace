@@ -6,7 +6,7 @@ Every saved place gets a score from 0 to 100 for each of your activities, for to
 
 {{table:bands}}
 
-The band sets the dial's colour and the word beside it. At {{derived.bands.everything}} or more, the sentence under the dial says so: "{{ui.verdict.excellent}}"
+The band sets the dial's colour and the word beside it. On the very best days, the sentence under the dial says so: "{{ui.verdict.excellent}}"
 
 ## One place, four scores
 
@@ -18,4 +18,4 @@ A dash ({{ui.common.dash}}) means there's nothing to score: no forecast for that
 
 ## What goes into it
 
-Eight weather factors, weighted for your activity, then capped by the snowpack. [How scores work](/guide/how-scores-work/) walks through each step, and **{{ui.why.show}}** under any answer shows how each factor scored that day.
+Eight weather factors, judged for your activity and your settings, and the snowpack. [How scores work](/guide/how-scores-work/) explains what each one is, and **{{ui.why.show}}** under any answer shows how each factor scored that day.
