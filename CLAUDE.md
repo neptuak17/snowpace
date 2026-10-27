@@ -451,6 +451,32 @@ The about/credits screen must include:
     cloud and wind. Whether either model returns a usable one is unverified — GEM returned null for
     freezing level, so check against the live endpoint rather than assume.
 
+* **Choosing a webcam when Snowpace picked none.** When no nearby camera's name matches the
+  place, the whole webcam section is left out, "Other cameras" with it, so the user cannot
+  pick one for that place themselves (the guide says so). A small "Find a webcam ›" link in
+  that case would fix it. Not built.
+
+* **Noticed, not acted on (Oct 2026):**
+  - The Good and Fair hour-cell colours look pale in light mode.
+  - "Snow falling" is measured over 24 hours; look at it again in the winter retune.
+  - The monthly ski-area download has no timeout. That was left deliberately when the launch
+    timeouts were added; revisit if a launch is ever seen stuck on "Ski area listing".
+  - The website's link-preview image is the square app icon; a wider one would show better
+    when the link is shared.
+  - The App Store shows an individual developer's legal name as the seller, which sits
+    awkwardly with keeping the name off the website. A business developer account (which
+    needs a D-U-N-S number) shows a company name instead.
+
+* **Monetising: discussed Oct 2026, not decided.** The simplest route is a one-off App Store
+  price: no code, and Apple keeps 15% under its Small Business Program. But any income at all
+  ends Open-Meteo's free tier (a paid plan and `customer-api.open-meteo.com`, a monthly cost
+  that grows with use), and Windy's free tier requires webcams not to sit behind a payment.
+  Ads are ruled out by the hard constraints. A tip jar or a subscription needs an in-app
+  purchase library (a new dependency, testable only in development builds), and a service such
+  as RevenueCat would change the App Store privacy label and the privacy policy. A
+  subscription's monthly income matches Open-Meteo's monthly cost; a one-off price does not.
+  Ask Open-Meteo and Windy before choosing.
+
 ## Feedback
 
 Feedback is email the user sends from their own Mail app (`expo-mail-composer`); Snowpace never
@@ -589,9 +615,43 @@ screenshots, which go stale. Phase 3: a "What's new" page, and a check that flag
 whose source files changed without the page changing. Not yet built: links from the app at the
 moment of confusion (an empty webcam spot, the "Not right?" sheet, "No forecast").
 
-## Conventions
+## Working on Snowpace
 
-- Ask before adding a dependency.
-- Small commits, plain-English messages.
-- I am learning mobile development — when you make a non-obvious
-  architectural choice, explain why in one or two sentences.
+The owner's working agreements, for any session, on the owner's PC or in the cloud.
+
+- **Summarize, then ask before committing.** After making changes, say what changed and ask
+  whether to commit; never commit or push unprompted. The usual answer is "commit it and push".
+- **"Discuss first", "Don't make changes yet" or "Share your design"** means propose and wait.
+- **Ask before adding a dependency,** development-only ones included (`marked` was approved).
+- **Small commits, plain-English messages.**
+- **The owner is learning mobile development:** when you make a non-obvious architectural
+  choice, explain why in a sentence or two.
+
+**Checking a change.**
+
+- `npm run check` type-checks the app (`tsc --noEmit -p .`) and runs `scripts/check.mts`:
+  made-up weather put through the real scoring code, asserting the behaviour decided above
+  (crust and slush, bare ground, deep snow, the "Why?" rows, the "Not right?" email). Run it
+  after any change to scoring, tuning, the "Why?" rows or feedback; add a check when you fix a
+  bug it would have caught, or when a decision changes what the app should do.
+- `npm run build-guide` and `npm run build-site-demo` build the website's generated parts; both
+  stop on a problem. `scripts/app-loader.mts` is what lets Node run the app's TypeScript for
+  all three scripts: only modules that import nothing from React Native or Expo can be loaded.
+- **Never run `npm run lint` (`expo lint`).** The project has no ESLint, and that command
+  silently installs it, rewrites `package-lock.json` and adds `eslint.config.js`. It happened
+  in Oct 2026 and was undone with `git checkout -- package.json package-lock.json`, deleting
+  the config, and `npm ci`.
+- App screens can only be seen in Expo Go on the owner's phone, or in a TestFlight build. Say
+  so, rather than claiming a screen was checked.
+
+**Building and releasing.** The owner runs these.
+
+- TestFlight: `eas build --platform ios --profile production --auto-submit`. On the owner's
+  Windows PC it is `eas.cmd …`, because PowerShell's execution policy blocks `eas.ps1`; never
+  change the execution policy.
+- EAS environment variables are set by the owner. Never run `eas env:pull` without `--path`:
+  by default it writes `.env.local`, which holds the Windy key.
+- The Windy key lives only in `.env.local` on the owner's PC and in EAS. Never print it, paste
+  it anywhere or commit it; before committing, check the staged diff for it, and for the
+  owner's name or personal email address, which appear nowhere public. A session without the
+  key has no webcams, which is fine.
