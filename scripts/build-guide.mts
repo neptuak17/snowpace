@@ -21,33 +21,15 @@
  *
  * Needs Node 22.6+ (runs TypeScript directly) and the `marked` package.
  */
-import { register } from 'node:module';
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { join } from 'node:path';
 import { marked } from 'marked';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+// Lets Node load the app's TypeScript; see app-loader.mts.
+import { ROOT } from './app-loader.mts';
 const SRC = join(ROOT, 'guide');
 const OUT = join(ROOT, 'site', 'guide');
 
-// The app imports '@/lib/scoring' with no file extension, which Metro
-// understands and Node does not. This hook resolves those imports the way
-// Metro does, as scripts/build-site-demo.mts does.
-const HOOK = `
-import { statSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-let src;
-export function initialize(data) { src = data.src; }
-const isFile = (u) => { try { return statSync(fileURLToPath(u)).isFile(); } catch { return false; } };
-export async function resolve(spec, ctx, next) {
-  const local = spec.startsWith('@/') ? new URL(spec.slice(2), src).href
-    : spec.startsWith('.') && ctx.parentURL?.startsWith(src) ? new URL(spec, ctx.parentURL).href : null;
-  const found = local && ['', '.ts', '/index.ts'].map((ext) => local + ext).find(isFile);
-  const r = await next(found || spec, ctx);
-  return r.url.startsWith(src) && r.url.endsWith('.ts') ? { ...r, format: 'module-typescript' } : r;
-}`;
-register('data:text/javascript,' + encodeURIComponent(HOOK), { data: { src: pathToFileURL(join(ROOT, 'src')).href + '/' } });
 
 const { strings } = await import('../src/strings.ts');
 const { TUNING } = await import('../src/lib/tuning.ts');

@@ -14,32 +14,13 @@
  *
  * Needs Node 22.6+ (runs TypeScript directly). No dependencies.
  */
-import { register } from 'node:module';
 import { writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { join } from 'node:path';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+// Lets Node load the app's TypeScript; see app-loader.mts.
+import { ROOT } from './app-loader.mts';
 const OUT = join(ROOT, 'site', 'demo-data.js');
 
-// The app imports '@/lib/scoring' with no file extension, which Metro
-// understands and Node does not. This hook resolves those imports the way
-// Metro does ('@/' is src/, and a path without an extension gains .ts), and
-// tells Node the app's files are TypeScript modules.
-const HOOK = `
-import { statSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-let src;
-export function initialize(data) { src = data.src; }
-const isFile = (u) => { try { return statSync(fileURLToPath(u)).isFile(); } catch { return false; } };
-export async function resolve(spec, ctx, next) {
-  const local = spec.startsWith('@/') ? new URL(spec.slice(2), src).href
-    : spec.startsWith('.') && ctx.parentURL?.startsWith(src) ? new URL(spec, ctx.parentURL).href : null;
-  const found = local && ['', '.ts', '/index.ts'].map((ext) => local + ext).find(isFile);
-  const r = await next(found || spec, ctx);
-  return r.url.startsWith(src) && r.url.endsWith('.ts') ? { ...r, format: 'module-typescript' } : r;
-}`;
-register('data:text/javascript,' + encodeURIComponent(HOOK), { data: { src: pathToFileURL(join(ROOT, 'src')).href + '/' } });
 
 const { band, dayFacts, DEFAULT_PREFS, hourGrid, hourLine, isBare, score, verdict, windowLabel } = await import('../src/lib/scoring.ts');
 const { ACTS, localDate, placeFromArea } = await import('../src/data/places.ts');

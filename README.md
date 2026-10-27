@@ -59,8 +59,9 @@ npm install
 npx expo start
 ```
 
-Then open it in Expo Go on a phone. `npm run build-seed` regenerates the bundled
-ski-area seed from the live OpenSkiData file.
+Then open it in Expo Go on a phone. `npm run check` type-checks the app and runs the
+scoring and feedback checks in `scripts/check.mts`. `npm run build-seed` regenerates the
+bundled ski-area seed from the live OpenSkiData file.
 
 Webcams need a Windy API key (free, from [api.windy.com/keys](https://api.windy.com/keys)).
 Copy `.env.example` to `.env.local` and put the key there; it is git-ignored, and
