@@ -17,7 +17,8 @@ on:
       - 'guide/**'
       - 'src/**'
       - 'app.json'
-      - 'scripts/build-guide.mts'
+      # The guide build and everything it uses (app-loader.mts lets Node run the app's code).
+      - 'scripts/**'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/pages.yml'
