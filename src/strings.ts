@@ -58,7 +58,7 @@ export const strings = {
       `${verdict} Try one of the places below or switch activity to one offered there.`,
     whereCanIGo: 'Where can I go?',
     bestLabel: (range: string) => `Best ${range}`,
-    // Moves up under the answer when the home hill is Poor or worse and somewhere nearby beats it.
+    // Replaces "Other options nearby" when the home hill is Poor or worse and somewhere nearby beats it.
     betterToday: 'Better today',
     otherNearby: 'Other options nearby',
     seeAll: 'See all',

@@ -9,12 +9,11 @@ description: A tour of the Today tab, from the answer at the top to the places n
 1. **The place**, with its region, its base and summit elevations, and how far away it is.
 2. **Activity chips**, one for each activity the place offers, each with today's score. Tap one to switch; the whole app follows.
 3. **The answer:** the dial and band word, the best hours, the day in three numbers (temperature, wind and new snow), and [the sentence](/guide/the-verdict/) that names what's holding the day back. At its foot, how old the forecast is, and **{{ui.verdictFeedback.title}}** for [telling me it's wrong](/guide/not-right/).
-4. **{{ui.today.betterToday}}**, straight under the answer, when your home hill is Poor or worse and somewhere you've saved within {{derived.nearbyKm}} km scores higher.
-5. **The hour strip:** today, hour by hour. See [Best hours](/guide/best-hours/).
-6. **A webcam,** if the place has one. See [Webcams](/guide/webcams/).
-7. **{{ui.why.show}}:** the detail behind the score. See [The Why? detail](/guide/why/).
-8. **The place's web site,** when the listing has one: the authority on whether it's open and groomed.
-9. **{{ui.today.otherNearby}}:** your two best-scoring other places within {{derived.nearbyKm}} km. **{{ui.today.seeAll}}** opens **{{ui.tabs.places}}**.
+4. **The hour strip:** today, hour by hour. See [Best hours](/guide/best-hours/).
+5. **A webcam,** if the place has one. See [Webcams](/guide/webcams/).
+6. **{{ui.why.show}}:** the detail behind the score. See [The Why? detail](/guide/why/).
+7. **The place's web site,** when the listing has one: the authority on whether it's open and groomed.
+8. **{{ui.today.otherNearby}}:** your two best-scoring other places within {{derived.nearbyKm}} km. When your home hill is Poor or worse and some of them score higher, the heading reads **{{ui.today.betterToday}}** and lists only those. **{{ui.today.seeAll}}** opens **{{ui.tabs.places}}**.
 
 ## Changing your home hill
 

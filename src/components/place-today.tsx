@@ -1,5 +1,4 @@
 import { useRouter } from 'expo-router';
-import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { ActivityChips } from './activity-chips';
@@ -21,8 +20,6 @@ import { gutter } from '@/theme/tokens';
 
 type Props = {
   place: Place;
-  /** Shown straight under the answer — Today's "Better today" on a poor day. */
-  afterAnswer?: ReactNode;
 };
 
 /**
@@ -34,7 +31,7 @@ type Props = {
  * here, a card says so. On bare ground the hour strip is left out (every hour
  * would score 0), but the day's conditions and the detail stay.
  */
-export function PlaceToday({ place, afterAnswer }: Props) {
+export function PlaceToday({ place }: Props) {
   const s = useAppState();
   const router = useRouter();
   const act = s.activity;
@@ -94,8 +91,6 @@ export function PlaceToday({ place, afterAnswer }: Props) {
               />
             </Card>
           </View>
-
-          {afterAnswer}
 
           {grid && (
             <View style={styles.pad18}>
