@@ -2,7 +2,7 @@
  * App-wide state, held in React context.
  *
  * Three kinds of state live here:
- *  - settings (activity, prefs, units, theme, distance limit, webcams) — persisted as
+ *  - settings (activity, prefs, units, theme, webcams) — persisted as
  *    one JSON blob, loaded before first render, written back on change;
  *  - favourites and the home hill — rows in SQLite, keyed on the inventory
  *    key, reloaded after every write;
@@ -25,7 +25,6 @@ import { setSetting } from '@/db/settings';
 import type { Units } from '@/lib/format';
 import type { LatLon } from '@/lib/geo';
 import { DEFAULT_PREFS, knownActivity, mergePrefs, type Prefs, type PrefsByAct } from '@/lib/scoring';
-import { TUNING } from '@/lib/tuning';
 import type { Scheme } from '@/theme/tokens';
 
 export type SelCell = { loc: string; day: number };
@@ -36,7 +35,6 @@ type State = {
   prefs: PrefsByAct;
   units: Units;
   theme: Scheme;
-  maxDistanceKm: number;
   /** Last known phone position; persisted so distances render on the next launch too. */
   location: LatLon | null;
   /** Show a webcam for the place on screen (and so ask windy.com for one). */
@@ -56,7 +54,6 @@ type Actions = {
   resetPrefs: () => void;
   setUnits: (u: Units) => void;
   setTheme: (t: Scheme) => void;
-  setMaxDistance: (km: number) => void;
   setWebcams: (on: boolean) => void;
   setSelHour: (h: number) => void;
   setSelCell: (c: SelCell) => void;
@@ -79,9 +76,9 @@ type Derived = {
 const Ctx = createContext<(State & Actions & Derived) | null>(null);
 
 /** The slice of state that survives a relaunch. Stored as one JSON blob. */
-export type PersistedState = Pick<State, 'activity' | 'myActs' | 'prefs' | 'units' | 'theme' | 'maxDistanceKm' | 'location' | 'webcams'>;
+export type PersistedState = Pick<State, 'activity' | 'myActs' | 'prefs' | 'units' | 'theme' | 'location' | 'webcams'>;
 export const PERSIST_KEY = 'state';
-const PERSISTED: (keyof PersistedState)[] = ['activity', 'myActs', 'prefs', 'units', 'theme', 'maxDistanceKm', 'location', 'webcams'];
+const PERSISTED: (keyof PersistedState)[] = ['activity', 'myActs', 'prefs', 'units', 'theme', 'location', 'webcams'];
 
 type ProviderProps = {
   children: ReactNode;
@@ -102,7 +99,6 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
     return {
       units: 'metric',
       theme: system === 'dark' ? 'dark' : 'light',
-      maxDistanceKm: TUNING.distance.defaultKm,
       location: null,
       selHour: Math.max(7, Math.min(17, new Date().getHours())),
       selCell: null,
@@ -214,10 +210,9 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
         patch((s) => ({
           prefs: { ...s.prefs, [s.activity]: { ...s.prefs[s.activity], [key]: v } },
         })),
-      resetPrefs: () => patch({ prefs: DEFAULT_PREFS, maxDistanceKm: TUNING.distance.defaultKm }),
+      resetPrefs: () => patch({ prefs: DEFAULT_PREFS }),
       setUnits: (units) => patch({ units }),
       setTheme: (theme) => patch({ theme }),
-      setMaxDistance: (maxDistanceKm) => patch({ maxDistanceKm }),
       setWebcams: (webcams) => patch({ webcams }),
       setSelHour: (selHour) => patch({ selHour }),
       setSelCell: (selCell) => patch({ selCell }),

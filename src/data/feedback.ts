@@ -30,7 +30,7 @@ export async function canSendMail(): Promise<boolean> {
   }
 }
 
-type SettingsSlice = Pick<Diagnostics, 'myActs' | 'activity' | 'units' | 'maxDistanceKm' | 'prefs' | 'locationGranted'> & { webcamsOn: boolean };
+type SettingsSlice = Pick<Diagnostics, 'myActs' | 'activity' | 'units' | 'prefs' | 'locationGranted'> & { webcamsOn: boolean };
 
 export async function sendFeedback(
   input: Omit<FeedbackInput, 'diagnostics' | 'forecasts'>,
@@ -50,7 +50,7 @@ export async function sendFeedback(
     forecasts: input.place ? (forecasts.get(input.place.key) ?? []) : [],
     diagnostics: {
       myActs: settings.myActs, activity: settings.activity, units: settings.units,
-      maxDistanceKm: settings.maxDistanceKm, prefs: settings.prefs, locationGranted: settings.locationGranted,
+      prefs: settings.prefs, locationGranted: settings.locationGranted,
       appVersion: Constants.expoConfig?.version ?? null,
       device: Device.modelName,
       osVersion: Device.osVersion,
@@ -67,7 +67,8 @@ export async function sendFeedback(
   const attachments: string[] = [];
   if (mail.attachment) {
     const file = new File(Paths.cache, mail.attachment.name);
-    file.write(mail.attachment.json);
+    // Asynchronous since SDK 58: wait, so the file exists before Mail opens it.
+    await file.write(mail.attachment.json);
     attachments.push(file.uri);
   }
 

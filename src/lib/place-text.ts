@@ -3,7 +3,7 @@ import type { Place } from '@/data/places';
 import { fmtDistance, type Units } from '@/lib/format';
 import { strings } from '@/strings';
 
-/** Without a location the distance limit cannot apply, so nothing is excluded. */
+/** Within Today's nearby range (TUNING.nearby). Without a location it cannot apply, so nothing is excluded. */
 export function withinLimit(p: Place, maxKm: number): boolean {
   return p.distanceKm === null || p.distanceKm <= maxKm;
 }

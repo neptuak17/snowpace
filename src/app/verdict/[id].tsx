@@ -82,7 +82,7 @@ export default function VerdictFeedbackScreen() {
     try {
       const outcome = await sendFeedback(
         { kind: 'score', place, includeDiagnostics, verdict: { di, act, issues: offered.filter((k) => issues.includes(k)) } },
-        { myActs: s.myActs, activity: s.activity, units: s.units, maxDistanceKm: s.maxDistanceKm, prefs: s.prefs, locationGranted: s.location !== null, webcamsOn: s.webcams },
+        { myActs: s.myActs, activity: s.activity, units: s.units, prefs: s.prefs, locationGranted: s.location !== null, webcamsOn: s.webcams },
       );
       if (outcome === 'sent') { setNotice(f.thanks); setTimeout(() => router.back(), 900); }
       else if (outcome === 'saved') setNotice(f.saved);

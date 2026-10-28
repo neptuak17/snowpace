@@ -1,6 +1,6 @@
 ---
 title: The You tab
-description: Your activities, what a good day feels like, how far you'll go, webcams and display.
+description: Your activities, what a good day feels like, webcams and display.
 ---
 ## {{ui.you.activitiesKicker}}
 
@@ -16,10 +16,6 @@ Pick an activity with the chips, then set:
 - **Snow falling:** **{{ui.fall.labelOut}}** for downhill and snowshoeing, **{{ui.fall.labelTolerance}}** for classic and skate.
 
 [Your settings](/guide/your-settings/) explains how each one changes a score, and lists the values Snowpace starts with.
-
-## {{ui.you.gettingThere}}
-
-**{{ui.you.maxDistance}}.** {{ui.you.maxDistanceHint}} It goes from {{derived.distance.minKm}} to {{derived.distance.maxKm}} km, starting at {{derived.distance.defaultKm}} km. It only decides which places **{{ui.tabs.today}}** suggests; **{{ui.tabs.places}}** and **{{ui.tabs.forecast}}** show every saved place.
 
 ## {{ui.you.webcamsKicker}}
 

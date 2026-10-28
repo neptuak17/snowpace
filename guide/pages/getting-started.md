@@ -12,7 +12,7 @@ On the **{{ui.tabs.you}}** tab, under **{{ui.you.activitiesKicker}}**, switch on
 
 ## 2. Say what a good day feels like
 
-Still on **{{ui.tabs.you}}**, pick an activity and set your **{{ui.you.idealTemp}}**, your **{{ui.you.windLimit}}**, how much new snow you want, and how you feel about snow falling while you're out. Each activity has its own settings, and Snowpace starts you with sensible ones. Then set **{{ui.you.maxDistance}}**. [Your settings](/guide/your-settings/) explains what each one does.
+Still on **{{ui.tabs.you}}**, pick an activity and set your **{{ui.you.idealTemp}}**, your **{{ui.you.windLimit}}**, how much new snow you want, and how you feel about snow falling while you're out. Each activity has its own settings, and Snowpace starts you with sensible ones. [Your settings](/guide/your-settings/) explains what each one does.
 
 ## 3. Add your places
 

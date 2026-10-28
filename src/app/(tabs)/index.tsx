@@ -56,7 +56,7 @@ function HomeToday({ home }: { home: Place }) {
   const alternatives = s.places
     .filter((l) => l.listed && l.key !== home.key)
     .map((l) => ({ l, sc: score(l, 0, act, s.prefs) }))
-    .filter((o): o is { l: Place; sc: number } => o.sc !== null && withinLimit(o.l, s.maxDistanceKm))
+    .filter((o): o is { l: Place; sc: number } => o.sc !== null && withinLimit(o.l, TUNING.nearby.km))
     .sort((a, b) => b.sc - a.sc)
     .slice(0, 2);
   // On a Poor or worse day the useful answer is somewhere else, so places
@@ -112,7 +112,7 @@ function HomeToday({ home }: { home: Place }) {
           {rows(alternatives)}
           {alternatives.length === 0 && (
             <AppText size={12.5} muted>
-              {strings.today.noAlternatives(actLabel(act), fmtDistance(s.maxDistanceKm, s.units))}
+              {strings.today.noAlternatives(actLabel(act), fmtDistance(TUNING.nearby.km, s.units))}
             </AppText>
           )}
         </View>

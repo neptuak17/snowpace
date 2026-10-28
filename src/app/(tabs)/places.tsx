@@ -26,7 +26,7 @@ export default function PlacesScreen() {
 
   // Every saved place appears here whatever its distance — you may have added
   // somewhere you plan to visit. Only the activity splits the list, and the
-  // distance limit belongs to the screens that rank places for today.
+  // nearby range (TUNING.nearby) belongs to Today's suggestions.
   const listed = s.places.filter((l) => l.listed);
   const ranked = listed
     .filter((l) => l.acts.includes(act))

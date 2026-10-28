@@ -10,9 +10,8 @@ import { Segmented } from '@/components/ui/segmented';
 import { ToggleSwitch } from '@/components/ui/toggle-switch';
 import { ACT_NOTES, ACTS } from '@/data/places';
 import { WINDY_API_KEY } from '@/data/project';
-import { fmtDistance, fmtS, fmtT, fmtW } from '@/lib/format';
+import { fmtS, fmtT, fmtW } from '@/lib/format';
 import { actLabel, fallCopy, fallLabel, snowHint, snowLabel } from '@/lib/scoring';
-import { TUNING } from '@/lib/tuning';
 import { useAppState } from '@/state/app-state';
 import { gutter } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
@@ -86,15 +85,6 @@ export default function YouScreen() {
         <PrefSlider
           label={fallLabel(act)} value={y.percent(p.precipTol)} raw={p.precipTol} min={0} max={100} step={5}
           hint={fallCopy(act, p.precipTol)} onChange={(v) => s.setPref('precipTol', v)}
-        />
-      </Card>
-
-      <Card style={styles.gap15}>
-        <Kicker>{y.gettingThere}</Kicker>
-        <PrefSlider
-          label={y.maxDistance} value={fmtDistance(s.maxDistanceKm, s.units)} raw={s.maxDistanceKm}
-          min={TUNING.distance.minKm} max={TUNING.distance.maxKm} step={TUNING.distance.stepKm}
-          hint={y.maxDistanceHint} onChange={s.setMaxDistance}
         />
       </Card>
 

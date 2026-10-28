@@ -24,10 +24,10 @@ A light breeze costs nothing. As the wind picks up towards your limit the wind f
 - **Downhill and snowshoeing** (**{{ui.fall.labelOut}}**): snow coming down while you're out is a bonus. Your setting decides how much counts as too much.
 - **Classic and skate** (**{{ui.fall.labelTolerance}}**): snow filling the track is slow going. The higher your tolerance, the less it bothers the score.
 
-## {{ui.you.maxDistance}}
+## Places nearby
 
-This only decides which places **{{ui.tabs.today}}** suggests: your home hill is always shown, and other places only if they're within this straight-line distance. **{{ui.tabs.places}}** and **{{ui.tabs.forecast}}** show every saved place.
+There's no distance setting. **{{ui.tabs.today}}** only suggests other places within {{derived.nearbyKm}} km of you, in a straight line, so a resort you've saved for a trip isn't offered as somewhere to go today. **{{ui.tabs.places}}** and **{{ui.tabs.forecast}}** show every saved place, however far away, so you can follow how conditions are building before a trip.
 
 ## Starting again
 
-**{{ui.you.reset}}**, at the bottom of the **{{ui.tabs.you}}** tab, puts every activity's settings back to the values above and the distance back to {{derived.distance.defaultKm}} km. Your places are kept.
+**{{ui.you.reset}}**, at the bottom of the **{{ui.tabs.you}}** tab, puts every activity's settings back to the values above. Your places are kept.

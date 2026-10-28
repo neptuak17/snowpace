@@ -22,7 +22,7 @@ Tap **{{ui.search.setHome}}** beside the place you go to most. It gets a HOME ta
 
 - **{{ui.tabs.places}}:** every saved place, however far away.
 - **{{ui.tabs.forecast}}:** every saved place that offers the activity.
-- **{{ui.tabs.today}}:** your home hill, plus up to two other places within your distance limit (**{{ui.you.maxDistance}}** on the **{{ui.tabs.you}}** tab). A place you saved for a trip won't be suggested while you're at home.
+- **{{ui.tabs.today}}:** your home hill, plus up to two other places within {{derived.nearbyKm}} km of you. A place you saved for a trip won't be suggested while you're at home, but it's always here and in **{{ui.tabs.forecast}}**.
 
 A place that doesn't offer the activity you're looking at is left out of **{{ui.tabs.today}}** and the grid; switch activity to see it.
 

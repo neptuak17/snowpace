@@ -265,6 +265,10 @@ export const TUNING = {
   // ── A forecast older than this (minutes) is shown in gold as a nudge to refresh.
   staleForecastMin: 360,
 
-  // ── "How far will you go" — straight-line km from the phone.
-  distance: { defaultKm: 150, minKm: 20, maxKm: 400, stepKm: 10 },
+  // ── How far Today looks for other places to suggest ("Better today",
+  // "Other options nearby"), in straight-line km from the phone. Built in,
+  // not a setting (owner's call, Oct 2026): its only job is to keep trip
+  // destinations out of "where should I go today"; My places and Forecast
+  // show every saved place, however far.
+  nearby: { km: 150 },
 } as const;

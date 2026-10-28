@@ -70,7 +70,7 @@ const facts = {
     bands: { excellent: T.bands.hi, good: T.bands.go, fair: T.bands.fair, poor: T.bands.poor },
     staleForecastHours: T.staleForecastMin / 60,
     hourStrip: { from: clock(T.hourly.hours[0]), to: clock(T.hourly.hours[T.hourly.hours.length - 1] + 1) },
-    distance: T.distance,
+    nearbyKm: T.nearby.km,
     webcamRadiusNordicKm: T.webcam.radiusKm.nordic, webcamRadiusDownhillKm: T.webcam.radiusKm.downhill,
     gridDays: FORECAST_DAYS,
   },

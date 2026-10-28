@@ -47,7 +47,6 @@ export type Diagnostics = {
   myActs: ActivityKey[];
   activity: ActivityKey;
   units: Units;
-  maxDistanceKm: number;
   prefs: PrefsByAct;
   locationGranted: boolean;
   inventory: { count: number; source: string | null; fetchedAt: string | null; lastError: string | null };
@@ -168,7 +167,7 @@ function diagnosticsBlock({ place, diagnostics: d }: FeedbackInput): string[] {
     [`Snowpace ${d.appVersion ?? '?'}`, d.device ?? 'unknown device', d.osVersion ? `iOS ${d.osVersion}` : null].filter(Boolean).join(' · '),
     `Sent ${stamp(d.now)}`,
     `Activities: ${d.myActs.join(', ')} (viewing ${d.activity})`,
-    `Units: ${d.units} · distance limit ${d.maxDistanceKm} km`,
+    `Units: ${d.units}`,
     `Location: ${d.locationGranted ? 'granted' : 'not granted'} (never included)`,
     '',
     `Inventory: ${d.inventory.source ?? 'none'}${d.inventory.fetchedAt ? ` ${d.inventory.fetchedAt.slice(0, 10)}` : ''} (${d.inventory.count} areas) · last error: ${d.inventory.lastError ?? 'none'}`,

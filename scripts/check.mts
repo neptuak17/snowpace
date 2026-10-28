@@ -23,6 +23,8 @@ const { breakdown, DEFAULT_PREFS, freezeThaw, rainPrior, score, shownAnswer, sub
 const { localDate, placeFromArea } = await import('../src/data/places.ts');
 const { buildFeedbackMail, verdictIssuesFor } = await import('../src/lib/diagnostics.ts');
 const { strings } = await import('../src/strings.ts');
+const { withinLimit } = await import('../src/lib/place-text.ts');
+const { TUNING } = await import('../src/lib/tuning.ts');
 
 type Place = ReturnType<typeof placeFromArea>;
 type Act = 'downhill' | 'classic' | 'skate' | 'snowshoe';
@@ -135,6 +137,14 @@ const checks: [string, () => void][] = [
     }
   }],
 
+  // Today's suggestions (CLAUDE.md: Distance, not drive time)
+  ['Today only suggests places within the built-in nearby range; without a location, any', () => {
+    const at = (km: number | null) => ({ ...place(snowy(-10, -4)), distanceKm: km });
+    assert.equal(withinLimit(at(TUNING.nearby.km - 1), TUNING.nearby.km), true);
+    assert.equal(withinLimit(at(TUNING.nearby.km + 1), TUNING.nearby.km), false, 'a trip destination is not suggested');
+    assert.equal(withinLimit(at(null), TUNING.nearby.km), true);
+  }],
+
   // "Not right?" and its email (CLAUDE.md: Feedback)
   ['Not right? offers "There\'s snow here" only on bare or thin days, and no "too high" at 0', () => {
     const onBare = verdictIssuesFor(place(bare(-2, 6)), 0, 'downhill', P, 'metric');
@@ -165,7 +175,7 @@ const checks: [string, () => void][] = [
 function diagnostics() {
   return {
     appVersion: '1.0.0', device: 'iPhone', osVersion: '26.0', now: new Date(), myActs: ACTS, activity: 'downhill' as const,
-    units: 'metric' as const, maxDistanceKm: 150, prefs: P, locationGranted: true,
+    units: 'metric' as const, prefs: P, locationGranted: true,
     inventory: { count: 1341, source: 'seed', fetchedAt: null, lastError: null },
     forecast: { lastAttemptAt: null, lastError: null, lastFailure: null },
     webcams: { on: true, lastError: null }, launch: null,

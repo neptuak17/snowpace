@@ -14,4 +14,4 @@ Snowpace only reads your location while it's open, deliberately approximately, a
 
 - **They're straight lines,** not driving distances. A place across a mountain range can be much further by road.
 - **They're from where you were when the app opened.** If a fresh fix takes more than {{policy.locationWaitS}} seconds, Snowpace uses the last position your phone knows, which can be from somewhere else. Reopen the app to update it.
-- **Places "near you" on Today** are those within **{{ui.you.maxDistance}}** on the **{{ui.tabs.you}}** tab.
+- **Places Today suggests** are those within {{derived.nearbyKm}} km of where you are, in a straight line.

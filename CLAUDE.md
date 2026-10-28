@@ -152,8 +152,13 @@ public repo, so attribution is required in the app and the seed carries its ODbL
 #### Distance, not drive time
 
 There is no routing service, so the app shows **straight-line distance from the phone's location**
-("~45 km away") and the "how far will you go" preference is a distance limit in km. Drive times are
-never estimated.
+("~45 km away"). Drive times are never estimated.
+
+There is **no distance setting** (removed Oct 2026, owner's call): places are fixed and known to
+the user, who may well be following a resort for a trip. Distance only decides which other places
+Today suggests ("Better today", "Other options nearby"): those within a built-in straight-line
+range, `TUNING.nearby.km` (150), so a trip destination is never offered as somewhere to go today.
+My places and Forecast show every saved place, however far.
 
 #### Report age
 
