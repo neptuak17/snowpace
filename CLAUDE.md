@@ -611,14 +611,13 @@ and links to the troubleshooter and the guide. Links open in the in-app browser 
 `guideUrl()`, so the build can check them. The website's header and footer link to the guide,
 and the home page's "How it decides" links to how scores work.
 
-**Phases (owner's decisions, Oct 2026).** Phase 1, built: the structure and build, search, the
+**Complete (owner's call, Oct 2026).** Built: the structure and build, search, the
 troubleshooter, the privacy and data pages, the support page as front door, and links from Help
-and Feedback. Phase 2: a score explorer running the app's own scoring in the browser (the
-scoring modules import nothing from React Native, so the TypeScript compiler can convert them),
-and live illustrations of the app's screens drawn from the engine and `strings.ts` instead of
-screenshots, which go stale. Phase 3: a "What's new" page, and a check that flags a guide page
-whose source files changed without the page changing. Not yet built: links from the app at the
-moment of confusion (an empty webcam spot, the "Not right?" sheet, "No forecast").
+and Feedback. Two later phases were planned and dropped: a score explorer and live screen
+illustrations (the home page's demo card, built from the engine's own output, covers what the
+explorer was for), and a "What's new" page with a check for guide pages left stale by a code
+change. Not built: links from the app at the moment of confusion (an empty webcam spot, the
+"Not right?" sheet, "No forecast").
 
 ## Working on Snowpace
 
