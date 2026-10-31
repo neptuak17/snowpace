@@ -472,11 +472,9 @@ The about/credits screen must include:
   - "Snow falling" is measured over 24 hours; look at it again in the winter retune.
   - The website's link-preview image is the square app icon; a wider one would show better
     when the link is shared.
-  - The App Store shows an individual developer's legal name as the seller, which sits
-    awkwardly with keeping the name off the website. A business developer account (which
-    needs a D-U-N-S number) shows a company name instead.
 
-* **Monetising: discussed Oct 2026, not decided.** The simplest route is a one-off App Store
+* **Monetising: discussed Oct 2026, not decided.** Snowpace launches free (owner's call, Oct
+  2026), so this waits until after launch. The simplest route is a one-off App Store
   price: no code, and Apple keeps 15% under its Small Business Program. But any income at all
   ends Open-Meteo's free tier (a paid plan and `customer-api.open-meteo.com`, a monthly cost
   that grows with use), and Windy's free tier requires webcams not to sit behind a payment.
@@ -623,6 +621,34 @@ illustrations (the home page's demo card, built from the engine's own output, co
 explorer was for), and a "What's new" page with a check for guide pages left stale by a code
 change. Not built: links from the app at the moment of confusion (an empty webcam spot, the
 "Not right?" sheet, "No forecast").
+
+## App Store launch
+
+Planned for early 2027, free, with TestFlight testing until then. The listing's words and
+answers are drafted in `docs/app-store-listing.md`, for the owner to edit and paste into App
+Store Connect. Decided Oct 2026 (owner's calls):
+
+* **Individual developer account.** The App Store shows the developer's legal name as the
+  seller; a business account (a legal entity and a D-U-N-S number) was not worth it for a free
+  app. An app can be moved to a business account later.
+* **Canada and the United States only**, the only places the app knows ski areas. Staying out
+  of the EU also avoids its trader-status declaration.
+* **App Privacy label: "Data Not Collected."** Location never leaves the phone; feedback is
+  optional email the user sends themself, which Apple lets an app leave off the label. If the
+  app ever sends anything itself, the label must change along with the privacy policy.
+* **Categories:** Weather, then Sports. Age rating 4+. Manual release after approval.
+* **Screenshots:** plain, no frames or captions, taken on the owner's iPhone 17 Pro
+  (1206 × 2622) once there is real snow and scaled to the 6.9-inch size (1320 × 2868), which
+  has the same shape. Check Apple's current sizes before uploading.
+* **The winter retune is not a launch blocker**, but check the scores against a few real
+  December days before submitting.
+
+Before launch: email Windy (free-tier use, how "never stretch" counts pixels); a courtesy note
+to OpenSkiData's maintainer about the coming traffic; a TestFlight pass (fresh install, offline,
+location refused, largest text, VoiceOver, dark mode); drop "Source on GitHub" from Credits and
+the site footers if the repository is going private. Once live: Apple's badge and an App Store
+link in place of "Coming soon" on all four page shells, a Smart App Banner meta tag, and the
+README.
 
 ## Working on Snowpace
 
