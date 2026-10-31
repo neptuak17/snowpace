@@ -16,9 +16,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { parseSkiAreas } from '../src/data/openskidata.ts';
+import { SITE_URL } from '../src/data/project.ts';
 
 const SOURCE = 'https://tiles.openskimap.org/geojson/ski_areas.geojson';
-const USER_AGENT = 'Snowpace/1.0 (+https://github.com/cliffsmith/snowpace; seed build)';
+const USER_AGENT = `Snowpace/1.0 (+${SITE_URL}; seed build)`;
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'data', 'seed', 'ski-areas.json');
 
 async function load(): Promise<{ text: string; lastModified: string | null; etag: string | null }> {

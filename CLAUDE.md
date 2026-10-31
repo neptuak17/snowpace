@@ -77,8 +77,10 @@ conservative:
 - **On failure, keep the existing data and do not retry for 24 hours.** One attempt per cycle, no
   retry loops, no exponential-backoff storms.
 - **Send a User-Agent that identifies the app** and includes a contact URL, so the maintainer can
-  reach out rather than block: `Snowpace/1.0 (+https://github.com/neptuak17/snowpace)`, defined once in
-  `src/data/project.ts` and sent by every fetcher.
+  reach out rather than block: `Snowpace/1.0 (+https://snowpace.com/)`, defined once in
+  `src/data/project.ts` and sent by every fetcher. It names the website rather than the GitHub
+  repository (changed Oct 2026, before the App Store launch), because shipped builds keep it for
+  good and the repository may go private.
 - **Request gzip** (`Accept-Encoding`) and honour HTTP caching headers. Use a conditional request
   (`If-Modified-Since` / `If-None-Match`) so an unchanged file costs a 304 rather than 4.6 MB.
 
@@ -582,7 +584,8 @@ thresholds, penalties or formulas. The score bands and the default settings are 
 shows both. The same goes for the website's home page, which lists the factors without their
 weights, and `site/demo-data.js`, which no longer carries them. The code (`TUNING` included) is
 still public on GitHub; whether to make the repository private is an open question for the owner
-(GitHub Pages on a private repository needs a paid plan, and the app's User-Agent points at it).
+(GitHub Pages on a private repository needs a paid plan, and the Credits screen's "Source"
+link and the website footers point at it; the User-Agent no longer does).
 
 **Explanations are hand-written, and kept current in the same commit.** When behaviour a user
 can see changes, update the guide pages that describe it alongside the code, as the privacy

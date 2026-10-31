@@ -1,8 +1,9 @@
 /**
  * Where Snowpace lives and how to reach its author. The User-Agent every
- * outbound request carries names the project page, so the operators of the
+ * outbound request carries names the website, so the operators of the
  * services we call can find out what Snowpace is and get in touch — their
- * first move is then an email rather than a block.
+ * first move is then an email rather than a block. It names the website, not
+ * the repository, because shipped builds keep it for good.
  */
 export const PROJECT_URL = 'https://github.com/neptuak17/snowpace';
 
@@ -35,7 +36,7 @@ export function guideUrl(page: keyof typeof GUIDE_PAGES): string {
   return slug ? `${GUIDE_URL}${slug}/` : GUIDE_URL;
 }
 
-export const USER_AGENT = `Snowpace/1.0 (+${PROJECT_URL})`;
+export const USER_AGENT = `Snowpace/1.0 (+${SITE_URL})`;
 
 /**
  * The Windy Webcams API key. It is never committed: in development it comes
