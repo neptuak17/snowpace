@@ -140,7 +140,6 @@
     if (f.personal) row.querySelector('.you').textContent = youSet;
     $('factors').append(row);
   }
-  $('snowpack').textContent = D.snowpack;
 
   // ── Score bands ───────────────────────────────────────────────────────────
   for (const b of D.bands) {

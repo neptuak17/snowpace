@@ -531,7 +531,7 @@ four sports side by side, how the score is decided, features, privacy, and a foo
   (the owner edits it directly, sometimes on github.com). Everything that describes how the app
   scores is generated into `site/demo-data.js` by `node scripts/build-site-demo.mts`: the sample
   days (made-up weather run through the real engine with `DEFAULT_PREFS`), the score bands,
-  and the factor and snowpack wording copied from `strings.help`; never the factor weights.
+  and the factor wording copied from `strings.help`; never the factor weights.
   Rerun it and commit after any change to scoring, tuning or that Help wording, so the site
   cannot contradict the app. Never hand-edit `demo-data.js`.
 * **Same principles as the app.** No analytics, no tracking, no cookies, and no third-party

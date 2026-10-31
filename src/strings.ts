@@ -157,9 +157,9 @@ export const strings = {
   },
 
   // The Help screen is a short quick start; the full guide is on the website
-  // (guide/, built into site/guide/). `bands`, `factors` and
-  // `decidesSnowpack` are not shown in the app any more: the website's home
-  // page and the guide copy them from here, so they stay the one wording.
+  // (guide/, built into site/guide/). `bands` and `factors` are not shown in
+  // the app any more: the website's home page and the guide copy them from
+  // here, so they stay the one wording.
   help: {
     title: 'Help',
     warning: "Snowpace only scores the weather. Before you go, check the location's web site for hours, grooming and lift status, and the avalanche forecast for the area.",
@@ -180,7 +180,6 @@ export const strings = {
       { id: 'fall', k: 'Snow falling', v: 'welcome for downhill or snowshoeing, slow going on skinny skis' },
       { id: 'c', k: 'Cloud cover', v: 'flat light versus a bluebird day' },
     ],
-    decidesSnowpack: 'On top of those, the modelled snowpack caps the score: on bare ground it is 0, however good the weather. The snowpack is a weather model’s estimate, not a measurement, and it does not know about snowmaking, so a hill making snow can still show as bare. For skate and classic skiing, deep new snow caps it too: a skate lane stays soft and slow until it has been packed, and classic tracks fill in until they have been reset.',
     quickKicker: 'Quick start',
     steps: [
       { t: 'Turn on your activities', d: 'On the You tab, switch on the ones you do.' },

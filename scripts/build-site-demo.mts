@@ -8,9 +8,8 @@
  * Run by hand after changing the scoring, the tuning or the Help wording it
  * copies, and commit the result. Everything on the site that describes how
  * the app scores comes from here, so the site cannot contradict the app: the
- * sample days, the score bands, and the factor and
- * snowpack wording from the Help screen. Marketing copy lives in
- * site/index.html and is edited by hand.
+ * sample days, the score bands, and the factor wording from the Help screen.
+ * Marketing copy lives in site/index.html and is edited by hand.
  *
  * Needs Node 22.6+ (runs TypeScript directly). No dependencies.
  */
@@ -154,7 +153,6 @@ const data = {
   activities: ACTS.map((a) => ({ key: a.key, label: a.label })),
   samples,
   factors: help.factors.map((f) => ({ key: f.id, name: f.k, what: capital(f.v), personal: PERSONAL.includes(f.id as FactorKey) })),
-  snowpack: help.decidesSnowpack,
   bands: help.bands.map((b) => ({ key: b.key, word: strings.bands[b.key], range: b.range, text: b.text })),
 };
 
