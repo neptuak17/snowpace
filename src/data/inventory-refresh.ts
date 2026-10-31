@@ -5,6 +5,7 @@
  * Never in the background, never mid-session. The rules (CLAUDE.md):
  *   - at most once every 30 days per device;
  *   - one attempt per 24 hours, no retries;
+ *   - the download has a time limit (POLICY.inventoryTimeoutS);
  *   - conditional request, so an unchanged file costs a 304;
  *   - on any failure keep what we have and record why.
  */
@@ -15,6 +16,7 @@ import { confirmCurrent, inventoryStatus, recordAttempt, replaceInventory } from
 
 export const REFRESH_AFTER_DAYS = POLICY.inventoryRefreshDays;
 export const RETRY_AFTER_HOURS = POLICY.inventoryRetryHours;
+const DOWNLOAD_TIMEOUT_MS = POLICY.inventoryTimeoutS * 1000;
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -60,23 +62,32 @@ async function refreshInventory(st: Status): Promise<RefreshOutcome> {
   if (st.etag) headers['If-None-Match'] = st.etag;
   else if (st.lastModified) headers['If-Modified-Since'] = st.lastModified;
 
+  // The limit covers the download, not the parse: the loading screen waits on
+  // it, and left to iOS a slow but steady download has no limit at all.
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), DOWNLOAD_TIMEOUT_MS);
   try {
-    const res = await fetch(SOURCE_URL, { headers });
+    const res = await fetch(SOURCE_URL, { headers, signal: ctrl.signal });
     if (res.status === 304) {
+      clearTimeout(timer);
       // Unchanged upstream: the data is as fresh as a download would make it.
       await confirmCurrent();
       await recordAttempt(null);
       return { kind: 'unchanged' };
     }
     if (!res.ok) return fail(`HTTP ${res.status}`);
+    let text: string | null = await res.text();
+    clearTimeout(timer);
 
     // Parse straight from the response and drop the text and the parsed
     // document as soon as the slim records exist — this is the 20 MB moment.
     let parsed;
     try {
-      parsed = parseSkiAreas(JSON.parse(await res.text()));
+      parsed = parseSkiAreas(JSON.parse(text));
     } catch (e) {
       return fail('invalid JSON: ' + message(e));
+    } finally {
+      text = null;
     }
     if (!parsed.ok) return fail(parsed.reason);
 
@@ -88,7 +99,9 @@ async function refreshInventory(st: Status): Promise<RefreshOutcome> {
     await recordAttempt(null);
     return { kind: 'replaced', count: parsed.areas.length };
   } catch (e) {
-    return fail(message(e));
+    return fail(ctrl.signal.aborted ? `timed out after ${POLICY.inventoryTimeoutS} s` : message(e));
+  } finally {
+    clearTimeout(timer);
   }
 }
 

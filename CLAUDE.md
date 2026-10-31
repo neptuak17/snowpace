@@ -76,6 +76,10 @@ conservative:
   waiting, not behind a live screen. Once loaded, the app never refreshes the inventory mid-session.
 - **On failure, keep the existing data and do not retry for 24 hours.** One attempt per cycle, no
   retry loops, no exponential-backoff storms.
+- **The download gives up after 60 s** (`POLICY.inventoryTimeoutS`) and counts as a failure. It
+  runs before the forecasts, so without a limit a slow connection held the loading screen for as
+  long as the download took. 4.6 MB takes about 40 s at 1 Mbit/s. The limit covers the download,
+  not the parse. Added Oct 2026, before the App Store launch.
 - **Send a User-Agent that identifies the app** and includes a contact URL, so the maintainer can
   reach out rather than block: `Snowpace/1.0 (+https://snowpace.com/)`, defined once in
   `src/data/project.ts` and sent by every fetcher. It names the website rather than the GitHub
@@ -466,8 +470,6 @@ The about/credits screen must include:
 * **Noticed, not acted on (Oct 2026):**
   - The Good and Fair hour-cell colours look pale in light mode.
   - "Snow falling" is measured over 24 hours; look at it again in the winter retune.
-  - The monthly ski-area download has no timeout. That was left deliberately when the launch
-    timeouts were added; revisit if a launch is ever seen stuck on "Ski area listing".
   - The website's link-preview image is the square app icon; a wider one would show better
     when the link is shared.
   - The App Store shows an individual developer's legal name as the seller, which sits

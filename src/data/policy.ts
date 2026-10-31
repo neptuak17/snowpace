@@ -17,4 +17,6 @@ export const POLICY = {
   inventoryRefreshDays: 30,
   /** After a failed listing refresh, no retry for this long. */
   inventoryRetryHours: 24,
+  /** A listing download still unfinished after this is abandoned, as a failure. About 4.6 MB, so this allows a poor cellular connection. */
+  inventoryTimeoutS: 60,
 } as const;

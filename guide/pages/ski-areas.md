@@ -12,7 +12,7 @@ The list knows two kinds of skiing: downhill and nordic. Snowpace counts nordic 
 
 ## Keeping it current
 
-A copy comes with the app, so it works on first launch and offline. After that, Snowpace downloads a fresh list at most once every {{policy.inventoryRefreshDays}} days, behind the loading screen ("{{ui.loading.steps.listing}}"). If that fails, it keeps the list it has and doesn't try again for {{policy.inventoryRetryHours}} hours. A correction made at the source reaches the app within about a month.
+A copy comes with the app, so it works on first launch and offline. After that, Snowpace downloads a fresh list at most once every {{policy.inventoryRefreshDays}} days, behind the loading screen ("{{ui.loading.steps.listing}}"). If that fails, or the download takes longer than {{policy.inventoryTimeoutS}} seconds, it keeps the list it has and doesn't try again for {{policy.inventoryRetryHours}} hours. A correction made at the source reaches the app within about a month.
 
 ## When a place is missing or wrong
 
