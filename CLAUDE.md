@@ -637,9 +637,10 @@ Store Connect. Decided Oct 2026 (owner's calls):
   optional email the user sends themself, which Apple lets an app leave off the label. If the
   app ever sends anything itself, the label must change along with the privacy policy.
 * **Categories:** Weather, then Sports. Age rating 4+. Manual release after approval.
-* **Screenshots:** plain, no frames or captions, taken on the owner's iPhone 17 Pro
-  (1206 × 2622) once there is real snow and scaled to the 6.9-inch size (1320 × 2868), which
-  has the same shape. Check Apple's current sizes before uploading.
+* **Screenshots:** plain, no frames or captions, taken on the owner's iPhone 17 Pro once there
+  is real snow and uploaded as they are: App Store Connect's "iPhone with Dynamic Island
+  (medium display)" slot takes 1206 × 2622, the 17 Pro's own size (seen there, Nov 2026), so
+  nothing needs scaling. The iPad and Apple Watch slots don't apply to an iPhone-only build.
 * **The winter retune is not a launch blocker**, but check the scores against a few real
   December days before submitting.
 

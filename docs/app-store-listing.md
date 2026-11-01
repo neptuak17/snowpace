@@ -110,10 +110,10 @@ no App Tracking Transparency prompt.
 
 ## Screenshots
 
-iPhone only (no iPad build). Apple wants the 6.9-inch size; smaller iPhones are
-scaled from it. Taken on an iPhone 17 Pro (1206 × 2622) and scaled to
-1320 × 2868: the two have the same shape, so only a pixel or two is trimmed.
-Plain screenshots, no device frames or captions, taken once there is real snow.
+iPhone only (no iPad build, no Watch app). App Store Connect's "iPhone with
+Dynamic Island (medium display)" slot takes 1206 × 2622, an iPhone 17 Pro's own
+screenshot size, so they go in unscaled. Plain screenshots, no device frames or
+captions, taken once there is real snow.
 
 Shot list (up to 10; the first three show in search results):
 
