@@ -14,7 +14,7 @@ When rain is holding the day back, **{{ui.why.show}}** lists it as "{{ui.why.row
 
 ## Rain that refroze
 
-When rain in the last three days is followed by a frost, the wet surface freezes into ice, which is worse than wet snow. **{{ui.why.show}}** says "{{ui.why.rows.rainIced}}", or "refrozen" in the line underneath, and the sentence may say "{{ui.rain.refroze}}".
+When rain in the last three days is followed by a frost, the wet surface freezes into ice, which is worse than wet snow. **{{ui.why.show}}** says "{{ui.why.rows.rainIced}}", or "refrozen" in the line underneath.
 
 ## In the hour strip
 

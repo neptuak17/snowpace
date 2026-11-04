@@ -11,7 +11,7 @@
 import type { Forecast } from '@/data/open-meteo';
 import { ACTS, dayLabel, type ActivityKey, type Place } from '@/data/places';
 import type { Units } from '@/lib/format';
-import { actLabel, band, breakdown, canScore, coverageSub, hasDepth, score, shownAnswer, subsFor, type PrefsByAct } from '@/lib/scoring';
+import { actLabel, band, breakdown, canScore, coverageSub, hasDepth, score, shownAnswer, subsFor, why, type PrefsByAct } from '@/lib/scoring';
 import { daySurfaceText } from '@/lib/surface';
 import { TUNING, type FactorKey } from '@/lib/tuning';
 import { strings } from '@/strings';
@@ -20,7 +20,7 @@ export type FeedbackKind = 'bug' | 'score' | 'idea' | 'other';
 
 export const FEEDBACK_KINDS: FeedbackKind[] = ['bug', 'score', 'idea', 'other'];
 
-/** What "Not right?" lets the user say is wrong with a verdict. */
+/** What "Not right?" lets the user say is wrong with a day's answer. */
 export type VerdictIssue = 'high' | 'low' | 'reason' | 'snow' | 'hours' | 'weather' | 'other';
 
 const VERDICT_ISSUES: VerdictIssue[] = ['high', 'low', 'reason', 'snow', 'hours', 'weather', 'other'];
@@ -97,7 +97,7 @@ export type FeedbackInput = {
   forecasts: Forecast[];
   includeDiagnostics: boolean;
   diagnostics: Diagnostics;
-  /** Set by "Not right?": the day (index into place.days) and activity whose verdict is reported, and what is off. */
+  /** Set by "Not right?": the day (index into place.days) and activity whose answer is reported, and what is off. */
   verdict?: { di: number; act: ActivityKey; issues: VerdictIssue[] } | null;
 };
 
@@ -114,8 +114,8 @@ export function buildFeedbackMail(input: FeedbackInput): FeedbackMail {
   const f = strings.feedback;
   const report = input.place && input.verdict ? verdictReport(input.place, input.verdict, input.diagnostics) : null;
   const subject = report ? report.subject : f.subject(f.kinds[input.kind], input.place?.shortName ?? null);
-  // A verdict report says what was on screen above the divider: it is what the
-  // report is about, so it stays even without diagnostics.
+  // A "Not right?" report says what was on screen above the divider: it is
+  // what the report is about, so it stays even without diagnostics.
   const lines: string[] = report
     ? [strings.verdictFeedback.bodyPrompt, '', ...report.lines, '']
     : [f.bodyPrompt(input.kind), ''];
@@ -138,20 +138,23 @@ export function buildFeedbackMail(input: FeedbackInput): FeedbackMail {
 }
 
 /**
- * A "Not right?" report: the subject, the verdict as it was shown, and the
- * detail behind it (the Why rows, with each factor's 0–100) for diagnostics.
- * Built from the same shownAnswer() the card used, so it matches the screen.
+ * A "Not right?" report: the subject, the score as it was shown with what
+ * Why? lists for it, and for diagnostics the detail behind it (every factor,
+ * with its 0–100). Built from the same shownAnswer() and why() the card
+ * used, so it matches the screen.
  */
 function verdictReport(p: Place, v: NonNullable<FeedbackInput['verdict']>, d: Diagnostics) {
   const vf = strings.verdictFeedback;
   const shown = shownAnswer(p, v.di, v.act, d.prefs, d.units);
+  const w = why(p, v.di, v.act, d.prefs, d.units);
   const date = p.days[v.di]?.date ?? null;
   const label = date ? dayLabel(date, d.now) : null;
   const day = label ? `${label.label}, ${label.date}` : strings.common.dash;
   const lines = [
     ...(v.issues.length ? [vf.issuesLine(v.issues.map((k) => vf.issues[k]))] : []),
     vf.dayLine(p.name, actLabel(v.act), day, date ?? strings.common.dash),
-    shown ? vf.verdictLine(shown.score, band(shown.score).word, shown.verdict) : strings.verdict.noForecast,
+    ...(shown ? [vf.scoreLine(shown.score, band(shown.score).word)] : [strings.verdict.noForecast]),
+    ...(w ? [vf.holdingLine([...w.caps.map((c) => c.title), ...w.holding.map((r) => vf.holdingRow(r.label, r.value))])] : []),
   ];
   const detail = shown
     ? [

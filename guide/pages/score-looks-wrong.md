@@ -2,7 +2,7 @@
 title: A score looks wrong
 description: The usual reasons a score doesn't match the day, and how to tell which one it is.
 ---
-Start with **{{ui.why.show}}** under the answer: **{{ui.why.holding}}** lists what's pulling the score down, the biggest first, and the sentence under the dial names it.
+Start with **{{ui.why.show}}** under the dial: **{{ui.why.holding}}** lists what's pulling the score down, the biggest first.
 
 ## Check these first
 
@@ -13,7 +13,7 @@ Start with **{{ui.why.show}}** under the answer: **{{ui.why.holding}}** lists wh
 
 ## There is snow, but it says bare
 
-The snowpack comes from a weather model's estimate, and the model doesn't know about snowmaking or grooming. Early and late in the season, a hill making snow can show "{{ui.verdict.bareGround}}" while its runs are open. Look at the webcam, if there is one, and the place's web site. Then tap **{{ui.verdictFeedback.title}}** and choose "{{ui.verdictFeedback.issues.snow}}": those reports are how Snowpace's snowpack readings get tuned.
+The snowpack comes from a weather model's estimate, and the model doesn't know about snowmaking or grooming. Early and late in the season, a hill making snow can show "{{ui.why.caps.bare.title}}" while its runs are open. Look at the webcam, if there is one, and the place's web site. Then tap **{{ui.verdictFeedback.title}}** and choose "{{ui.verdictFeedback.issues.snow}}": those reports are how Snowpace's snowpack readings get tuned.
 
 ## It felt better, or worse, than the score
 
@@ -25,4 +25,4 @@ The snowpack comes from a weather model's estimate, and the model doesn't know a
 
 ## Tell me
 
-If the score still looks wrong, **{{ui.verdictFeedback.title}}** under it sends me that exact day: the forecast, every factor, and what you picked as off. Scores are tuned from reports like these.
+If the score still looks wrong, **{{ui.verdictFeedback.title}}**, at the foot of the answer while **{{ui.why.show}}** is open, sends me that exact day: the forecast, every factor, and what you picked as off. Scores are tuned from reports like these.

@@ -12,8 +12,8 @@ A brief rise just above freezing melts little or nothing: on a calm, clear day t
 
 | What happened | In **{{ui.why.show}}** | What to expect |
 | --- | --- | --- |
-| A melt, then a frost | "{{ui.why.rows.crust}}" when it's holding the day back, otherwise "{{ui.why.fine.lightCrust}}" | Crust while it's cold, softening as it warms. The bigger the melt, the more it costs. The sentence may say "{{ui.weakest.crust}}". |
-| A melt, and no frost | "{{ui.why.rows.slush}}" | Slush. The sentence may say "{{ui.weakest.slush}}". |
+| A melt, then a frost | "{{ui.why.rows.crust}}" when it's holding the day back, otherwise "{{ui.why.fine.lightCrust}}" | Crust while it's cold, softening as it warms. The bigger the melt, the more it costs. |
+| A melt, and no frost | "{{ui.why.rows.slush}}" | Slush. |
 | Little or no melt | "{{ui.why.fine.noCrust}}" | No crust. |
 | No snow on the ground | Nothing: the snowpack is bare | Nothing to freeze or thaw. |
 

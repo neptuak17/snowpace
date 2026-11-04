@@ -364,7 +364,6 @@ export type ShownAnswer = {
   /** Today's hours; null on other days and on bare ground, where every hour scores 0. */
   grid: HourGrid | null;
   best: string | null;
-  verdict: string;
   facts: string;
 };
 
@@ -378,7 +377,7 @@ export function shownAnswer(l: Place, di: number, act: ActivityKey, prefs: Prefs
   if (sc === null) return null;
   const bare = isBare(l, di, act);
   const grid = di === 0 && !bare ? hourGrid(l, act, prefs) : null;
-  return { score: sc, bare, grid, best: grid ? windowLabel(grid) : null, verdict: verdict(l, di, act, prefs, units), facts: dayFacts(l, di, units) };
+  return { score: sc, bare, grid, best: grid ? windowLabel(grid) : null, facts: dayFacts(l, di, units) };
 }
 
 export type BandKey = 'hi' | 'go' | 'fair' | 'poor' | 'skip' | 'none';
@@ -390,9 +389,7 @@ export function band(s: number | null): Band {
   return { key, word: strings.bands[key] };
 }
 
-// The factors severely holding the day down. A day with several gets a
-// plural verdict rather than one named reason, and the Why? detail lists
-// exactly those.
+// The factors severely holding the day down: the Why? detail lists every one.
 function severeKeys(x: Subs): FactorKey[] {
   return FACTOR_KEYS.filter((k) => x[k] < T.limiters.severeBelow);
 }
@@ -401,8 +398,8 @@ function severeKeys(x: Subs): FactorKey[] {
  * The points each factor takes off the day's score, the costliest first.
  * A blend factor costs its weight times what it is short of 100, scaled by
  * the ceilings; a ceiling costs what it takes off the blend. Together they
- * make up 100 minus the score, before rounding. The verdict and the Why?
- * detail both rank by this, so the factor the sentence names leads the list.
+ * make up 100 minus the score, before rounding. The Why? detail ranks by
+ * this, so the factor costing the most leads its list.
  */
 function costs(x: Subs, act: ActivityKey): { k: FactorKey; cost: number }[] {
   const g = T.weights[act];
@@ -430,32 +427,15 @@ export function actLabel(k: ActivityKey): string {
   return a ? a.label.toLowerCase() : k;
 }
 
-export function baseNote(total: number, units: Units): string {
-  if (total < 3) return strings.base.dry;
-  if (total < 10) return strings.base.only(fmtS(total, units));
-  return strings.base.thin(fmtS(total, units));
-}
-
-export function rainNote(l: Place, di: number, day?: Wx): string {
-  const r = rainSub(l, di, day);
-  if (r.nowMm > T.rain.floorMm) return strings.rain.raining;
-  if (r.prior.iced) return strings.rain.refroze;
-  if (r.prior.mm > T.rain.floorMm) return strings.rain.recent;
-  if (r.laterMm > T.rain.floorMm) return strings.rain.later;
-  return strings.rain.movingIn;
-}
-
 /**
- * Each factor of a day in words, for when it is holding the day back: the
- * phrase the verdict splices in (`note`), and the Why? row's `label` and
- * `value`. `fine` is the factor in a few words for when it is not.
+ * Each blend factor of a day in words: the Why? row's `label` and `value` for
+ * when it is holding the day back, and `fine`, a few words, for when it is not.
  */
-type Said = { note: string; label: string; value: string; fine: string };
+type Said = { label: string; value: string; fine: string };
 
-function sayFactors(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units): Record<FactorKey, Said> {
+function sayFactors(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units): Record<BlendKey, Said> {
   const d = dayAt(l, di), p = prefs[act];
-  const x = subsFor(l, di, act, prefs, d);
-  const w = strings.weakest, r = strings.why.rows, f = strings.why.fine;
+  const r = strings.why.rows, f = strings.why.fine;
   const onHill = isHill(act);
   const total3 = snow72(l, di);
   const ft = freezeThaw(l, di);
@@ -474,54 +454,23 @@ function sayFactors(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, u
         ? { label: r.rainRecent, value: mm(rain.prior.mm), fine: f.rainRecent(mm(rain.prior.mm)) }
         : { label: r.rain, value: strings.format.mmNone, fine: f.noRain };
   return {
-    t: { note: d.t < p.temp ? w.colder : w.warmer, label: d.t < p.temp ? r.colder : r.warmer, value: fmtT(d.t, units), fine: fmtT(d.t, units) },
-    s: {
-      note: onHill ? w.notMuchFresh : fewNew ? w.nothingNew : w.tooMuchUnpacked,
-      label: fewNew ? r.notMuchNew : r.tooMuchNew,
-      value: fmtS(d.snow, units),
-      fine: f.newSnow(fmtS(d.snow, units)),
-    },
-    base: { note: baseNote(total3, units), label: r.little3d, value: fmtS(total3, units), fine: f.threeDay(fmtS(total3, units)) },
+    t: { label: d.t < p.temp ? r.colder : r.warmer, value: fmtT(d.t, units), fine: fmtT(d.t, units) },
+    s: { label: fewNew ? r.notMuchNew : r.tooMuchNew, value: fmtS(d.snow, units), fine: f.newSnow(fmtS(d.snow, units)) },
+    base: { label: r.little3d, value: fmtS(total3, units), fine: f.threeDay(fmtS(total3, units)) },
     ft: {
-      note: ft.slush ? w.slush : w.crust,
       label: ft.slush ? r.slush : r.crust,
       value: strings.breakdown.freezeThawRange(fmtT(ft.minLo, units), fmtT(ft.maxHi, units)),
       fine: ft.hit ? f.lightCrust : f.noCrust,
     },
-    w: { note: w.wind, label: r.windy, value: fmtW(d.wind, units), fine: f.wind(fmtW(d.wind, units)) },
-    pr: { note: rainNote(l, di, d), ...rainRow },
+    w: { label: r.windy, value: fmtW(d.wind, units), fine: f.wind(fmtW(d.wind, units)) },
+    pr: rainRow,
     fall: {
-      note: !onHill ? w.snowingOnTrack : tooMuchFall ? w.tooMuchFalling : w.notMuchFalling,
       label: !onHill ? r.fallOnTrack : tooMuchFall ? r.fallTooMuch : r.fallNotMuch,
       value: mm(fallMm),
       fine: rainy(fallMm) ? f.falling(mm(fallMm)) : f.noFalling,
     },
-    c: { note: w.flatLight, label: r.flatLight, value: f.cloud(d.cloud), fine: f.cloud(d.cloud) },
-    // The ceilings are shown as banners (see why()), so only their notes are read.
-    cov: { note: x.cov <= 0 ? w.bareGround : w.thinSnowpack, label: '', value: '', fine: '' },
-    deep: { note: w.tooMuchUnpacked, label: '', value: '', fine: '' },
+    c: { label: r.flatLight, value: f.cloud(d.cloud), fine: f.cloud(d.cloud) },
   };
-}
-
-export function verdict(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units): string {
-  const s = score(l, di, act, prefs);
-  const v = strings.verdict;
-  if (!l.acts.includes(act)) return v.doesNotDo(l.shortName, actLabel(act));
-  if (s === null) return v.noForecast;
-  // Bare ground makes every other factor moot, so say that rather than counting them.
-  if (coverageSub(l, di, act) <= 0) return v.bareGround;
-  const x = subsFor(l, di, act, prefs);
-  const severe = severeKeys(x).length;
-  if (severe >= T.limiters.pluralFrom) return v.manyThings(v.countWords[Math.min(8, severe)]);
-  const w = sayFactors(l, di, act, prefs, units)[costs(x, act)[0].k].note;
-  if (s >= T.verdictExcellent) return v.excellent;
-  switch (band(s).key) {
-    case 'hi': return v.great(w);
-    case 'go': return v.good(w.charAt(0).toUpperCase() + w.slice(1));
-    case 'fair': return v.fair(w);
-    case 'poor': return v.poor(w);
-    default: return v.skip(w);
-  }
 }
 
 export function fallCopy(act: ActivityKey, tol: number): string {
@@ -595,11 +544,11 @@ function surfaceRow(l: Place, di: number, act: ActivityKey): Factor[] {
 /** A ceiling holding the whole score down, shown as a banner above the rest. */
 export type WhyCap = { key: 'cov' | 'deep'; title: string; text: string; bare: boolean };
 /** A factor holding the day back: what is wrong, its value, and its 0–100 (for the dot's colour). */
-export type WhyRow = { key: FactorKey; label: string; value: string; v: number };
+export type WhyRow = { key: BlendKey; label: string; value: string; v: number };
 
 export type Why = {
   caps: WhyCap[];
-  /** The costliest first, so the verdict's named factor leads. */
+  /** The costliest first. */
   holding: WhyRow[];
   /** The other factors in a few words each ("−4°C", "no rain"); on bare ground, just the weather. */
   rest: string[];
@@ -616,8 +565,9 @@ export type Why = {
  *
  * Snowpack and deep new snow lead as banners while either holds the score
  * down; on bare ground nothing else counts, so the rest is just the weather.
- * Otherwise the rows are what the sentence under the dial talks about,
- * ranked by the points they cost, as the sentence ranks them.
+ * Otherwise the rows are ranked by the points they cost. There is no sentence
+ * under the dial (removed Nov 2026, owner's call), so this is the only place
+ * the app says why.
  */
 export function why(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units): Why | null {
   const s = score(l, di, act, prefs);
@@ -634,22 +584,21 @@ export function why(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, u
     const weather: BlendKey[] = ['t', 's', 'w', 'pr', 'fall', 'c'];
     return { caps, holding: [], rest: weather.map((k) => said[k].fine), bare, surface };
   }
-  // The rows follow the sentence, case by case as verdict() decides it: every
-  // severe factor when it counts them, nothing on a day it calls excellent,
-  // only the factor it names on a really good one ("The only note: …"), and
-  // otherwise the severe factors and the one it names.
-  const severe = severeKeys(x);
+  // Nothing on an excellent day; only the costliest factor on a really good
+  // one; otherwise the costliest, then every other factor severely off. The
+  // ranking puts the costliest first. A ceiling (snowpack, deep new snow) is
+  // already a banner, so it is never a row.
   const ranked = costs(x, act);
-  const named = ranked[0].k;
+  const costliest = ranked[0].k;
   const shown = new Set<FactorKey>(
-    severe.length >= T.limiters.pluralFrom ? severe
-      : s >= T.verdictExcellent ? []
-        : band(s).key === 'hi' ? [named]
-          : [...severe, named],
+    s >= T.excellentFrom ? []
+      : band(s).key === 'hi' ? [costliest]
+        : [costliest, ...severeKeys(x)],
   );
   const holding = ranked
-    .filter(({ k }) => shown.has(k) && k !== 'cov' && k !== 'deep')
-    .map(({ k }) => ({ key: k, label: said[k].label, value: said[k].value, v: x[k] }));
+    .map(({ k }) => k)
+    .filter((k): k is BlendKey => shown.has(k) && k !== 'cov' && k !== 'deep')
+    .map((k) => ({ key: k, label: said[k].label, value: said[k].value, v: x[k] }));
   const rest = BLEND_KEYS.filter((k) => !shown.has(k)).map((k) => said[k].fine);
   return { caps, holding, rest, bare, surface };
 }

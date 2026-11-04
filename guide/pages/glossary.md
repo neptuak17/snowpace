@@ -29,5 +29,3 @@ description: The words Snowpace and this guide use, in plain terms.
 **Snowpack.** The modelled snow depth. When it's holding the score down, **{{ui.why.show}}** says {{ui.coverage.thin}} or {{ui.coverage.bare}}.
 
 **Surface.** For classic and skate, a word for the likely snow surface, such as {{ui.surface.words.firm}}. Not part of the score yet. See [The Surface row](/guide/surface/).
-
-**Verdict.** The sentence under the dial. See [The sentence under the dial](/guide/the-verdict/).

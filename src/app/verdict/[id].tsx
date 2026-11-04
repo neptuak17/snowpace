@@ -24,12 +24,13 @@ import { useTheme } from '@/theme/use-theme';
 const OPPOSITE: Partial<Record<VerdictIssue, VerdictIssue>> = { high: 'low', low: 'high' };
 
 /**
- * "Not right?": a sheet over the answer card for saying a verdict is off.
+ * "Not right?": a sheet over the answer card for saying a day's score is off.
  * It opens from "Not right? ›" on Today, the place screen and the Forecast
  * detail, for one place and day (`date`, YYYY-MM-DD) in the current
  * activity. The user taps what is wrong; Send feedback opens Mail with the
- * verdict as it was shown and, with diagnostics on, the detail behind it and
- * the forecast. The full feedback screen, from Help, stays for bugs and ideas.
+ * score as it was shown and what Why? lists for it, plus, with diagnostics
+ * on, every factor behind it and the forecast. The full feedback screen, from
+ * Help, stays for bugs and ideas.
  */
 export default function VerdictFeedbackScreen() {
   const { id, date } = useLocalSearchParams<{ id: string; date?: string }>();
@@ -99,7 +100,7 @@ export default function VerdictFeedbackScreen() {
       <CancelButton onPress={() => router.back()} />
       <ScreenTitle size={24}>{vf.title}</ScreenTitle>
 
-      {/* The verdict being reported, so it stays in view. */}
+      {/* The answer being reported, so it stays in view. */}
       <Card style={styles.gap6}>
         <Kicker>{strings.forecast.selKicker(day.label, day.date, actLabel(act))}</Kicker>
         <AppText heading size={18} lh={1.2}>
@@ -108,8 +109,8 @@ export default function VerdictFeedbackScreen() {
         <AppText heading size={16} color={bandColors(theme, b).ring}>
           {`${shown.score} ${b.word}`}
         </AppText>
-        <AppText size={13} lh={1.45}>
-          {shown.verdict}
+        <AppText size={12.5} lh={1.4} muted>
+          {shown.facts}
         </AppText>
       </Card>
 

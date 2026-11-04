@@ -15,9 +15,10 @@ export type FactorKey = 't' | 's' | 'base' | 'ft' | 'w' | 'pr' | 'fall' | 'c' | 
 export type BlendKey = Exclude<FactorKey, 'cov' | 'deep'>;
 
 export const TUNING = {
-  // ── Score bands — the dial colour and word. Verdict adds one tier above.
+  // ── Score bands — the dial colour and word. From `excellentFrom`, high
+  // in the Excellent band, the Why? detail lists nothing under "Holding it back".
   bands: { hi: 80, go: 70, fair: 55, poor: 40 },
-  verdictExcellent: 90,
+  excellentFrom: 90,
 
   // ── Temperature: points off per °C from the user's ideal.
   tempPenaltyPerDeg: 8,
@@ -191,12 +192,10 @@ export const TUNING = {
   },
 
   // ── Limiters: the factors holding a score down. A factor below
-  // `severeBelow` is severe, and the Why? detail lists it; with `pluralFrom`
-  // or more the verdict says how many rather than naming one, and a severe
-  // snowpack leads the email's "Behind the score" line.
+  // `severeBelow` is severe: the Why? detail lists it below the Excellent band,
+  // and a severe snowpack leads the email's "Behind the score" line.
   limiters: {
     severeBelow: 55,
-    pluralFrom: 3,
   },
 
   // ── Webcams (Windy, src/data/windy.ts). See docs/snowpace-webcams-feature-handoff.md.

@@ -24,9 +24,9 @@ The same weather means different things on different gear: wind matters more on 
 
 No amount of sunshine makes up for no snow, so the snowpack holds the whole score down when it's thin, and a bare hill scores 0 whatever the weather. For skate and classic, a big dump of new snow holds the score down too, until the trails are packed and reset. See [Snowpack and deep new snow](/guide/snowpack-and-deep-snow/).
 
-## 5. The score, and its sentence
+## 5. The score, and why
 
-What comes out is the score, shown with its [band](/guide/the-score/) and [the sentence](/guide/the-verdict/) naming what's holding the day back most. **{{ui.why.show}}** lists what's holding it back that day.
+What comes out is the score, shown with its [band](/guide/the-score/). **{{ui.why.show}}** under the dial lists [what's holding it back](/guide/why/) that day, the costliest first.
 
 ## See it in action
 

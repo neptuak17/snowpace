@@ -141,7 +141,17 @@ header.top { display: flex; align-items: center; justify-content: space-between;
 .band-word { font-family: var(--display); font-size: 1.6rem; line-height: 1.1; color: var(--ring); }
 .best { font-size: 0.85rem; font-weight: 700; color: var(--accent); }
 .dayfacts { font-size: 0.85rem; color: var(--muted); }
-.verdict { font-size: 0.97rem; line-height: 1.45; }
+/* The Why? detail, as in the app: a banner per ceiling, then the rows, then the rest */
+.why { display: grid; gap: 0.85rem; border-top: 1px solid var(--divider); padding-top: 1rem; }
+.why .cap { background: var(--fill); border-radius: 0.75rem; padding: 0.6rem 0.8rem; display: grid; gap: 0.15rem; font-size: 0.85rem; line-height: 1.4; }
+.why .cap b { font-size: 0.92rem; }
+.why-sec { display: grid; gap: 0.4rem; }
+.holding { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }
+.holding li { display: flex; align-items: baseline; gap: 0.55rem; }
+.holding li::before { content: ''; flex: none; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--ring); align-self: center; }
+.holding .name { flex: 1; font-weight: 600; font-size: 0.92rem; }
+.holding .val { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
+.why .rest { font-size: 0.85rem; color: var(--muted); }
 .demo-foot { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; font-size: 0.75rem; color: var(--muted); }
 .demo-foot p { flex: 1 1 14rem; }
 .demo-foot .chip { min-height: 1.9rem; padding: 0.2rem 0.65rem; }

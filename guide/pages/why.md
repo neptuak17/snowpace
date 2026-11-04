@@ -1,16 +1,16 @@
 ---
 title: The Why? detail
-description: What's holding a score back, in words, and how to read the detail under the answer.
+description: What's holding a score back, in words, and how to read the detail inside the answer.
 ---
-Tap **{{ui.why.show}}** under any answer to see what's behind the score. **{{ui.why.hide}}** closes it, and Snowpace remembers which way you left it.
+Tap **{{ui.why.show}}** under the dial to see what's behind the score. The detail opens inside the answer, and **{{ui.why.hide}}** closes it. It stays open on every screen until you close the app, and starts closed the next time.
 
 ## Holding it back
 
-**{{ui.why.holding}}** lists what's pulling the score down, each said as what's wrong ("{{ui.why.rows.windy}}") with the day's value beside it. They're the things the sentence under the dial talks about, and the one costing the score most comes first:
+**{{ui.why.holding}}** lists what's pulling the score down, each said as what's wrong ("{{ui.why.rows.windy}}") with the day's value beside it. The one costing the score most comes first. That isn't always the one furthest off: some factors matter more to a day than others.
 
-- When the sentence names one thing, that thing leads the list. Anything else that's well off today follows it.
-- When the sentence says "Three things are working against it today", the list is those three.
-- On a day the sentence calls excellent, nothing is listed.
+- Usually the list is the costliest factor, then anything else that's well off today.
+- On an {{ui.bands.hi}} day, it's just the costliest one.
+- On the very best days, nothing is listed.
 
 The dot beside each is red when that factor is bad today, and amber when it's more of a knock.
 
@@ -48,3 +48,5 @@ The detail ends with **{{ui.breakdown.surface}}**, a word for what the weather i
 Temperature, wind and cloud are daytime averages, over the same hours as the hour strip, {{derived.hourStrip.from}} to {{derived.hourStrip.to}}.
 
 With VoiceOver, each item in the list is read as one, and so is the line under it.
+
+While the detail is open, **{{ui.verdictFeedback.title}}** sits at the foot of the answer. If the list doesn't fit the day, tap it and choose "{{ui.verdictFeedback.issues.reason}}". See [Not right?](/guide/not-right/).

@@ -3,7 +3,6 @@ import { StyleSheet, View } from 'react-native';
 
 import { ActivityChips } from '@/components/activity-chips';
 import { DayAnswer } from '@/components/day-answer';
-import { DayBreakdown, WhyToggle } from '@/components/day-breakdown';
 import { AppButton, LinkButton } from '@/components/ui/app-button';
 import { AppText } from '@/components/ui/app-text';
 import { Card, Kicker } from '@/components/ui/card';
@@ -131,28 +130,21 @@ export default function ForecastScreen() {
               {placeMetaAway(selLoc, s.units)}
             </AppText>
           </View>
+          {/* With no forecast for the day there is nothing to explain or report; the foot says so. */}
           <DayAnswer
             score={selScore}
-            verdict={shown?.verdict ?? strings.verdict.noForecast}
             best={shown?.best}
             facts={shown?.facts}
+            why={shown ? { place: selLoc, di: selDay } : null}
             onReport={shown ? () => router.push({ pathname: '/verdict/[id]', params: { id: toRouteId(selLoc.key), date: dates[selCol] } }) : null}
+            foot={selCol === 0 ? strings.common.forecastAge(fmtForecastAge(selLoc.forecastAt)) : f.forecastLabel}
           />
           <View style={[styles.selFoot, { borderTopColor: theme.divider }]}>
-            <AppText size={10.5} muted style={styles.flex}>
-              {vs}
-            </AppText>
             <AppText size={10.5} muted>
-              {selCol === 0 ? strings.common.forecastAge(fmtForecastAge(selLoc.forecastAt)) : f.forecastLabel}
+              {vs}
             </AppText>
           </View>
         </Card>
-        {selScore !== null && (
-          <View style={styles.why}>
-            <WhyToggle />
-            {s.showBreakdown && <DayBreakdown place={selLoc} di={selDay} />}
-          </View>
-        )}
         {selLoc.website && <LinkButton href={selLoc.website} style={styles.site}>{strings.common.siteLink(selLoc.shortName)}</LinkButton>}
       </View>
     </Screen>
@@ -189,7 +181,6 @@ function EmptyForecast() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
   content: { paddingHorizontal: 16, gap: 12 },
   head: { paddingLeft: 6, paddingRight: 52, gap: 3 },
   inset: { paddingHorizontal: 6 },
@@ -203,7 +194,6 @@ const styles = StyleSheet.create({
   selCard: { gap: 11 },
   empty: { alignItems: 'flex-start' },
   selTitle: { gap: 3 },
-  why: { paddingTop: 10, gap: 6 },
-  site: { marginTop: 4 },
-  selFoot: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, borderTopWidth: 1, paddingTop: 10 },
+  site: { marginTop: 10 },
+  selFoot: { borderTopWidth: 1, paddingTop: 10 },
 });

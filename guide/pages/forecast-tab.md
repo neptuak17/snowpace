@@ -6,7 +6,7 @@ description: Every saved place against the next five days, and the detail for an
 
 ## The detail for a day
 
-Tap a square for that day's detail underneath: the same answer as on **{{ui.tabs.today}}**, with **{{ui.why.show}}** and **{{ui.verdictFeedback.title}}**. The line at its foot compares the day with the other four at that place:
+Tap a square for that day's detail underneath: the same answer as on **{{ui.tabs.today}}**, with **{{ui.why.show}}**, and, once it's open, **{{ui.verdictFeedback.title}}** across from the forecast's age. The line at the very foot compares the day with the other four at that place:
 
 - "{{ui.forecast.bestOfFive}}"
 - "Sat looks better — 72 against today's 48."

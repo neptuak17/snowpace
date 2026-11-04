@@ -8,7 +8,7 @@ Most factors raise or lower a score a little. Two work differently: when there i
 
 Snowpace reads the forecast model's snow depth for the place. When it's thin, the score is held down; when it's bare, the score is 0, however good the weather. Downhill needs a deeper base than a groomed nordic track or a snowshoe trail.
 
-While the snowpack is holding the score down, a banner leads **{{ui.why.show}}**: "{{ui.why.caps.thin.title}}" or "{{ui.why.caps.bare.title}}". On a bare day the sentence under the dial says "{{ui.verdict.bareGround}}". If the forecast has no snow depth for a place, the snowpack doesn't hold its score down at all.
+While the snowpack is holding the score down, a banner leads **{{ui.why.show}}**: "{{ui.why.caps.thin.title}}" or "{{ui.why.caps.bare.title}}". On a bare day there's nothing else to list, so below the banner is just the day's weather. If the forecast has no snow depth for a place, the snowpack doesn't hold its score down at all.
 
 > **The snowpack is modelled, not measured.** It's a weather model's estimate for that spot, and the model doesn't know about snowmaking or grooming. Early and late in the season, a hill making snow can show as bare or thin while its runs are open. That's why Snowpace says bare or thin rather than a depth. Check the place's web site, or its webcam.
 

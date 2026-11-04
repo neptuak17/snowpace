@@ -119,7 +119,31 @@ window.SNOWPACE_DEMO = {
       "to": 5
      },
      "metric": {
-      "verdict": "Worth it if you are keen — there is more unpacked snow than you might want to push through.",
+      "why": {
+       "caps": [
+        {
+         "title": "Deep new snow: 22.2 cm",
+         "text": "This much fresh snow holds the whole score down.",
+         "bare": false
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More new snow than you like",
+         "value": "22.2 cm",
+         "skip": true
+        },
+        {
+         "label": "Snow falling on the track",
+         "value": "22.2 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "-7°C · 26 cm in 3 days · no crust · wind 8 km/h · no rain · 30% cloud",
+       "surface": "Surface (not scored): Fresh"
+      },
       "facts": "-7°C · wind 8 km/h · 22.2 cm new",
       "lines": [
        "7 AM · Fair 68 · -11°C · wind 8 km/h · snow 0.4 mm",
@@ -136,7 +160,31 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Worth it if you are keen — there is more unpacked snow than you might want to push through.",
+      "why": {
+       "caps": [
+        {
+         "title": "Deep new snow: 8.7\"",
+         "text": "This much fresh snow holds the whole score down.",
+         "bare": false
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More new snow than you like",
+         "value": "8.7\"",
+         "skip": true
+        },
+        {
+         "label": "Snow falling on the track",
+         "value": "22.2 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "19°F · 10.2\" in 3 days · no crust · wind 5 mph · no rain · 30% cloud",
+       "surface": "Surface (not scored): Fresh"
+      },
       "facts": "19°F · wind 5 mph · 8.7\" new",
       "lines": [
        "7 AM · Fair 68 · 13°F · wind 5 mph · snow 0.4 mm",
@@ -176,7 +224,31 @@ window.SNOWPACE_DEMO = {
       "to": 7
      },
      "metric": {
-      "verdict": "Soft call today: there is more unpacked snow than you might want to push through.",
+      "why": {
+       "caps": [
+        {
+         "title": "Deep new snow: 22.2 cm",
+         "text": "This much fresh snow holds the whole score down.",
+         "bare": false
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More new snow than you like",
+         "value": "22.2 cm",
+         "skip": true
+        },
+        {
+         "label": "Snow falling on the track",
+         "value": "22.2 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "-7°C · 26 cm in 3 days · no crust · wind 8 km/h · no rain · 30% cloud",
+       "surface": "Surface (not scored): Fresh"
+      },
       "facts": "-7°C · wind 8 km/h · 22.2 cm new",
       "lines": [
        "7 AM · Poor 47 · -11°C · wind 8 km/h · snow 0.4 mm",
@@ -193,7 +265,31 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Soft call today: there is more unpacked snow than you might want to push through.",
+      "why": {
+       "caps": [
+        {
+         "title": "Deep new snow: 8.7\"",
+         "text": "This much fresh snow holds the whole score down.",
+         "bare": false
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More new snow than you like",
+         "value": "8.7\"",
+         "skip": true
+        },
+        {
+         "label": "Snow falling on the track",
+         "value": "22.2 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "19°F · 10.2\" in 3 days · no crust · wind 5 mph · no rain · 30% cloud",
+       "surface": "Surface (not scored): Fresh"
+      },
       "facts": "19°F · wind 5 mph · 8.7\" new",
       "lines": [
        "7 AM · Poor 47 · 13°F · wind 5 mph · snow 0.4 mm",
@@ -233,7 +329,20 @@ window.SNOWPACE_DEMO = {
       "to": 7
      },
      "metric": {
-      "verdict": "A really good one. The only note: more snow is falling than you like.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More snow falling than you like",
+         "value": "22.2 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "-7°C · 22.2 cm new · 26 cm in 3 days · no crust · wind 8 km/h · no rain · 30% cloud",
+       "surface": null
+      },
       "facts": "-7°C · wind 8 km/h · 22.2 cm new",
       "lines": [
        "7 AM · Excellent 86 · -11°C · wind 8 km/h · snow 0.4 mm",
@@ -250,7 +359,20 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "A really good one. The only note: more snow is falling than you like.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More snow falling than you like",
+         "value": "22.2 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "19°F · 8.7\" new · 10.2\" in 3 days · no crust · wind 5 mph · no rain · 30% cloud",
+       "surface": null
+      },
       "facts": "19°F · wind 5 mph · 8.7\" new",
       "lines": [
        "7 AM · Excellent 86 · 13°F · wind 5 mph · snow 0.4 mm",
@@ -290,7 +412,20 @@ window.SNOWPACE_DEMO = {
       "to": 4
      },
      "metric": {
-      "verdict": "A really good one. The only note: more snow is falling than you like.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More snow falling than you like",
+         "value": "22.2 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "-7°C · 22.2 cm new · 26 cm in 3 days · no crust · wind 8 km/h · no rain · 30% cloud",
+       "surface": null
+      },
       "facts": "-7°C · wind 8 km/h · 22.2 cm new",
       "lines": [
        "7 AM · Excellent 93 · -11°C · wind 8 km/h · snow 0.4 mm",
@@ -307,7 +442,20 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "A really good one. The only note: more snow is falling than you like.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More snow falling than you like",
+         "value": "22.2 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "19°F · 8.7\" new · 10.2\" in 3 days · no crust · wind 5 mph · no rain · 30% cloud",
+       "surface": null
+      },
       "facts": "19°F · wind 5 mph · 8.7\" new",
       "lines": [
        "7 AM · Excellent 93 · 13°F · wind 5 mph · snow 0.4 mm",
@@ -411,7 +559,20 @@ window.SNOWPACE_DEMO = {
       "to": 7
      },
      "metric": {
-      "verdict": "A good one. The last three days have been dry, but nothing that should keep you home.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Little snow in 3 days",
+         "value": "0 cm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "-11°C · 0 cm new · no crust · wind 6 km/h · no rain · no snow falling · 5% cloud",
+       "surface": "Surface (not scored): Firm"
+      },
       "facts": "-11°C · wind 6 km/h · 0 cm new",
       "lines": [
        "7 AM · Good 74 · -15°C · wind 6 km/h",
@@ -428,7 +589,20 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "A good one. The last three days have been dry, but nothing that should keep you home.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Little snow in 3 days",
+         "value": "0.0\"",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "12°F · 0.0\" new · no crust · wind 4 mph · no rain · no snow falling · 5% cloud",
+       "surface": "Surface (not scored): Firm"
+      },
       "facts": "12°F · wind 4 mph · 0.0\" new",
       "lines": [
        "7 AM · Good 74 · 5°F · wind 4 mph",
@@ -468,7 +642,20 @@ window.SNOWPACE_DEMO = {
       "to": 7
      },
      "metric": {
-      "verdict": "A really good one. The only note: the last three days have been dry.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Little snow in 3 days",
+         "value": "0 cm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "-11°C · 0 cm new · no crust · wind 6 km/h · no rain · no snow falling · 5% cloud",
+       "surface": "Surface (not scored): Firm"
+      },
       "facts": "-11°C · wind 6 km/h · 0 cm new",
       "lines": [
        "7 AM · Excellent 80 · -15°C · wind 6 km/h",
@@ -485,7 +672,20 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "A really good one. The only note: the last three days have been dry.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Little snow in 3 days",
+         "value": "0.0\"",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "12°F · 0.0\" new · no crust · wind 4 mph · no rain · no snow falling · 5% cloud",
+       "surface": "Surface (not scored): Firm"
+      },
       "facts": "12°F · wind 4 mph · 0.0\" new",
       "lines": [
        "7 AM · Excellent 80 · 5°F · wind 4 mph",
@@ -525,7 +725,30 @@ window.SNOWPACE_DEMO = {
       "to": 6
      },
      "metric": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Little snow in 3 days",
+         "value": "0 cm",
+         "skip": true
+        },
+        {
+         "label": "Not much new snow",
+         "value": "0 cm",
+         "skip": false
+        },
+        {
+         "label": "Colder than you like",
+         "value": "-11°C",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "no crust · wind 6 km/h · no rain · no snow falling · 5% cloud",
+       "surface": null
+      },
       "facts": "-11°C · wind 6 km/h · 0 cm new",
       "lines": [
        "7 AM · Fair 62 · -15°C · wind 6 km/h",
@@ -542,7 +765,30 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Little snow in 3 days",
+         "value": "0.0\"",
+         "skip": true
+        },
+        {
+         "label": "Not much new snow",
+         "value": "0.0\"",
+         "skip": false
+        },
+        {
+         "label": "Colder than you like",
+         "value": "12°F",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "no crust · wind 4 mph · no rain · no snow falling · 5% cloud",
+       "surface": null
+      },
       "facts": "12°F · wind 4 mph · 0.0\" new",
       "lines": [
        "7 AM · Fair 62 · 5°F · wind 4 mph",
@@ -582,7 +828,25 @@ window.SNOWPACE_DEMO = {
       "to": 6
      },
      "metric": {
-      "verdict": "Worth it if you are keen — there is not much fresh snow to play in.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Not much new snow",
+         "value": "0 cm",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0 cm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "-11°C · no crust · wind 6 km/h · no rain · no snow falling · 5% cloud",
+       "surface": null
+      },
       "facts": "-11°C · wind 6 km/h · 0 cm new",
       "lines": [
        "7 AM · Fair 63 · -15°C · wind 6 km/h",
@@ -599,7 +863,25 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Worth it if you are keen — there is not much fresh snow to play in.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Not much new snow",
+         "value": "0.0\"",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0.0\"",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "12°F · no crust · wind 4 mph · no rain · no snow falling · 5% cloud",
+       "surface": null
+      },
       "facts": "12°F · wind 4 mph · 0.0\" new",
       "lines": [
        "7 AM · Fair 63 · 5°F · wind 4 mph",
@@ -703,7 +985,30 @@ window.SNOWPACE_DEMO = {
       "to": 2
      },
      "metric": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Warmer than you like",
+         "value": "4°C",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0 cm",
+         "skip": true
+        },
+        {
+         "label": "Crust from a thaw",
+         "value": "-6°C to 7°C",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "0 cm new · wind 8 km/h · no rain · no snow falling · 10% cloud",
+       "surface": "Surface (not scored): Soft → Slushy"
+      },
       "facts": "4°C · wind 8 km/h · 0 cm new",
       "lines": [
        "7 AM · Good 74 · -3°C · wind 8 km/h",
@@ -720,7 +1025,30 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Warmer than you like",
+         "value": "39°F",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0.0\"",
+         "skip": true
+        },
+        {
+         "label": "Crust from a thaw",
+         "value": "21°F to 45°F",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "0.0\" new · wind 5 mph · no rain · no snow falling · 10% cloud",
+       "surface": "Surface (not scored): Soft → Slushy"
+      },
       "facts": "39°F · wind 5 mph · 0.0\" new",
       "lines": [
        "7 AM · Good 74 · 26°F · wind 5 mph",
@@ -760,7 +1088,30 @@ window.SNOWPACE_DEMO = {
       "to": 2
      },
      "metric": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Crust from a thaw",
+         "value": "-6°C to 7°C",
+         "skip": true
+        },
+        {
+         "label": "Warmer than you like",
+         "value": "4°C",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0 cm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "0 cm new · wind 8 km/h · no rain · no snow falling · 10% cloud",
+       "surface": "Surface (not scored): Soft → Slushy"
+      },
       "facts": "4°C · wind 8 km/h · 0 cm new",
       "lines": [
        "7 AM · Good 75 · -3°C · wind 8 km/h",
@@ -777,7 +1128,30 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Crust from a thaw",
+         "value": "21°F to 45°F",
+         "skip": true
+        },
+        {
+         "label": "Warmer than you like",
+         "value": "39°F",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0.0\"",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "0.0\" new · wind 5 mph · no rain · no snow falling · 10% cloud",
+       "surface": "Surface (not scored): Soft → Slushy"
+      },
       "facts": "39°F · wind 5 mph · 0.0\" new",
       "lines": [
        "7 AM · Good 75 · 26°F · wind 5 mph",
@@ -817,7 +1191,30 @@ window.SNOWPACE_DEMO = {
       "to": 2
      },
      "metric": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Warmer than you like",
+         "value": "4°C",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0 cm",
+         "skip": true
+        },
+        {
+         "label": "Not much new snow",
+         "value": "0 cm",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "light crust · wind 8 km/h · no rain · no snow falling · 10% cloud",
+       "surface": null
+      },
       "facts": "4°C · wind 8 km/h · 0 cm new",
       "lines": [
        "7 AM · Good 75 · -3°C · wind 8 km/h",
@@ -834,7 +1231,30 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Warmer than you like",
+         "value": "39°F",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0.0\"",
+         "skip": true
+        },
+        {
+         "label": "Not much new snow",
+         "value": "0.0\"",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "light crust · wind 5 mph · no rain · no snow falling · 10% cloud",
+       "surface": null
+      },
       "facts": "39°F · wind 5 mph · 0.0\" new",
       "lines": [
        "7 AM · Good 75 · 26°F · wind 5 mph",
@@ -874,7 +1294,30 @@ window.SNOWPACE_DEMO = {
       "to": 2
      },
      "metric": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Not much new snow",
+         "value": "0 cm",
+         "skip": true
+        },
+        {
+         "label": "Warmer than you like",
+         "value": "4°C",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0 cm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "light crust · wind 8 km/h · no rain · no snow falling · 10% cloud",
+       "surface": null
+      },
       "facts": "4°C · wind 8 km/h · 0 cm new",
       "lines": [
        "7 AM · Fair 64 · -3°C · wind 8 km/h",
@@ -891,7 +1334,30 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Not much new snow",
+         "value": "0.0\"",
+         "skip": true
+        },
+        {
+         "label": "Warmer than you like",
+         "value": "39°F",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0.0\"",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "light crust · wind 5 mph · no rain · no snow falling · 10% cloud",
+       "surface": null
+      },
       "facts": "39°F · wind 5 mph · 0.0\" new",
       "lines": [
        "7 AM · Fair 64 · 26°F · wind 5 mph",
@@ -995,7 +1461,36 @@ window.SNOWPACE_DEMO = {
       "to": 3
      },
      "metric": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [
+        {
+         "title": "Deep new snow: 16.5 cm",
+         "text": "This much fresh snow holds the whole score down.",
+         "bare": false
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More new snow than you like",
+         "value": "16.5 cm",
+         "skip": false
+        },
+        {
+         "label": "Snow falling on the track",
+         "value": "16.5 mm",
+         "skip": true
+        },
+        {
+         "label": "Windier than you like",
+         "value": "27 km/h",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "-6°C · 24 cm in 3 days · no crust · no rain · 68% cloud",
+       "surface": "Surface (not scored): Firm → Fresh"
+      },
       "facts": "-6°C · wind 27 km/h · 16.5 cm new",
       "lines": [
        "7 AM · Good 79 · -9°C · wind 12 km/h",
@@ -1012,7 +1507,36 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [
+        {
+         "title": "Deep new snow: 6.5\"",
+         "text": "This much fresh snow holds the whole score down.",
+         "bare": false
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More new snow than you like",
+         "value": "6.5\"",
+         "skip": false
+        },
+        {
+         "label": "Snow falling on the track",
+         "value": "16.5 mm",
+         "skip": true
+        },
+        {
+         "label": "Windier than you like",
+         "value": "17 mph",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "21°F · 9.4\" in 3 days · no crust · no rain · 68% cloud",
+       "surface": "Surface (not scored): Firm → Fresh"
+      },
       "facts": "21°F · wind 17 mph · 6.5\" new",
       "lines": [
        "7 AM · Good 79 · 16°F · wind 7 mph",
@@ -1052,7 +1576,36 @@ window.SNOWPACE_DEMO = {
       "to": 4
      },
      "metric": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [
+        {
+         "title": "Deep new snow: 16.5 cm",
+         "text": "This much fresh snow holds the whole score down.",
+         "bare": false
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More new snow than you like",
+         "value": "16.5 cm",
+         "skip": true
+        },
+        {
+         "label": "Windier than you like",
+         "value": "27 km/h",
+         "skip": true
+        },
+        {
+         "label": "Snow falling on the track",
+         "value": "16.5 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "-6°C · 24 cm in 3 days · no crust · no rain · 68% cloud",
+       "surface": "Surface (not scored): Firm → Fresh"
+      },
       "facts": "-6°C · wind 27 km/h · 16.5 cm new",
       "lines": [
        "7 AM · Poor 53 · -9°C · wind 12 km/h",
@@ -1069,7 +1622,36 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Three things are working against it today.",
+      "why": {
+       "caps": [
+        {
+         "title": "Deep new snow: 6.5\"",
+         "text": "This much fresh snow holds the whole score down.",
+         "bare": false
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More new snow than you like",
+         "value": "6.5\"",
+         "skip": true
+        },
+        {
+         "label": "Windier than you like",
+         "value": "17 mph",
+         "skip": true
+        },
+        {
+         "label": "Snow falling on the track",
+         "value": "16.5 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "21°F · 9.4\" in 3 days · no crust · no rain · 68% cloud",
+       "surface": "Surface (not scored): Firm → Fresh"
+      },
       "facts": "21°F · wind 17 mph · 6.5\" new",
       "lines": [
        "7 AM · Poor 53 · 16°F · wind 7 mph",
@@ -1109,7 +1691,20 @@ window.SNOWPACE_DEMO = {
       "to": 4
      },
      "metric": {
-      "verdict": "A good one. More snow is falling than you like, but nothing that should keep you home.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More snow falling than you like",
+         "value": "16.5 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "-6°C · 16.5 cm new · 24 cm in 3 days · no crust · wind 27 km/h · no rain · 68% cloud",
+       "surface": null
+      },
       "facts": "-6°C · wind 27 km/h · 16.5 cm new",
       "lines": [
        "7 AM · Excellent 90 · -9°C · wind 12 km/h",
@@ -1126,7 +1721,20 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "A good one. More snow is falling than you like, but nothing that should keep you home.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More snow falling than you like",
+         "value": "16.5 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "21°F · 6.5\" new · 9.4\" in 3 days · no crust · wind 17 mph · no rain · 68% cloud",
+       "surface": null
+      },
       "facts": "21°F · wind 17 mph · 6.5\" new",
       "lines": [
        "7 AM · Excellent 90 · 16°F · wind 7 mph",
@@ -1166,7 +1774,20 @@ window.SNOWPACE_DEMO = {
       "to": 2
      },
      "metric": {
-      "verdict": "A good one. More snow is falling than you like, but nothing that should keep you home.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More snow falling than you like",
+         "value": "16.5 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "-6°C · 16.5 cm new · 24 cm in 3 days · no crust · wind 27 km/h · no rain · 68% cloud",
+       "surface": null
+      },
       "facts": "-6°C · wind 27 km/h · 16.5 cm new",
       "lines": [
        "7 AM · Excellent 94 · -9°C · wind 12 km/h",
@@ -1183,7 +1804,20 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "A good one. More snow is falling than you like, but nothing that should keep you home.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "More snow falling than you like",
+         "value": "16.5 mm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "21°F · 6.5\" new · 9.4\" in 3 days · no crust · wind 17 mph · no rain · 68% cloud",
+       "surface": null
+      },
       "facts": "21°F · wind 17 mph · 6.5\" new",
       "lines": [
        "7 AM · Excellent 94 · 16°F · wind 7 mph",
@@ -1287,7 +1921,35 @@ window.SNOWPACE_DEMO = {
       "to": 2
      },
      "metric": {
-      "verdict": "Four things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Warmer than you like",
+         "value": "3°C",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0 cm",
+         "skip": true
+        },
+        {
+         "label": "Rain",
+         "value": "18.0 mm",
+         "skip": false
+        },
+        {
+         "label": "Windier than you like",
+         "value": "25 km/h",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "0 cm new · light crust · no snow falling · 100% cloud",
+       "surface": "Surface (not scored): Slushy"
+      },
       "facts": "3°C · wind 25 km/h · 0 cm new",
       "lines": [
        "7 AM · Fair 59 · 2°C · wind 25 km/h",
@@ -1304,7 +1966,35 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Four things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Warmer than you like",
+         "value": "38°F",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0.0\"",
+         "skip": true
+        },
+        {
+         "label": "Rain",
+         "value": "18.0 mm",
+         "skip": false
+        },
+        {
+         "label": "Windier than you like",
+         "value": "16 mph",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "0.0\" new · light crust · no snow falling · 100% cloud",
+       "surface": "Surface (not scored): Slushy"
+      },
       "facts": "38°F · wind 16 mph · 0.0\" new",
       "lines": [
        "7 AM · Fair 59 · 35°F · wind 16 mph",
@@ -1344,7 +2034,40 @@ window.SNOWPACE_DEMO = {
       "to": 2
      },
      "metric": {
-      "verdict": "Five things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Windier than you like",
+         "value": "25 km/h",
+         "skip": true
+        },
+        {
+         "label": "Warmer than you like",
+         "value": "3°C",
+         "skip": true
+        },
+        {
+         "label": "Crust from a thaw",
+         "value": "-3°C to 4°C",
+         "skip": false
+        },
+        {
+         "label": "Rain",
+         "value": "18.0 mm",
+         "skip": false
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0 cm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "0 cm new · no snow falling · 100% cloud",
+       "surface": "Surface (not scored): Slushy"
+      },
       "facts": "3°C · wind 25 km/h · 0 cm new",
       "lines": [
        "7 AM · Fair 58 · 2°C · wind 25 km/h",
@@ -1361,7 +2084,40 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Five things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Windier than you like",
+         "value": "16 mph",
+         "skip": true
+        },
+        {
+         "label": "Warmer than you like",
+         "value": "38°F",
+         "skip": true
+        },
+        {
+         "label": "Crust from a thaw",
+         "value": "27°F to 39°F",
+         "skip": false
+        },
+        {
+         "label": "Rain",
+         "value": "18.0 mm",
+         "skip": false
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0.0\"",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "0.0\" new · no snow falling · 100% cloud",
+       "surface": "Surface (not scored): Slushy"
+      },
       "facts": "38°F · wind 16 mph · 0.0\" new",
       "lines": [
        "7 AM · Fair 58 · 35°F · wind 16 mph",
@@ -1401,7 +2157,35 @@ window.SNOWPACE_DEMO = {
       "to": 2
      },
      "metric": {
-      "verdict": "Four things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Little snow in 3 days",
+         "value": "0 cm",
+         "skip": true
+        },
+        {
+         "label": "Not much new snow",
+         "value": "0 cm",
+         "skip": false
+        },
+        {
+         "label": "Warmer than you like",
+         "value": "3°C",
+         "skip": false
+        },
+        {
+         "label": "Rain",
+         "value": "18.0 mm",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "light crust · wind 25 km/h · no snow falling · 100% cloud",
+       "surface": null
+      },
       "facts": "3°C · wind 25 km/h · 0 cm new",
       "lines": [
        "7 AM · Fair 61 · 2°C · wind 25 km/h",
@@ -1418,7 +2202,35 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Four things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Little snow in 3 days",
+         "value": "0.0\"",
+         "skip": true
+        },
+        {
+         "label": "Not much new snow",
+         "value": "0.0\"",
+         "skip": false
+        },
+        {
+         "label": "Warmer than you like",
+         "value": "38°F",
+         "skip": false
+        },
+        {
+         "label": "Rain",
+         "value": "18.0 mm",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "light crust · wind 16 mph · no snow falling · 100% cloud",
+       "surface": null
+      },
       "facts": "38°F · wind 16 mph · 0.0\" new",
       "lines": [
        "7 AM · Fair 61 · 35°F · wind 16 mph",
@@ -1458,7 +2270,35 @@ window.SNOWPACE_DEMO = {
       "to": 2
      },
      "metric": {
-      "verdict": "Four things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Not much new snow",
+         "value": "0 cm",
+         "skip": true
+        },
+        {
+         "label": "Warmer than you like",
+         "value": "3°C",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0 cm",
+         "skip": true
+        },
+        {
+         "label": "Rain",
+         "value": "18.0 mm",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "light crust · wind 25 km/h · no snow falling · 100% cloud",
+       "surface": null
+      },
       "facts": "3°C · wind 25 km/h · 0 cm new",
       "lines": [
        "7 AM · Poor 51 · 2°C · wind 25 km/h",
@@ -1475,7 +2315,35 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Four things are working against it today.",
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Not much new snow",
+         "value": "0.0\"",
+         "skip": true
+        },
+        {
+         "label": "Warmer than you like",
+         "value": "38°F",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "0.0\"",
+         "skip": true
+        },
+        {
+         "label": "Rain",
+         "value": "18.0 mm",
+         "skip": false
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "light crust · wind 16 mph · no snow falling · 100% cloud",
+       "surface": null
+      },
       "facts": "38°F · wind 16 mph · 0.0\" new",
       "lines": [
        "7 AM · Poor 51 · 35°F · wind 16 mph",
@@ -1564,12 +2432,38 @@ window.SNOWPACE_DEMO = {
      "bands": null,
      "window": null,
      "metric": {
-      "verdict": "No snow on the ground to speak of.",
+      "why": {
+       "caps": [
+        {
+         "title": "Snowpack: bare",
+         "text": "Not enough snow on the ground, so the score is 0 whatever the weather.",
+         "bare": true
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [],
+       "restKicker": "The weather",
+       "rest": "4°C · 0 cm new · wind 8 km/h · no rain · no snow falling · 10% cloud",
+       "surface": "Surface (not scored): —"
+      },
       "facts": "4°C · wind 8 km/h · 0 cm new",
       "lines": null
      },
      "imperial": {
-      "verdict": "No snow on the ground to speak of.",
+      "why": {
+       "caps": [
+        {
+         "title": "Snowpack: bare",
+         "text": "Not enough snow on the ground, so the score is 0 whatever the weather.",
+         "bare": true
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [],
+       "restKicker": "The weather",
+       "rest": "39°F · 0.0\" new · wind 5 mph · no rain · no snow falling · 10% cloud",
+       "surface": "Surface (not scored): —"
+      },
       "facts": "39°F · wind 5 mph · 0.0\" new",
       "lines": null
      }
@@ -1582,12 +2476,38 @@ window.SNOWPACE_DEMO = {
      "bands": null,
      "window": null,
      "metric": {
-      "verdict": "No snow on the ground to speak of.",
+      "why": {
+       "caps": [
+        {
+         "title": "Snowpack: bare",
+         "text": "Not enough snow on the ground, so the score is 0 whatever the weather.",
+         "bare": true
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [],
+       "restKicker": "The weather",
+       "rest": "4°C · 0 cm new · wind 8 km/h · no rain · no snow falling · 10% cloud",
+       "surface": "Surface (not scored): —"
+      },
       "facts": "4°C · wind 8 km/h · 0 cm new",
       "lines": null
      },
      "imperial": {
-      "verdict": "No snow on the ground to speak of.",
+      "why": {
+       "caps": [
+        {
+         "title": "Snowpack: bare",
+         "text": "Not enough snow on the ground, so the score is 0 whatever the weather.",
+         "bare": true
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [],
+       "restKicker": "The weather",
+       "rest": "39°F · 0.0\" new · wind 5 mph · no rain · no snow falling · 10% cloud",
+       "surface": "Surface (not scored): —"
+      },
       "facts": "39°F · wind 5 mph · 0.0\" new",
       "lines": null
      }
@@ -1600,12 +2520,38 @@ window.SNOWPACE_DEMO = {
      "bands": null,
      "window": null,
      "metric": {
-      "verdict": "No snow on the ground to speak of.",
+      "why": {
+       "caps": [
+        {
+         "title": "Snowpack: bare",
+         "text": "Not enough snow on the ground, so the score is 0 whatever the weather.",
+         "bare": true
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [],
+       "restKicker": "The weather",
+       "rest": "4°C · 0 cm new · wind 8 km/h · no rain · no snow falling · 10% cloud",
+       "surface": null
+      },
       "facts": "4°C · wind 8 km/h · 0 cm new",
       "lines": null
      },
      "imperial": {
-      "verdict": "No snow on the ground to speak of.",
+      "why": {
+       "caps": [
+        {
+         "title": "Snowpack: bare",
+         "text": "Not enough snow on the ground, so the score is 0 whatever the weather.",
+         "bare": true
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [],
+       "restKicker": "The weather",
+       "rest": "39°F · 0.0\" new · wind 5 mph · no rain · no snow falling · 10% cloud",
+       "surface": null
+      },
       "facts": "39°F · wind 5 mph · 0.0\" new",
       "lines": null
      }
@@ -1618,12 +2564,38 @@ window.SNOWPACE_DEMO = {
      "bands": null,
      "window": null,
      "metric": {
-      "verdict": "No snow on the ground to speak of.",
+      "why": {
+       "caps": [
+        {
+         "title": "Snowpack: bare",
+         "text": "Not enough snow on the ground, so the score is 0 whatever the weather.",
+         "bare": true
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [],
+       "restKicker": "The weather",
+       "rest": "4°C · 0 cm new · wind 8 km/h · no rain · no snow falling · 10% cloud",
+       "surface": null
+      },
       "facts": "4°C · wind 8 km/h · 0 cm new",
       "lines": null
      },
      "imperial": {
-      "verdict": "No snow on the ground to speak of.",
+      "why": {
+       "caps": [
+        {
+         "title": "Snowpack: bare",
+         "text": "Not enough snow on the ground, so the score is 0 whatever the weather.",
+         "bare": true
+        }
+       ],
+       "holdingKicker": "Holding it back",
+       "holding": [],
+       "restKicker": "The weather",
+       "rest": "39°F · 0.0\" new · wind 5 mph · no rain · no snow falling · 10% cloud",
+       "surface": null
+      },
       "facts": "39°F · wind 5 mph · 0.0\" new",
       "lines": null
      }

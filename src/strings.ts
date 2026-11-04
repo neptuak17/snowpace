@@ -185,12 +185,12 @@ export const strings = {
       { t: 'Turn on your activities', d: 'On the You tab, switch on the ones you do.' },
       { t: 'Say what a good day feels like', d: 'Also on You: your ideal temperature, your wind limit, how much new snow you want, and how you feel about snow falling while you are out.' },
       { t: 'Add your places', d: 'My places → + Add. Save the places you go to and set one as your home hill; Today opens on it.' },
-      { t: 'Read the answer', d: 'A score out of 100, the best hours, and the reason in a sentence. Why? shows what is behind it; Not right? tells me when it is wrong.' },
+      { t: 'Read the answer', d: 'A score out of 100 and the best hours. Why? shows what is holding the score back, and Not right? under it tells me when it is wrong.' },
       { t: 'Look ahead', d: 'Forecast lays out every saved place against the next five days. Tap a square for that day.' },
     ],
     creditsLink: 'Credits and data sources',
     feedbackKicker: 'Something to tell me?',
-    feedbackBody: 'A score that looked wrong, something broken, or an idea for the app. Feedback goes straight to the developer. For a score, Not right? under its verdict is quicker: it brings the day along.',
+    feedbackBody: 'A score that looked wrong, something broken, or an idea for the app. Feedback goes straight to the developer. For a score, open its Why? and tap Not right?: it is quicker and brings the day along.',
     feedbackButton: 'Send feedback',
   },
 
@@ -267,17 +267,17 @@ export const strings = {
     divider: '—————— Diagnostics (delete this block if you would rather not send it) ——————',
   },
 
-  // "Not right? ›" under a verdict, the sheet it opens, and the email it drafts.
+  // "Not right? ›" on the answer card, the sheet it opens, and the email it drafts.
   verdictFeedback: {
     link: 'Not right? ›',
-    linkLabel: 'Not right? Send feedback on this verdict',
+    linkLabel: 'Not right? Send feedback on this score',
     title: 'Not right?',
     issuesKicker: 'What’s off?',
     issuesHint: 'Tap any that apply.',
     issues: {
       high: 'Score too high',
       low: 'Score too low',
-      reason: 'The reason doesn’t fit',
+      reason: 'The reasons don’t fit',
       snow: 'There’s snow here',
       hours: 'Best hours are off',
       weather: 'The weather was different',
@@ -291,7 +291,10 @@ export const strings = {
     bodyPrompt: '(What did you see at the hill?)',
     issuesLine: (issues: string[]) => `What’s off: ${issues.join(' · ')}`,
     dayLine: (place: string, activity: string, day: string, date: string) => `${place} · ${activity} · ${day} (${date})`,
-    verdictLine: (score: number, word: string, verdict: string) => `Verdict shown: ${score} ${word} — “${verdict}”`,
+    scoreLine: (score: number, word: string) => `Score shown: ${score} ${word}`,
+    // What Why? lists for the day: "Snowpack: thin · Warmer than you like (−2°C)".
+    holdingLine: (parts: string[]) => `Holding it back: ${parts.length ? parts.join(' · ') : 'nothing'}`,
+    holdingRow: (label: string, value: string) => `${label} (${value})`,
     shownLine: (parts: string[]) => `Shown with it: ${parts.join(' · ')}`,
     behindLine: (rows: string[]) => `Behind the score: ${rows.join(' · ')}`,
   },
@@ -370,11 +373,14 @@ export const strings = {
     failed: 'Could not reach windy.com. Try again later.',
   },
 
-  // The detail behind a day's score, opened from the answer: what is holding
-  // it back, in words, and the rest in one line. No numbers, no bars.
+  // The detail behind a day's score, opened inside the answer card: what is
+  // holding it back, in words, and the rest in one line. No numbers, no bars.
   why: {
     show: 'Why? ›',
     hide: 'Hide the detail ›',
+    // What VoiceOver and Voice Control call the link, without the "›".
+    showLabel: 'Why?',
+    hideLabel: 'Hide the detail',
     holding: 'Holding it back',
     // Heads the rest when something is holding the day back, and when nothing is.
     otherwise: 'Otherwise fine',
@@ -461,50 +467,11 @@ export const strings = {
     surface: 'Surface (not scored)',
   },
 
+  // There is no sentence under the dial (removed Nov 2026); these are what is
+  // left of it: the card for a place without the activity, and a day with no forecast.
   verdict: {
     doesNotDo: (name: string, activity: string) => `${name} does not do ${activity}.`,
     noForecast: 'No forecast for this day yet.',
-    bareGround: 'No snow on the ground to speak of.',
-    manyThings: (count: string) => `${count} things are working against it today.`,
-    countWords: ['', '', '', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'],
-    excellent: 'Everything lines up — go now, and go early.',
-    great: (note: string) => `A really good one. The only note: ${note}.`,
-    good: (note: string) => `A good one. ${note}, but nothing that should keep you home.`,
-    fair: (note: string) => `Worth it if you are keen — ${note}.`,
-    poor: (note: string) => `Soft call today: ${note}.`,
-    skip: (note: string) => `Probably one to skip — ${note}.`,
-  },
-
-  // The "weakest factor" phrases that get spliced into a verdict.
-  weakest: {
-    colder: 'it is colder than your sweet spot',
-    warmer: 'it is warmer than you like',
-    notMuchFresh: 'there is not much fresh snow to play in',
-    nothingNew: 'not much new snow has fallen',
-    tooMuchUnpacked: 'there is more unpacked snow than you might want to push through',
-    crust: 'it thawed and refroze (expect crust)',
-    slush: 'it has stayed above freezing (expect slush)',
-    wind: 'the wind is the one knock',
-    notMuchFalling: 'not much snow is falling',
-    tooMuchFalling: 'more snow is falling than you like',
-    snowingOnTrack: 'it is snowing on the track',
-    flatLight: 'the light will be flat',
-    bareGround: 'there is no snow on the ground',
-    thinSnowpack: 'the snowpack is thin',
-  },
-
-  base: {
-    dry: 'the last three days have been dry',
-    only: (amount: string) => `only ${amount} has fallen in three days`,
-    thin: (amount: string) => `the base is thinner than ideal at ${amount} in three days`,
-  },
-
-  rain: {
-    raining: 'rain is forecast',
-    refroze: 'it rained and then refroze (expect ice)',
-    recent: 'rain in the last three days has hurt the surface',
-    later: 'rain is in the forecast for later today',
-    movingIn: 'there is weather moving in',
   },
 
   fall: {

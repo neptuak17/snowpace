@@ -8,7 +8,8 @@
  * Run by hand after changing the scoring, the tuning or the Help wording it
  * copies, and commit the result. Everything on the site that describes how
  * the app scores comes from here, so the site cannot contradict the app: the
- * sample days, the score bands, and the factor wording from the Help screen.
+ * sample days with their Why? detail, the score bands, and the factor
+ * wording from the Help screen.
  * Marketing copy lives in site/index.html and is edited by hand.
  *
  * Needs Node 22.6+ (runs TypeScript directly). No dependencies.
@@ -21,7 +22,7 @@ import { ROOT } from './app-loader.mts';
 const OUT = join(ROOT, 'site', 'demo-data.js');
 
 
-const { band, dayFacts, DEFAULT_PREFS, hourGrid, hourLine, isBare, score, verdict, windowLabel } = await import('../src/lib/scoring.ts');
+const { band, dayFacts, DEFAULT_PREFS, hourGrid, hourLine, isBare, score, why, windowLabel } = await import('../src/lib/scoring.ts');
 const { ACTS, localDate, placeFromArea } = await import('../src/data/places.ts');
 const { TUNING } = await import('../src/lib/tuning.ts');
 const { strings } = await import('../src/strings.ts');
@@ -114,6 +115,25 @@ function samplePlace(s: (typeof SAMPLES)[number]) {
   }, null, [forecast]);
 }
 
+/**
+ * The Why? detail as the app's card shows it (DayBreakdown): banners, the
+ * rows holding the day back, the rest in one line, and the shadow-mode
+ * surface. Words only, as in the app: no factor's 0–100 and no weights.
+ */
+function whyText(p: ReturnType<typeof samplePlace>, act: (typeof ACTS)[number]['key'], units: 'metric' | 'imperial') {
+  const w = why(p, 0, act, DEFAULT_PREFS, units);
+  if (!w) return null;
+  const t = strings.why;
+  return {
+    caps: w.caps.map((c) => ({ title: c.title, text: c.text, bare: c.bare })),
+    holdingKicker: t.holding,
+    holding: w.holding.map((r) => ({ label: r.label, value: r.value, skip: band(r.v).key === 'skip' })),
+    restKicker: w.bare ? t.weather : w.holding.length || w.caps.length ? t.otherwise : t.nothing,
+    rest: t.rest(w.rest),
+    surface: w.surface,
+  };
+}
+
 const samples = SAMPLES.map((s) => {
   const p = samplePlace(s);
   const acts = Object.fromEntries(ACTS.map(({ key: act }) => {
@@ -121,7 +141,7 @@ const samples = SAMPLES.map((s) => {
     const bare = sc !== null && isBare(p, 0, act);
     const g = sc !== null && !bare ? hourGrid(p, act, DEFAULT_PREFS) : null;
     const text = (units: 'metric' | 'imperial') => ({
-      verdict: verdict(p, 0, act, DEFAULT_PREFS, units),
+      why: whyText(p, act, units),
       facts: dayFacts(p, 0, units),
       lines: g ? g.hours.map((h) => hourLine(g, h, units)) : null,
     });

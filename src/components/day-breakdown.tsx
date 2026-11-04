@@ -1,8 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
-import { AppButton } from './ui/app-button';
 import { AppText } from './ui/app-text';
-import { Card, Kicker } from './ui/card';
+import { Kicker } from './ui/card';
 
 import type { Place } from '@/data/places';
 import { band, why, type WhyCap } from '@/lib/scoring';
@@ -11,24 +10,13 @@ import { strings } from '@/strings';
 import { radius } from '@/theme/tokens';
 import { useTheme } from '@/theme/use-theme';
 
-/** "Why? ›" — opens and closes the detail. The open state is shared by every screen. */
-export function WhyToggle() {
-  const s = useAppState();
-  return (
-    <View style={styles.toggle}>
-      <AppButton variant="ghost" size={12.5} onPress={s.toggleBreakdown}>
-        {s.showBreakdown ? strings.why.hide : strings.why.show}
-      </AppButton>
-    </View>
-  );
-}
-
 /**
  * What is holding a day's score back, in words: a banner for a thin or bare
  * snowpack or deep new snow, then the factors costing the most points, then
- * the rest in one line. Shown under WhyToggle when it is open. A dot's colour
- * repeats what the words say (red for bad, amber for a knock), so nothing
- * rests on colour, and VoiceOver reads each row and the line as one item.
+ * the rest in one line. Shown inside the answer card when "Why? ›" is open
+ * (DayAnswer). A dot's colour repeats what the words say (red for bad, amber
+ * for a knock), so nothing rests on colour, and VoiceOver reads each row and
+ * the line as one item.
  */
 export function DayBreakdown({ place, di }: { place: Place; di: number }) {
   const s = useAppState();
@@ -38,7 +26,7 @@ export function DayBreakdown({ place, di }: { place: Place; di: number }) {
   const t = strings.why;
   const restKicker = w.bare ? t.weather : w.holding.length || w.caps.length ? t.otherwise : t.nothing;
   return (
-    <Card style={styles.card}>
+    <View style={styles.body}>
       {w.caps.map((c) => (
         <CapBanner key={c.key} cap={c} />
       ))}
@@ -69,7 +57,7 @@ export function DayBreakdown({ place, di }: { place: Place; di: number }) {
           {w.surface}
         </AppText>
       )}
-    </Card>
+    </View>
   );
 }
 
@@ -90,9 +78,7 @@ function CapBanner({ cap }: { cap: WhyCap }) {
 }
 
 const styles = StyleSheet.create({
-  // The ghost button's own padding, pulled back so its text lines up with the page.
-  toggle: { alignItems: 'flex-start', marginLeft: -10 },
-  card: { gap: 14, paddingVertical: 15 },
+  body: { gap: 14 },
   section: { gap: 7 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 9 },
   dot: { width: 9, height: 9, borderRadius: radius.pill },

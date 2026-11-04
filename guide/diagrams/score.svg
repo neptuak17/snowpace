@@ -1,6 +1,6 @@
 <svg viewBox="0 0 360 450" role="img" aria-labelledby="dg-score-t dg-score-d" xmlns="http://www.w3.org/2000/svg">
 <title id="dg-score-t">How a score is built</title>
-<desc id="dg-score-d">The mountain forecast gives eight weather factors. They are judged for your activity against your own settings, checked against the snowpack, and the result is the score, with its band word and verdict.</desc>
+<desc id="dg-score-d">The mountain forecast gives eight weather factors. They are judged for your activity against your own settings, checked against the snowpack, and the result is the score, with its band word and what is holding it back.</desc>
 <defs><marker id="dg-score-a" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="d-arrow" d="M0 0L10 5L0 10z"/></marker></defs>
 <rect class="d-box" x="20" y="10" width="320" height="52" rx="12"/>
 <text x="180" y="32" text-anchor="middle" class="d-title">The mountain forecast</text>
@@ -27,5 +27,5 @@
 <line class="d-line" x1="180" y1="362" x2="180" y2="382" marker-end="url(#dg-score-a)"/>
 <rect class="d-strong" x="20" y="388" width="320" height="52" rx="12"/>
 <text x="180" y="410" text-anchor="middle" class="d-accent">The score, 0–100</text>
-<text x="180" y="429" text-anchor="middle" class="d-small">with its band word and the verdict sentence</text>
+<text x="180" y="429" text-anchor="middle" class="d-small">with its band word and what's holding it back</text>
 </svg>

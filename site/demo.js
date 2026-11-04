@@ -1,7 +1,8 @@
 // The interactive parts of the page: the demo card, the four sports, the
-// eight factors and the score bands. Every score and sentence comes
-// from demo-data.js, which scripts/build-site-demo.mts writes from the app's
-// own scoring engine. The words around them are in index.html.
+// eight factors and the score bands. Every score, and every word of the
+// answer and its Why? detail, comes from demo-data.js, which
+// scripts/build-site-demo.mts writes from the app's own scoring engine. The
+// words around them are in index.html.
 (() => {
   const D = window.SNOWPACE_DEMO;
   if (!D) return;
@@ -69,6 +70,42 @@
   chips($('units'), [['metric', '°C'], ['imperial', '°F']], 'units');
 
   // ── The demo card ─────────────────────────────────────────────────────────
+  const el = (tag, cls, text) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  };
+  // The app's Why? detail, always open here: banners for the snowpack or deep
+  // new snow, what is holding the day back (red dot for bad, amber for a
+  // knock, as in the app), then the rest in one line.
+  function renderWhy(w) {
+    const root = $('why');
+    root.replaceChildren();
+    root.hidden = !w;
+    if (!w) return;
+    for (const c of w.caps) {
+      const b = el('div', 'cap ' + (c.bare ? 'b-skip' : 'b-fair'));
+      b.append(el('b', '', c.title), el('span', '', c.text));
+      root.append(b);
+    }
+    if (w.holding.length) {
+      const ul = el('ul', 'holding');
+      for (const r of w.holding) {
+        const li = el('li', r.skip ? 'b-skip' : 'b-fair');
+        li.append(el('span', 'name', r.label), el('span', 'val', r.value));
+        ul.append(li);
+      }
+      const sec = el('div', 'why-sec');
+      sec.append(el('p', 'kicker', w.holdingKicker), ul);
+      root.append(sec);
+    }
+    const rest = el('div', 'why-sec');
+    rest.append(el('p', 'kicker', w.restKicker), el('p', 'rest', w.rest));
+    root.append(rest);
+    if (w.surface) root.append(el('p', 'rest', w.surface));
+  }
+
   const big = dial(112, 13);
   $('dial-slot').append(big);
   D.hours.forEach((h) => {
@@ -90,7 +127,7 @@
     $('best').hidden = !x.best;
     $('facts').textContent = u.facts || '';
     $('facts').hidden = !u.facts;
-    $('verdict').textContent = u.verdict;
+    renderWhy(u.why);
     $('strip').hidden = !x.bands;
     if (!x.bands) return;
     const sel = state.hour ?? (x.window ? D.hours[x.window.from] : 12);

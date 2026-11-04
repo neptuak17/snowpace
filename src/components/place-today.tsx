@@ -3,7 +3,6 @@ import { StyleSheet, View } from 'react-native';
 
 import { ActivityChips } from './activity-chips';
 import { DayAnswer } from './day-answer';
-import { DayBreakdown, WhyToggle } from './day-breakdown';
 import { HourStrip } from './hour-grid';
 import { WebcamSection } from './webcam-section';
 import { AppButton, LinkButton } from './ui/app-button';
@@ -13,7 +12,7 @@ import { Card, Kicker } from './ui/card';
 import type { Place } from '@/data/places';
 import { fmtForecastAge } from '@/lib/format';
 import { toRouteId } from '@/lib/geo';
-import { actLabel, canScore, score, shownAnswer, verdict } from '@/lib/scoring';
+import { actLabel, canScore, score, shownAnswer } from '@/lib/scoring';
 import { useAppState } from '@/state/app-state';
 import { strings } from '@/strings';
 import { gutter } from '@/theme/tokens';
@@ -23,8 +22,8 @@ type Props = {
 };
 
 /**
- * Today at one place, answer first: your sport, the day's score and verdict,
- * the hours, and the detail behind it on request. Today shows it for the home
+ * Today at one place, answer first: your sport, the day's score with the
+ * detail behind it on request, then the hours. Today shows it for the home
  * hill and the place screen for any other, so the two cannot drift apart.
  *
  * What is shown follows the answer. With no forecast, or the sport not offered
@@ -68,7 +67,7 @@ export function PlaceToday({ place }: Props) {
           <Card style={styles.startCard}>
             <Kicker>{strings.today.noActivityKicker(actLabel(act))}</Kicker>
             <AppText size={14} lh={1.45}>
-              {strings.today.noActivityBody(verdict(place, 0, act, s.prefs, s.units))}
+              {strings.today.noActivityBody(strings.verdict.doesNotDo(place.shortName, actLabel(act)))}
             </AppText>
             <AppButton size={12.5} onPress={() => router.navigate('/places')}>
               {strings.today.whereCanIGo}
@@ -83,11 +82,11 @@ export function PlaceToday({ place }: Props) {
             <Card style={styles.answerCard}>
               <DayAnswer
                 score={shown.score}
-                verdict={shown.verdict}
                 best={shown.best}
                 facts={shown.facts}
-                foot={strings.common.forecastAge(fmtForecastAge(place.forecastAt))}
+                why={{ place, di: 0 }}
                 onReport={today ? () => router.push({ pathname: '/verdict/[id]', params: { id: toRouteId(place.key), date: today } }) : null}
+                foot={strings.common.forecastAge(fmtForecastAge(place.forecastAt))}
               />
             </Card>
           </View>
@@ -100,15 +99,6 @@ export function PlaceToday({ place }: Props) {
 
           {/* Evidence for the answer: after the hours, or straight under the answer on bare ground. */}
           <WebcamSection place={place} style={styles.pad18} />
-
-          <View style={styles.pad10}>
-            <WhyToggle />
-          </View>
-          {s.showBreakdown && (
-            <View style={styles.pad6}>
-              <DayBreakdown place={place} di={0} />
-            </View>
-          )}
         </>
       )}
 
@@ -122,7 +112,6 @@ export function PlaceToday({ place }: Props) {
 }
 
 const styles = StyleSheet.create({
-  pad6: { paddingTop: 6, paddingHorizontal: gutter },
   pad10: { paddingTop: 10, paddingHorizontal: gutter },
   pad14: { paddingTop: 14, paddingHorizontal: gutter },
   pad16: { paddingTop: 16, paddingHorizontal: gutter },

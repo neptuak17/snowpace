@@ -19,7 +19,7 @@ import assert from 'node:assert/strict';
 // Lets Node load the app's TypeScript; see app-loader.mts.
 import './app-loader.mts';
 
-const { breakdown, DEFAULT_PREFS, freezeThaw, rainPrior, score, shownAnswer, subsFor, verdict, why } = await import('../src/lib/scoring.ts');
+const { breakdown, DEFAULT_PREFS, freezeThaw, rainPrior, score, shownAnswer, subsFor, why } = await import('../src/lib/scoring.ts');
 const { localDate, placeFromArea } = await import('../src/data/places.ts');
 const { buildFeedbackMail, verdictIssuesFor } = await import('../src/lib/diagnostics.ts');
 const { strings } = await import('../src/strings.ts');
@@ -100,10 +100,9 @@ const checks: [string, () => void][] = [
   }],
 
   // Snowpack and deep new snow (CLAUDE.md: Snow depth)
-  ['Bare ground scores 0 for every activity, and the sentence says why', () => {
+  ['Bare ground scores 0 for every activity', () => {
     const p = place(bare(-2, 6));
     for (const act of ACTS) assert.equal(score(p, 0, act, P), 0, act);
-    assert.equal(verdict(p, 0, 'downhill', P, 'metric'), strings.verdict.bareGround);
     assert.equal(ft(p), 0);
   }],
   ['Bare ground keeps the day\'s conditions but leaves out the hours', () => {
@@ -128,25 +127,28 @@ const checks: [string, () => void][] = [
   }],
 
   // The Why? detail (CLAUDE.md: The "Why?" detail says what is holding the score back)
-  ['The verdict names the factor costing the most points, not the emptiest, and it leads the Why? rows', () => {
+  ['The Why? rows lead with the factor costing the most points, not the emptiest', () => {
     // Cold and dry: no snow in three days scores 0 but weighs little; no new snow scores more but weighs more.
     const p = place(snowy(-10, -4));
     const x = subsFor(p, 0, 'downhill', P);
     assert.ok(x.base < x.s, `3-day ${x.base}, new snow ${x.s}: the scenario needs 3-day to be the emptiest`);
-    assert.ok(verdict(p, 0, 'downhill', P, 'metric').includes(strings.weakest.notMuchFresh));
     assert.deepEqual(whyOf(p, 'downhill').holding.map((r) => r.key), ['s', 'base']);
   }],
-  ['A "Three things" verdict lists exactly those things', () => {
+  ['Below the Excellent band, every factor badly off is listed under Holding it back', () => {
     const p = place(snowy(1, 8));
     for (const act of ACTS) {
-      const w = whyOf(p, act);
-      const things = w.holding.length + w.caps.filter((c) => c.key === 'cov').length;
-      assert.equal(verdict(p, 0, act, P, 'metric'), strings.verdict.manyThings(strings.verdict.countWords[things]), act);
+      const x = subsFor(p, 0, act, P);
+      const keys = whyOf(p, act).holding.map((r) => r.key);
+      const severe = (['t', 's', 'base', 'ft', 'w', 'pr', 'fall', 'c'] as const).filter((k) => x[k] < TUNING.limiters.severeBelow);
+      assert.ok(severe.length > 0, `${act}: the scenario needs something badly off`);
+      for (const k of severe) assert.ok(keys.includes(k), `${act}: ${k} missing from ${keys.join(',')}`);
+      const cost = keys.map((k) => TUNING.weights[act][k] * (100 - x[k]));
+      assert.deepEqual(cost, [...cost].sort((a, b) => b - a), `${act}: rows not costliest first`);
     }
   }],
-  ['Nothing is holding back a day the verdict calls excellent', () => {
+  ['Nothing is listed on an excellent day', () => {
     const p = place(snowy(-10, -4));
-    assert.equal(verdict(p, 0, 'skate', P, 'metric'), strings.verdict.excellent);
+    assert.ok(score(p, 0, 'skate', P)! >= TUNING.excellentFrom, `skate ${score(p, 0, 'skate', P)}`);
     assert.equal(whyOf(p, 'skate').holding.length, 0);
   }],
   ['The Why? detail has no numbers out of 100, and shows Surface unscored for classic only', () => {
@@ -181,7 +183,7 @@ const checks: [string, () => void][] = [
     const onSnow = verdictIssuesFor(place(snowy(-10, -4)), 0, 'downhill', P, 'metric');
     assert.ok(!onSnow.includes('snow') && onSnow.includes('hours'), onSnow.join(','));
   }],
-  ['The Not right? email names the day; diagnostics add the factors and the forecast', () => {
+  ['The Not right? email names the day and what Why? lists; diagnostics add the factors and the forecast', () => {
     const p = place(bare(-2, 6));
     const mail = (on: boolean) => buildFeedbackMail({
       kind: 'score', place: p, forecasts: [{} as never], includeDiagnostics: on, diagnostics: diagnostics(),
@@ -189,7 +191,10 @@ const checks: [string, () => void][] = [
     });
     const on = mail(true), off = mail(false);
     assert.ok(on.subject.includes(`Not right — ${p.shortName}, downhill`), on.subject);
-    for (const m of [on, off]) assert.match(m.body, /Verdict shown: 0 /);
+    for (const m of [on, off]) {
+      assert.match(m.body, /Score shown: 0 /);
+      assert.ok(m.body.includes(`Holding it back: ${strings.why.caps.bare.title}`), m.body);
+    }
     assert.match(on.body, /Behind the score: /);
     assert.ok(on.attachment, 'the forecast is attached');
     assert.doesNotMatch(off.body, /Behind the score|Diagnostics/);

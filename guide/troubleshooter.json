@@ -4,7 +4,7 @@
     "start": {
       "q": "What's going on?",
       "options": [
-        { "label": "A score or verdict looks wrong", "next": "score" },
+        { "label": "A score looks wrong", "next": "score" },
         { "label": "A place shows no forecast, or an old one", "next": "forecast" },
         { "label": "I can't find a place, or it's listed wrong", "next": "place" },
         { "label": "Webcams: none, the wrong one, or a blank picture", "next": "webcam" },

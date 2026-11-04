@@ -256,26 +256,36 @@ replaced a bar of 0–100 per factor plus an hour-by-hour grid, which were hard 
 factor got the same room whether it cost the score nothing or everything, an empty bar (the worst)
 looked like no data, the same "no snow" read red for new snow and green for snow falling, and the
 snowpack ceiling looked like one bar among nine. `why()` in `src/lib/scoring.ts` builds it; the
-card is `DayBreakdown`. From the top:
+detail is `DayBreakdown`. From the top:
 
 * **A banner** while snowpack ("Snowpack: thin" / "Snowpack: bare") or deep new snow is holding
   the whole score down: amber, or red when bare. On bare ground the rest is only "The weather".
 * **"Holding it back":** each factor said as what is wrong ("Windier than you like") with its
-  value, and a dot, red when the factor scores in the Skip it band, amber otherwise. The rows are
-  what the sentence under the dial talks about, case by case as `verdict()` decides it: every
-  severe factor when it says "Three things…" (so the count always matches), nothing on a day it
-  calls excellent, only the factor it names on a really good day ("The only note: …"), and
-  otherwise the severe factors plus the one it names.
+  value, and a dot, red when the factor scores in the Skip it band, amber otherwise, the
+  costliest first. Nothing on a day from `TUNING.excellentFrom` (90); only the costliest factor
+  on the rest of an Excellent day; otherwise the costliest, then every other factor below
+  `TUNING.limiters.severeBelow`. A ceiling is a banner, never a row.
 * **"Otherwise fine":** every other factor in a few words, on one line ("−4°C · no rain · 80%
   cloud"); "Nothing holding it back" when the list is empty.
 * For classic and skate, "Surface (not scored): Firm → Slushy" at the foot.
 
+**There is no sentence under the dial (removed Nov 2026, owner's call).** It used to name the
+costliest factor ("Soft call today: …") or count them ("Three things are working against it
+today"), which either repeated the list or said nothing without it, and on bare ground repeated
+the banner. In its place, "Why? ›" sits under the dial and opens the detail inside the answer
+card (`DayAnswer`), under a divider. The card's foot is the forecast age, and **"Not right? ›"
+appears across from it only while the detail is open**, in the same small bold link style as
+Why?, so the skier reads the reasons before reporting the score (owner's call). On the Forecast
+detail the age moved into that row too, and the five-day comparison sits alone under the divider
+below it. The open state is shared by every screen and lasts until the app is closed; it starts closed each launch (owner's call: the reason is one tap
+away, and the hope is that tuning makes the score trusted on its own). The same change went
+through the "Not right?" sheet and email, the website demo (which shows the detail, always
+open) and the guide, which lost its "The sentence under the dial" page.
+
 **Factors are ranked by the points they cost, not by the emptiest sub-score** (Nov 2026, owner's
 call): a factor's weight times what it is short of 100, scaled by the ceilings; a ceiling costs
-what it takes off the blend (`costs()`). The verdict names the costliest, so the sentence and the
-list always agree. Before, the verdict named the emptiest bar, so a dry spell (3-day snowfall at
-0, lightly weighted) was named over a lack of new snow that cost twice the points. When the
-verdict counts "N things", it still counts factors below `TUNING.limiters.severeBelow`, unchanged.
+what it takes off the blend (`costs()`). Before, the emptiest bar was named first, so a dry spell
+(3-day snowfall at 0, lightly weighted) led over a lack of new snow that cost twice the points.
 The card shows no numbers and no bars, so the weights stay private. VoiceOver reads each row and
 the line as one item. The full rows with each factor's 0–100 (`breakdown()`) now live only in the
 "Not right?" email's diagnostics. The hour-by-hour grid is gone: the strip under the answer, with
@@ -308,8 +318,7 @@ clear-night frosts. Crust costs points by how warm the thaw got. **Slush scores 
 and never a refreeze over the three days — and so does bare ground, where there is no snow to
 freeze or thaw (owner's call, Oct 2026: both have no firm surface, so the factor scores 0 like
 Snowpack's). That overlaps the Temperature factor on warm days, knowingly: a warm, snowy day loses
-the factor's weight (skate 16 points, classic 11, downhill 6, snowshoe 5), and the verdict names
-it as "expect slush". In the Why? detail, "Crust from a thaw" or "Slush" shows the low and high
+the factor's weight (skate 16 points, classic 11, downhill 6, snowshoe 5). In the Why? detail, "Crust from a thaw" or "Slush" shows the low and high
 over the three days; otherwise the line says "no crust" or "light crust". Rain followed
 by a refreeze ices the surface without any melt, which the rain factor counts. The order of melt
 and refreeze is not checked: the surface model below is meant to replace this factor for classic
@@ -374,8 +383,7 @@ Oct 2026; the full design is `docs/snowpace-webcams-feature-handoff.md`, and the
   around. Decided Oct 2026 to build on that basis; if Windy objects or limits the key, the toggle
   defaults off or the feature comes out.
 * **Layout:** one camera as a compact row on Today and the place screen (the shared
-  `PlaceToday`), after the hour strip and before "Why? ›" — straight under the answer on bare
-  ground, where it can show snowmaking the snowpack model cannot see. Not on the Forecast detail.
+  `PlaceToday`), after the hour strip — straight under the answer on bare ground, where it can show snowmaking the snowpack model cannot see. Not on the Forecast detail.
   Other candidates sit behind "Other cameras ›", which is also the user's override.
 * **Which camera:** the user's pick (persisted per place in the settings table, key
   `webcam:<place key>`) always wins; otherwise the nearby search (5 km nordic, 10 km downhill)
@@ -513,12 +521,13 @@ The about/credits screen must include:
 
 Feedback is email the user sends from their own Mail app (`expo-mail-composer`); Snowpace never
 sends anything itself. There are two ways in. Help → Send feedback (`src/app/feedback.tsx`) is
-for bugs, ideas and anything else. **"Not right? ›"** at the foot of every answer card (Today,
-the place screen, the Forecast detail; added Oct 2026) opens a sheet (`src/app/verdict/[id].tsx`)
-where the user taps what is off. Its email names the place, day and verdict above the divider,
+for bugs, ideas and anything else. **"Not right? ›"** at the foot of every answer card, shown while Why? is open (Today,
+the place screen, the Forecast detail; added Oct 2026), opens a sheet (`src/app/verdict/[id].tsx`)
+where the user taps what is off. Its email names the place, day and score above the divider, with
+what Why? lists for it ("Holding it back: Snowpack: thin · Warmer than you like (−2°C)"),
 because that is what the report is about. With diagnostics on, it adds every factor with its
 value and 0–100 (more than the Why? card shows), the usual diagnostics and the forecast attachment. The email is built from the
-same `shownAnswer()` the card uses, so it describes exactly what was on screen. The diagnostics
+same `shownAnswer()` and `why()` the card uses, so it describes exactly what was on screen. The diagnostics
 switch stays on both screens, because the privacy policy promises the user chooses. When either
 email's contents change, update the policy's "Feedback you send" section and its date.
 

@@ -24,7 +24,7 @@ Snowpace asks for your location to show how far away each place is and to list s
 
 ## 5. Check Today
 
-**{{ui.tabs.today}}** shows your home hill: the score, the best hours, and the reason in a sentence. Tap **{{ui.why.show}}** to see what's behind it, or **{{ui.verdictFeedback.title}}** if it doesn't match the day. [Today](/guide/today/) gives the full tour.
+**{{ui.tabs.today}}** shows your home hill: the score and the best hours. Tap **{{ui.why.show}}** under the dial to see what's holding the score back, If it doesn't match the day, **{{ui.verdictFeedback.title}}** then appears at the foot of the answer. [Today](/guide/today/) gives the full tour.
 
 ## Each time you open Snowpace
 

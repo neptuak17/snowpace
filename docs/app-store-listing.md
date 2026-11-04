@@ -24,7 +24,7 @@ Collected"; Weather first, Sports second; manual release after approval.
 
 Can be changed at any time without a new build, so it can follow the season.
 
-    Downhill, classic, skate or snowshoe: Snowpace reads the mountain forecast for the places you go and tells you, in one sentence, whether today is worth it.
+    Downhill, classic, skate or snowshoe: Snowpace reads the mountain forecast for the places you go and tells you, with a score out of 100, whether today is worth it.
 
 ## Keywords (100)
 
@@ -45,7 +45,7 @@ resorts' names, which Apple rejects.
 
     THE ANSWER, AND WHY
     • Today, hour by hour, with the best three hours in a row marked
-    • The reason in a sentence, and every factor behind the score one tap away
+    • What's holding the score back, in plain words, one tap away
     • Five days ahead for every place you save
     • On a poor day at your home hill, places nearby that score better
     • A recent daylight webcam picture, where a place has one
