@@ -18,7 +18,7 @@ Everything Snowpace knows about you is stored on your phone and nowhere else: yo
 | OpenSkiData | {{hosts.openSkiData}} | Nothing beyond the request itself | At most once every {{policy.inventoryRefreshDays}} days |
 | windy.com | {{hosts.windy}} | The location of the place you're looking at, or the number of a camera chosen for it | Once each time you open the app, and on Refresh; only while webcams are on |
 
-None of these requests includes your location or anything about you. Each one names the app and links to its source code, so the people running those services can get in touch. Like any request on the internet, it reaches the service with your IP address; Snowpace adds nothing to that.
+None of these requests includes your location or anything about you. Each one names the app and links to the Snowpace website, so the people running those services can get in touch. Like any request on the internet, it reaches the service with your IP address; Snowpace adds nothing to that.
 
 ## Your location
 
