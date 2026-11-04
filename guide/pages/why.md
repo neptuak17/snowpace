@@ -1,35 +1,50 @@
 ---
 title: The Why? detail
-description: Every row behind a score, what its value means, and how to read the bars.
+description: What's holding a score back, in words, and how to read the detail under the answer.
 ---
-Tap **{{ui.why.show}}** under any answer to open **{{ui.why.kicker}}**. Each row is one factor: its name, the day's value, and a bar showing how that factor scored for your activity, from empty (0) to full (100), coloured like the score bands. **{{ui.why.hide}}** closes it, and Snowpace remembers which way you left it.
+Tap **{{ui.why.show}}** under any answer to see what's behind the score. **{{ui.why.hide}}** closes it, and Snowpace remembers which way you left it.
 
-## The rows
+## Holding it back
 
-| Row | Its value | What it measures |
-| --- | --- | --- |
-| {{ui.breakdown.snowpack}} | {{ui.coverage.bare}}, {{ui.coverage.thin}} or {{ui.coverage.enough}} | Whether there's enough snow. Listed first when it's holding the score down. [More](/guide/snowpack-and-deep-snow/) |
-| {{ui.breakdown.deepSnow}} | New snow in 24 hours | Skate and classic only, and only while a big snowfall is holding the score down. Listed first. [More](/guide/snowpack-and-deep-snow/#deep-new-snow) |
-| {{ui.breakdown.temp}} | Daytime average | Against your ideal temperature. |
-| {{ui.breakdown.newSnow}} | Snow since yesterday | Against the amount you want, or will put up with. |
-| {{ui.breakdown.threeDay}} | Total over three days | A stand-in for coverage and how fresh the surface is. |
-| {{ui.breakdown.freezeThaw}} | Low to high over three days | Crust or slush. [More](/guide/freeze-thaw/) |
-| {{ui.breakdown.wind}} | Daytime average | Against your wind limit. |
-| {{ui.breakdown.rain}} | Rain today, "{{ui.format.mmLater}}", rain over three days ("3 d"), or "{{ui.format.mmNone}}" | Always a cost; "· ice" if it refroze. [More](/guide/rain-and-ice/) |
-| {{ui.breakdown.snowFalling}} | Millimetres during the day | Against your setting for snow while you're out. |
-| {{ui.breakdown.cloud}} | Daytime average | The light: flat or bright. |
-| {{ui.breakdown.surface}} | A word, such as "Firm → Slushy" | Classic and skate only. No bar: it isn't part of the score. [More](/guide/surface/) |
+**{{ui.why.holding}}** lists what's pulling the score down, each said as what's wrong ("{{ui.why.rows.windy}}") with the day's value beside it. They're the things the sentence under the dial talks about, and the one costing the score most comes first:
 
-"Daytime" means the same hours as the hour strip, {{derived.hourStrip.from}} to {{derived.hourStrip.to}}.
+- When the sentence names one thing, that thing leads the list. Anything else that's well off today follows it.
+- When the sentence says "Three things are working against it today", the list is those three.
+- On a day the sentence calls excellent, nothing is listed.
 
-## Reading the bars
+The dot beside each is red when that factor is bad today, and amber when it's more of a knock.
 
-- **A full bar means that factor costs nothing today.** It doesn't mean everything is perfect: freeze–thaw is full when there's no crust, whatever else the weather did.
-- **The emptiest bars matter most.** The sentence under the dial names the emptiest one.
-- **Snowpack and deep new snow hold the whole score down.** An empty Snowpack bar means a score of 0, even when every other bar is full.
+## Otherwise fine
 
-With VoiceOver, each row is read as one item with its score out of 100.
+Everything else goes on one line under **{{ui.why.otherwise}}**, a few words each: the temperature, new snow, wind, rain and so on. None of it is costing the score much. When nothing is holding the day back, the line is headed **{{ui.why.nothing}}**.
 
-## Hour by hour
+## Snowpack and deep new snow
 
-For today, the detail ends with the hours. See [Best hours and the hour strip](/guide/best-hours/#hour-by-hour-in-the-detail).
+These two hold the whole score down, so when either is doing that, a banner leads the detail:
+
+- **{{ui.why.caps.bare.title}}:** the score is 0 whatever the weather. Below it is just **{{ui.why.weather}}**, for what it's worth.
+- **{{ui.why.caps.thin.title}}:** the score is held down, but not to 0.
+- **{{ui.breakdown.deepSnow}}:** skate and classic only, after a big snowfall.
+
+See [Snowpack and deep new snow](/guide/snowpack-and-deep-snow/).
+
+## Surface, for classic and skate
+
+The detail ends with **{{ui.breakdown.surface}}**, a word for what the weather is likely doing to the snow surface. It isn't part of the score yet. See [The Surface row](/guide/surface/).
+
+## The words in the list
+
+| What it says | The factor |
+| --- | --- |
+| {{ui.why.rows.colder}}, {{ui.why.rows.warmer}} | Temperature, against your ideal |
+| {{ui.why.rows.notMuchNew}}, {{ui.why.rows.tooMuchNew}} | New snow since yesterday, against the amount you want, or will put up with |
+| {{ui.why.rows.little3d}} | Snowfall over three days: a stand-in for how fresh the surface is |
+| {{ui.why.rows.crust}}, {{ui.why.rows.slush}} | [Freeze–thaw](/guide/freeze-thaw/), with the low and high over three days |
+| {{ui.why.rows.windy}} | Wind, against your limit |
+| {{ui.why.rows.rain}}, {{ui.why.rows.rainRecent}}, {{ui.why.rows.rainIced}} | [Rain](/guide/rain-and-ice/), today or over three days |
+| {{ui.why.rows.fallOnTrack}}, {{ui.why.rows.fallTooMuch}}, {{ui.why.rows.fallNotMuch}} | Snow falling during the day, in millimetres of water, against your setting |
+| {{ui.why.rows.flatLight}} | Cloud cover |
+
+Temperature, wind and cloud are daytime averages, over the same hours as the hour strip, {{derived.hourStrip.from}} to {{derived.hourStrip.to}}.
+
+With VoiceOver, each item in the list is read as one, and so is the line under it.

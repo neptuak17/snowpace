@@ -190,15 +190,10 @@ export const TUNING = {
     windowHours: 3,
   },
 
-  // ── Hour-by-hour rows. The rain sub-score is calibrated on
-  // daily totals and reads light against one hour's mm (see the retune note
-  // in CLAUDE.md), so drizzle would show green; any hour with
-  // rain above `rain.floorMm` shows as the worst band instead.
-  grid: { rainCell: 0 },
-
   // ── Limiters: the factors holding a score down. A factor below
-  // `severeBelow` is severe; with `pluralFrom` or more the verdict says how
-  // many rather than naming one, and a severe snowpack leads the breakdown.
+  // `severeBelow` is severe, and the Why? detail lists it; with `pluralFrom`
+  // or more the verdict says how many rather than naming one, and a severe
+  // snowpack leads the email's "Behind the score" line.
   limiters: {
     severeBelow: 55,
     pluralFrom: 3,

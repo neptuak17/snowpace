@@ -127,7 +127,7 @@ const samples = SAMPLES.map((s) => {
     });
     return [act, {
       score: sc, band: band(sc).key, word: band(sc).word, best: g ? windowLabel(g) : null,
-      bands: g ? g.rows[0].cells.map((v) => band(v).key) : null, window: g?.window ?? null,
+      bands: g ? g.cells.map((v) => band(v).key) : null, window: g?.window ?? null,
       metric: text('metric'), imperial: text('imperial'),
     }];
   }));

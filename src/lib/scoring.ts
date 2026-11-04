@@ -303,30 +303,12 @@ export function realHour(l: Place, h: number): Wx | null {
   return { t: real.t, snow: day.snow, wind: real.wind, cloud: real.cloud, precip: real.precip, rain: real.rain };
 }
 
-/** A row of the hour grid: the overall score, or one condition that changes through the day. */
-export type GridRowKey = 'all' | 't' | 'w' | 'precip' | 'light' | 'sky';
-
-/**
- * The condition rows under "Overall", per activity. Only factors that vary
- * hour to hour get a row; new snow, the 3-day base, freeze–thaw and snowpack
- * are daily and would be a row of one colour. Cloud earns a row where it
- * carries weight: flat light on a hill, the view on snowshoes.
- */
-const GRID_ROWS: Record<ActivityKey, GridRowKey[]> = {
-  downhill: ['all', 't', 'w', 'precip', 'light'],
-  snowshoe: ['all', 't', 'w', 'precip', 'sky'],
-  classic: ['all', 't', 'w', 'precip'],
-  skate: ['all', 't', 'w', 'precip'],
-};
-
-/** Null where the hour's forecast is missing — shown blank, never estimated. */
-export type GridRow = { key: GridRowKey; cells: (number | null)[] };
-
 export type HourGrid = {
   hours: readonly number[];
   /** The real weather per hour, for captions; null where missing. */
   wx: (Wx | null)[];
-  rows: GridRow[];
+  /** Each hour's score; null where the hour's forecast is missing — shown blank, never estimated. */
+  cells: (number | null)[];
   /** The best run of `windowHours` hours, as indexes into `hours`; null when no hour scores above 0. */
   window: { from: number; to: number } | null;
 };
@@ -335,21 +317,8 @@ export type HourGrid = {
 export function hourGrid(l: Place, act: ActivityKey, prefs: PrefsByAct): HourGrid | null {
   if (!l.acts.includes(act) || !canScore(l, 0)) return null;
   const wx = HOURS.map((h) => realHour(l, h));
-  const subsAt = wx.map((d) => (d ? subsFor(l, 0, act, prefs, d) : null));
-  const cell = (key: GridRowKey, i: number): number | null => {
-    const d = wx[i], x = subsAt[i];
-    if (!d || !x) return null;
-    if (key === 'all') return blend(x, act);
-    if (key === 't') return x.t;
-    if (key === 'w') return x.w;
-    if (key === 'light' || key === 'sky') return x.c;
-    // Snow or rain falling this hour. The rain sub-score also reads the
-    // previous days and the rest of today, which belong to the day, not the hour.
-    const rain = d.rain > T.rain.floorMm ? T.grid.rainCell : 100;
-    return Math.min(rain, fallSub(d, prefs[act], act));
-  };
-  const rows = GRID_ROWS[act].map((key) => ({ key, cells: HOURS.map((_, i) => cell(key, i)) }));
-  return { hours: HOURS, wx, rows, window: bestRun(rows[0].cells) };
+  const cells = wx.map((d) => (d ? blend(subsFor(l, 0, act, prefs, d), act) : null));
+  return { hours: HOURS, wx, cells, window: bestRun(cells) };
 }
 
 // The best-scoring run of consecutive known hours. A day with nothing above
@@ -371,7 +340,7 @@ export function hourLine(g: HourGrid, h: number, units: Units): string {
   const t = strings.hourGrid;
   const i = g.hours.indexOf(h);
   const wx = i >= 0 ? g.wx[i] : null;
-  const v = i >= 0 ? g.rows[0].cells[i] : null;
+  const v = i >= 0 ? g.cells[i] : null;
   // It leads the line, so "noon" is capitalised.
   const hour = hourLabel(h).replace(/^./, (c) => c.toUpperCase());
   if (!wx || v === null) return t.line([hour, t.noForecast]);
@@ -421,12 +390,29 @@ export function band(s: number | null): Band {
   return { key, word: strings.bands[key] };
 }
 
-// How many factors are severely holding the day down. A day with several
-// gets a plural verdict rather than one named reason; the breakdown carries
-// the detail.
-function severeCount(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct): number {
-  const x = subsFor(l, di, act, prefs);
-  return FACTOR_KEYS.filter((k) => x[k] < T.limiters.severeBelow).length;
+// The factors severely holding the day down. A day with several gets a
+// plural verdict rather than one named reason, and the Why? detail lists
+// exactly those.
+function severeKeys(x: Subs): FactorKey[] {
+  return FACTOR_KEYS.filter((k) => x[k] < T.limiters.severeBelow);
+}
+
+/**
+ * The points each factor takes off the day's score, the costliest first.
+ * A blend factor costs its weight times what it is short of 100, scaled by
+ * the ceilings; a ceiling costs what it takes off the blend. Together they
+ * make up 100 minus the score, before rounding. The verdict and the Why?
+ * detail both rank by this, so the factor the sentence names leads the list.
+ */
+function costs(x: Subs, act: ActivityKey): { k: FactorKey; cost: number }[] {
+  const g = T.weights[act];
+  const weighted = BLEND_KEYS.reduce((sum, k) => sum + g[k] * x[k], 0);
+  const ceilings = (x.cov * x.deep) / 10000;
+  return [
+    ...BLEND_KEYS.map((k) => ({ k, cost: g[k] * (100 - x[k]) * ceilings })),
+    { k: 'cov' as const, cost: weighted * (1 - x.cov / 100) },
+    { k: 'deep' as const, cost: weighted * (x.cov / 100) * (1 - x.deep / 100) },
+  ].sort((a, b) => b.cost - a.cost);
 }
 
 export function fmtRain(r: Rain): string {
@@ -459,26 +445,62 @@ export function rainNote(l: Place, di: number, day?: Wx): string {
   return strings.rain.movingIn;
 }
 
-function weakest(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units, day?: Wx) {
-  const d = day || dayAt(l, di), p = prefs[act];
+/**
+ * Each factor of a day in words, for when it is holding the day back: the
+ * phrase the verdict splices in (`note`), and the Why? row's `label` and
+ * `value`. `fine` is the factor in a few words for when it is not.
+ */
+type Said = { note: string; label: string; value: string; fine: string };
+
+function sayFactors(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units): Record<FactorKey, Said> {
+  const d = dayAt(l, di), p = prefs[act];
   const x = subsFor(l, di, act, prefs, d);
-  const w = strings.weakest;
+  const w = strings.weakest, r = strings.why.rows, f = strings.why.fine;
   const onHill = isHill(act);
-  const snowNote = onHill ? w.notMuchFresh : d.snow < p.snow ? w.nothingNew : w.tooMuchUnpacked;
+  const total3 = snow72(l, di);
+  const ft = freezeThaw(l, di);
+  const rain = rainSub(l, di, d);
+  const fallMm = snowFallingMm(d);
+  const mm = (v: number) => strings.format.mm(v.toFixed(1));
+  const rainy = (v: number) => v > T.rain.floorMm;
   // On a hill, falling snow scores lower both when there is too little and when there is too much.
-  const fallNote = !onHill ? w.snowingOnTrack : snowFallingMm(d) > hillFallMm(p) ? w.tooMuchFalling : w.notMuchFalling;
-  const items = [
-    { k: 't', v: x.t, note: d.t < p.temp ? w.colder : w.warmer },
-    { k: 's', v: x.s, note: snowNote },
-    { k: 'base', v: x.base, note: baseNote(snow72(l, di), units) },
-    { k: 'ft', v: x.ft, note: freezeThaw(l, di).slush ? w.slush : w.crust },
-    { k: 'w', v: x.w, note: w.wind },
-    { k: 'pr', v: x.pr, note: rainNote(l, di, d) },
-    { k: 'fall', v: x.fall, note: fallNote },
-    { k: 'c', v: x.c, note: w.flatLight },
-    { k: 'cov', v: x.cov, note: x.cov <= 0 ? w.bareGround : w.thinSnowpack },
-  ];
-  return items.sort((a, b) => a.v - b.v)[0];
+  const tooMuchFall = onHill && fallMm > hillFallMm(p);
+  const fewNew = onHill || d.snow < p.snow;
+  const rainRow = rainy(rain.nowMm)
+    ? { label: r.rain, value: mm(rain.nowMm), fine: f.rain(mm(rain.nowMm)) }
+    : rain.prior.iced
+      ? { label: r.rainIced, value: mm(rain.prior.mm), fine: f.rainIced(mm(rain.prior.mm)) }
+      : rainy(rain.prior.mm)
+        ? { label: r.rainRecent, value: mm(rain.prior.mm), fine: f.rainRecent(mm(rain.prior.mm)) }
+        : { label: r.rain, value: strings.format.mmNone, fine: f.noRain };
+  return {
+    t: { note: d.t < p.temp ? w.colder : w.warmer, label: d.t < p.temp ? r.colder : r.warmer, value: fmtT(d.t, units), fine: fmtT(d.t, units) },
+    s: {
+      note: onHill ? w.notMuchFresh : fewNew ? w.nothingNew : w.tooMuchUnpacked,
+      label: fewNew ? r.notMuchNew : r.tooMuchNew,
+      value: fmtS(d.snow, units),
+      fine: f.newSnow(fmtS(d.snow, units)),
+    },
+    base: { note: baseNote(total3, units), label: r.little3d, value: fmtS(total3, units), fine: f.threeDay(fmtS(total3, units)) },
+    ft: {
+      note: ft.slush ? w.slush : w.crust,
+      label: ft.slush ? r.slush : r.crust,
+      value: strings.breakdown.freezeThawRange(fmtT(ft.minLo, units), fmtT(ft.maxHi, units)),
+      fine: ft.hit ? f.lightCrust : f.noCrust,
+    },
+    w: { note: w.wind, label: r.windy, value: fmtW(d.wind, units), fine: f.wind(fmtW(d.wind, units)) },
+    pr: { note: rainNote(l, di, d), ...rainRow },
+    fall: {
+      note: !onHill ? w.snowingOnTrack : tooMuchFall ? w.tooMuchFalling : w.notMuchFalling,
+      label: !onHill ? r.fallOnTrack : tooMuchFall ? r.fallTooMuch : r.fallNotMuch,
+      value: mm(fallMm),
+      fine: rainy(fallMm) ? f.falling(mm(fallMm)) : f.noFalling,
+    },
+    c: { note: w.flatLight, label: r.flatLight, value: f.cloud(d.cloud), fine: f.cloud(d.cloud) },
+    // The ceilings are shown as banners (see why()), so only their notes are read.
+    cov: { note: x.cov <= 0 ? w.bareGround : w.thinSnowpack, label: '', value: '', fine: '' },
+    deep: { note: w.tooMuchUnpacked, label: '', value: '', fine: '' },
+  };
 }
 
 export function verdict(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units): string {
@@ -488,9 +510,10 @@ export function verdict(l: Place, di: number, act: ActivityKey, prefs: PrefsByAc
   if (s === null) return v.noForecast;
   // Bare ground makes every other factor moot, so say that rather than counting them.
   if (coverageSub(l, di, act) <= 0) return v.bareGround;
-  const severe = severeCount(l, di, act, prefs);
+  const x = subsFor(l, di, act, prefs);
+  const severe = severeKeys(x).length;
   if (severe >= T.limiters.pluralFrom) return v.manyThings(v.countWords[Math.min(8, severe)]);
-  const w = weakest(l, di, act, prefs, units).note;
+  const w = sayFactors(l, di, act, prefs, units)[costs(x, act)[0].k].note;
   if (s >= T.verdictExcellent) return v.excellent;
   switch (band(s).key) {
     case 'hi': return v.great(w);
@@ -525,19 +548,17 @@ export function snowHint(act: ActivityKey, want: number, units: Units): string {
 }
 
 /**
- * A breakdown row. `info` rows carry no score — they are shown for context
- * and drawn without a bar (the surface model, while in shadow mode).
+ * A row of the breakdown: the factor, its value, and its 0–100. `info` rows
+ * carry no score (the surface model, while in shadow mode).
  */
-/** A row of the breakdown: the factor, its value, and its 0–100 as a bar (none when `info`). */
 export type Factor = { label: string; value: string; v: number; info?: boolean };
 
 /**
- * The breakdown card ("Behind the score"): a row per factor, its value and its
- * bar, and no explanation under it; Help explains the factors (owner's call,
- * Oct 2026: too much to read). The two ceilings get rows of their own:
- * snowpack when the forecast models a depth, and deep new snow while it is
- * capping a skate or classic score. Either leads when it is what is holding
- * the score down, so the reader is not scrolling past green bars to find it.
+ * Every factor of a day with its value and 0–100, for the "Behind the score"
+ * line of a "Not right?" email with diagnostics: the detail the Why? card
+ * leaves out. The two ceilings get rows of their own: snowpack when the
+ * forecast models a depth, and deep new snow while it is capping a skate or
+ * classic score. Either leads when it is what is holding the score down.
  */
 export function breakdown(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units): Factor[] {
   const day = dayAt(l, di);
@@ -564,9 +585,71 @@ export function breakdown(l: Place, di: number, act: ActivityKey, prefs: PrefsBy
   ];
 }
 
-/** The shadow-mode surface row, for nordic activities only. Never scored, so no bar. */
+/** The shadow-mode surface row, for nordic activities only. Never scored. */
 function surfaceRow(l: Place, di: number, act: ActivityKey): Factor[] {
   if (!showsSurface(act)) return [];
   const b = strings.breakdown;
   return [{ label: b.surface, value: daySurfaceText(l.surface, dayAt(l, di).date) ?? strings.common.dash, v: 0, info: true }];
+}
+
+/** A ceiling holding the whole score down, shown as a banner above the rest. */
+export type WhyCap = { key: 'cov' | 'deep'; title: string; text: string; bare: boolean };
+/** A factor holding the day back: what is wrong, its value, and its 0–100 (for the dot's colour). */
+export type WhyRow = { key: FactorKey; label: string; value: string; v: number };
+
+export type Why = {
+  caps: WhyCap[];
+  /** The costliest first, so the verdict's named factor leads. */
+  holding: WhyRow[];
+  /** The other factors in a few words each ("−4°C", "no rain"); on bare ground, just the weather. */
+  rest: string[];
+  bare: boolean;
+  /** "Surface (not scored): Firm → Slushy", classic and skate only. */
+  surface: string | null;
+};
+
+/**
+ * The Why? detail: what is holding the day's score back, in words, and the
+ * rest in one line (owner's call, Nov 2026: the bars of 0–100 were hard to
+ * read and gave equal room to factors that cost nothing). No numbers and no
+ * bars, so how the score is weighed stays private.
+ *
+ * Snowpack and deep new snow lead as banners while either holds the score
+ * down; on bare ground nothing else counts, so the rest is just the weather.
+ * Otherwise the rows are what the sentence under the dial talks about,
+ * ranked by the points they cost, as the sentence ranks them.
+ */
+export function why(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, units: Units): Why | null {
+  const s = score(l, di, act, prefs);
+  if (s === null) return null;
+  const x = subsFor(l, di, act, prefs);
+  const said = sayFactors(l, di, act, prefs, units);
+  const w = strings.why;
+  const bare = x.cov <= 0;
+  const caps: WhyCap[] = [];
+  if (hasDepth(l, di) && x.cov < 100) caps.push({ key: 'cov', ...(bare ? w.caps.bare : w.caps.thin), bare });
+  if (!bare && x.deep < 100) caps.push({ key: 'deep', ...w.caps.deep(fmtS(dayAt(l, di).snow, units)), bare: false });
+  const surface = showsSurface(act) ? `${strings.breakdown.surface}: ${daySurfaceText(l.surface, dayAt(l, di).date) ?? strings.common.dash}` : null;
+  if (bare) {
+    const weather: BlendKey[] = ['t', 's', 'w', 'pr', 'fall', 'c'];
+    return { caps, holding: [], rest: weather.map((k) => said[k].fine), bare, surface };
+  }
+  // The rows follow the sentence, case by case as verdict() decides it: every
+  // severe factor when it counts them, nothing on a day it calls excellent,
+  // only the factor it names on a really good one ("The only note: …"), and
+  // otherwise the severe factors and the one it names.
+  const severe = severeKeys(x);
+  const ranked = costs(x, act);
+  const named = ranked[0].k;
+  const shown = new Set<FactorKey>(
+    severe.length >= T.limiters.pluralFrom ? severe
+      : s >= T.verdictExcellent ? []
+        : band(s).key === 'hi' ? [named]
+          : [...severe, named],
+  );
+  const holding = ranked
+    .filter(({ k }) => shown.has(k) && k !== 'cov' && k !== 'deep')
+    .map(({ k }) => ({ key: k, label: said[k].label, value: said[k].value, v: x[k] }));
+  const rest = BLEND_KEYS.filter((k) => !shown.has(k)).map((k) => said[k].fine);
+  return { caps, holding, rest, bare, surface };
 }

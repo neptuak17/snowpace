@@ -18,4 +18,4 @@ A dash ({{ui.common.dash}}) means there's nothing to score: no forecast for that
 
 ## What goes into it
 
-Eight weather factors, judged for your activity and your settings, and the snowpack. [How scores work](/guide/how-scores-work/) explains what each one is, and **{{ui.why.show}}** under any answer shows how each factor scored that day.
+Eight weather factors, judged for your activity and your settings, and the snowpack. [How scores work](/guide/how-scores-work/) explains what each one is, and **{{ui.why.show}}** under any answer shows which of them are holding that day back.

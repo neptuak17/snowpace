@@ -26,7 +26,7 @@ No amount of sunshine makes up for no snow, so the snowpack holds the whole scor
 
 ## 5. The score, and its sentence
 
-What comes out is the score, shown with its [band](/guide/the-score/) and [the sentence](/guide/the-verdict/) naming what's holding the day back most. **{{ui.why.show}}** shows how each factor did that day.
+What comes out is the score, shown with its [band](/guide/the-score/) and [the sentence](/guide/the-verdict/) naming what's holding the day back most. **{{ui.why.show}}** lists what's holding it back that day.
 
 ## See it in action
 

@@ -19,7 +19,7 @@ import assert from 'node:assert/strict';
 // Lets Node load the app's TypeScript; see app-loader.mts.
 import './app-loader.mts';
 
-const { breakdown, DEFAULT_PREFS, freezeThaw, rainPrior, score, shownAnswer, subsFor, verdict } = await import('../src/lib/scoring.ts');
+const { breakdown, DEFAULT_PREFS, freezeThaw, rainPrior, score, shownAnswer, subsFor, verdict, why } = await import('../src/lib/scoring.ts');
 const { localDate, placeFromArea } = await import('../src/data/places.ts');
 const { buildFeedbackMail, verdictIssuesFor } = await import('../src/lib/diagnostics.ts');
 const { strings } = await import('../src/strings.ts');
@@ -68,6 +68,7 @@ const snowy = (lo: number, hi: number): Weather => (_d, hr) => ({ t: diurnal(lo,
 const bare = (lo: number, hi: number): Weather => (_d, hr) => ({ t: diurnal(lo, hi, hr), depth: 0 });
 const ft = (p: Place, act: Act = 'downhill') => subsFor(p, 0, act, P).ft;
 const row = (p: Place, act: Act, label: string) => breakdown(p, 0, act, P, 'metric').find((r) => r.label === label);
+const whyOf = (p: Place, act: Act) => why(p, 0, act, P, 'metric')!;
 
 // ── The checks ─────────────────────────────────────────────────────────────
 
@@ -111,21 +112,49 @@ const checks: [string, () => void][] = [
     assert.equal(a.grid, null);
     assert.equal(a.best, null);
   }],
-  ['A big snowfall holds skate down more than classic, and leads the Why rows', () => {
+  ['A big snowfall holds skate down more than classic, and leads the Why? detail', () => {
     const p = place((d, hr) => ({ t: -8, depth: 1, snow: d === 0 && hr < 12 ? 2 : 0 }));
     const skate = subsFor(p, 0, 'skate', P).deep, classic = subsFor(p, 0, 'classic', P).deep;
     assert.ok(skate < classic && classic < 100, `skate ${skate}, classic ${classic}`);
-    assert.equal(breakdown(p, 0, 'skate', P, 'metric')[0].label, strings.breakdown.deepSnow);
+    assert.equal(whyOf(p, 'skate').caps[0]?.key, 'deep');
+    assert.equal(breakdown(p, 0, 'skate', P, 'metric')[0].label, strings.breakdown.deepSnow, 'and leads the email\'s rows');
     assert.equal(subsFor(p, 0, 'downhill', P).deep, 100, 'downhill has no deep-snow cap');
   }],
+  ['On bare ground the Why? detail is the snowpack and the weather, nothing else', () => {
+    const w = whyOf(place(bare(-2, 6)), 'downhill');
+    assert.ok(w.bare && w.caps.length === 1 && w.caps[0].bare, JSON.stringify(w.caps));
+    assert.equal(w.holding.length, 0);
+    assert.ok(w.rest.length > 0, 'the weather is still shown');
+  }],
 
-  // The Why rows (CLAUDE.md: The "Why?" detail is rows only)
-  ['Why rows carry no explanations, and Surface is shown unscored', () => {
-    const rows = breakdown(place(snowy(-10, -4)), 0, 'classic', P, 'metric');
-    for (const r of rows) assert.ok(!('note' in r), `${r.label} has a note`);
-    const last = rows[rows.length - 1];
-    assert.equal(last.label, strings.breakdown.surface);
-    assert.equal(last.info, true);
+  // The Why? detail (CLAUDE.md: The "Why?" detail says what is holding the score back)
+  ['The verdict names the factor costing the most points, not the emptiest, and it leads the Why? rows', () => {
+    // Cold and dry: no snow in three days scores 0 but weighs little; no new snow scores more but weighs more.
+    const p = place(snowy(-10, -4));
+    const x = subsFor(p, 0, 'downhill', P);
+    assert.ok(x.base < x.s, `3-day ${x.base}, new snow ${x.s}: the scenario needs 3-day to be the emptiest`);
+    assert.ok(verdict(p, 0, 'downhill', P, 'metric').includes(strings.weakest.notMuchFresh));
+    assert.deepEqual(whyOf(p, 'downhill').holding.map((r) => r.key), ['s', 'base']);
+  }],
+  ['A "Three things" verdict lists exactly those things', () => {
+    const p = place(snowy(1, 8));
+    for (const act of ACTS) {
+      const w = whyOf(p, act);
+      const things = w.holding.length + w.caps.filter((c) => c.key === 'cov').length;
+      assert.equal(verdict(p, 0, act, P, 'metric'), strings.verdict.manyThings(strings.verdict.countWords[things]), act);
+    }
+  }],
+  ['Nothing is holding back a day the verdict calls excellent', () => {
+    const p = place(snowy(-10, -4));
+    assert.equal(verdict(p, 0, 'skate', P, 'metric'), strings.verdict.excellent);
+    assert.equal(whyOf(p, 'skate').holding.length, 0);
+  }],
+  ['The Why? detail has no numbers out of 100, and shows Surface unscored for classic only', () => {
+    const p = place(snowy(-10, -4));
+    const classic = whyOf(p, 'classic');
+    assert.ok(classic.surface?.startsWith(strings.breakdown.surface), String(classic.surface));
+    assert.equal(whyOf(p, 'downhill').surface, null);
+    for (const r of classic.holding) assert.doesNotMatch(r.value, /out of|\/ ?100/);
   }],
   ['Every score stays between 0 and 100', () => {
     for (const w of [snowy(-12, -3), snowy(-5, 2), snowy(1, 8), bare(-2, 6)]) {

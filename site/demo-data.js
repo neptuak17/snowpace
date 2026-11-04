@@ -119,7 +119,7 @@ window.SNOWPACE_DEMO = {
       "to": 5
      },
      "metric": {
-      "verdict": "Worth it if you are keen — it is snowing on the track.",
+      "verdict": "Worth it if you are keen — there is more unpacked snow than you might want to push through.",
       "facts": "-7°C · wind 8 km/h · 22.2 cm new",
       "lines": [
        "7 AM · Fair 68 · -11°C · wind 8 km/h · snow 0.4 mm",
@@ -136,7 +136,7 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Worth it if you are keen — it is snowing on the track.",
+      "verdict": "Worth it if you are keen — there is more unpacked snow than you might want to push through.",
       "facts": "19°F · wind 5 mph · 8.7\" new",
       "lines": [
        "7 AM · Fair 68 · 13°F · wind 5 mph · snow 0.4 mm",
@@ -582,7 +582,7 @@ window.SNOWPACE_DEMO = {
       "to": 6
      },
      "metric": {
-      "verdict": "Worth it if you are keen — the last three days have been dry.",
+      "verdict": "Worth it if you are keen — there is not much fresh snow to play in.",
       "facts": "-11°C · wind 6 km/h · 0 cm new",
       "lines": [
        "7 AM · Fair 63 · -15°C · wind 6 km/h",
@@ -599,7 +599,7 @@ window.SNOWPACE_DEMO = {
       ]
      },
      "imperial": {
-      "verdict": "Worth it if you are keen — the last three days have been dry.",
+      "verdict": "Worth it if you are keen — there is not much fresh snow to play in.",
       "facts": "12°F · wind 4 mph · 0.0\" new",
       "lines": [
        "7 AM · Fair 63 · 5°F · wind 4 mph",

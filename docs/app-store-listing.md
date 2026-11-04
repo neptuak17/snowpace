@@ -118,7 +118,7 @@ captions, taken once there is real snow.
 Shot list (up to 10; the first three show in search results):
 
 1. Today on a good day: the answer card, score and best hours
-2. "Why?" open: the factor rows
+2. "Why?" open: what's holding the day back
 3. Forecast: five days for several places
 4. My places, ranked for one activity
 5. The You tab: activities and preferences

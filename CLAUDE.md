@@ -243,19 +243,43 @@ estimate, not a measurement, and is interpolated to the requested coordinates.
 The weighted blend of the eight factors is multiplied by a 0–1 coverage figure from the day's
 modelled depth (`TUNING.coverage`: zero below 15 cm / full from 60 cm for downhill, 5 cm / 30 cm
 for nordic and snowshoe), so a bluebird day on bare ground scores 0 rather than "Fair". A day with
-no modelled depth gets no ceiling. The depth itself is **not shown** — the UI says only Bare /
-Thin / Enough — because the model does not know about snowmaking or grooming. Thresholds are
+no modelled depth gets no ceiling. The depth itself is **not shown** — the UI says only Bare or
+Thin — because the model does not know about snowmaking or grooming. Thresholds are
 guesses pending winter data. On bare ground the answer card still shows the day's conditions and
-"Why? ›" (Oct 2026, at the owner's call: the card looked empty), with the Snowpack row leading the
-detail. Only the hour strip is left out, since every hour scores 0. That the depth is modelled and
-blind to snowmaking is said once, in the guide (and the website's "How it decides"), not on the card.
+"Why? ›" (Oct 2026, at the owner's call: the card looked empty), with a "Snowpack: bare" banner
+leading the detail and the day's weather in one line under it. Only the hour strip is left out,
+since every hour scores 0. That the depth is modelled and blind to snowmaking is said once, in the
+guide (and the website's "How it decides"), not on the card.
 
-**The "Why?" detail is rows only (Oct 2026, owner's call: too much to read).** Each row is the
-factor, its value and its 0–100 bar, with no explanation under it; anything that needs explaining
-goes in the guide (see Guide below). What a note used to carry lives in the row itself: rain that refroze
-reads "10.1 mm, 3 d · ice", the deep-snow cap is a row of its own, and the shadow-mode surface row
-is labelled "Surface (not scored)". VoiceOver reads each row with its score ("Temperature, 3°C,
-18 out of 100"), since a bar says nothing to a screen reader.
+**The "Why?" detail says what is holding the score back, in words (Nov 2026, owner's call).** It
+replaced a bar of 0–100 per factor plus an hour-by-hour grid, which were hard to read: every
+factor got the same room whether it cost the score nothing or everything, an empty bar (the worst)
+looked like no data, the same "no snow" read red for new snow and green for snow falling, and the
+snowpack ceiling looked like one bar among nine. `why()` in `src/lib/scoring.ts` builds it; the
+card is `DayBreakdown`. From the top:
+
+* **A banner** while snowpack ("Snowpack: thin" / "Snowpack: bare") or deep new snow is holding
+  the whole score down: amber, or red when bare. On bare ground the rest is only "The weather".
+* **"Holding it back":** each factor said as what is wrong ("Windier than you like") with its
+  value, and a dot, red when the factor scores in the Skip it band, amber otherwise. The rows are
+  what the sentence under the dial talks about, case by case as `verdict()` decides it: every
+  severe factor when it says "Three things…" (so the count always matches), nothing on a day it
+  calls excellent, only the factor it names on a really good day ("The only note: …"), and
+  otherwise the severe factors plus the one it names.
+* **"Otherwise fine":** every other factor in a few words, on one line ("−4°C · no rain · 80%
+  cloud"); "Nothing holding it back" when the list is empty.
+* For classic and skate, "Surface (not scored): Firm → Slushy" at the foot.
+
+**Factors are ranked by the points they cost, not by the emptiest sub-score** (Nov 2026, owner's
+call): a factor's weight times what it is short of 100, scaled by the ceilings; a ceiling costs
+what it takes off the blend (`costs()`). The verdict names the costliest, so the sentence and the
+list always agree. Before, the verdict named the emptiest bar, so a dry spell (3-day snowfall at
+0, lightly weighted) was named over a lack of new snow that cost twice the points. When the
+verdict counts "N things", it still counts factors below `TUNING.limiters.severeBelow`, unchanged.
+The card shows no numbers and no bars, so the weights stay private. VoiceOver reads each row and
+the line as one item. The full rows with each factor's 0–100 (`breakdown()`) now live only in the
+"Not right?" email's diagnostics. The hour-by-hour grid is gone: the strip under the answer, with
+tap-for-detail, covers it.
 
 **Deep new snow caps skate and classic the same way (Oct 2026).** The weighted blend let a calm,
 cold day after 20 cm of new snow score Good for skate, because new snow and snow falling, both at
@@ -265,9 +289,9 @@ later, so that day now reads Poor. Classic got a gentler cap the next day, at th
 that set tracks fill in while it snows: from 8 cm down to 0.8 twenty cm later, which takes the
 same day from Good 75 to Fair 64 and leaves days without much snow untouched. Raising classic's
 weight on falling snow was tried and rejected: it lifted every snow-free day, and rain on snow
-went from Poor to Fair. When a cap bites, a "Deep new snow" row with the cap as its bar leads the
-Why breakdown, as Snowpack does for coverage. Thresholds are guesses; the surface model below is
-meant to replace both caps.
+went from Poor to Fair. When a cap bites, a "Deep new snow" banner leads the Why? detail, as
+Snowpack does for coverage. Thresholds are guesses; the surface model below is meant to replace
+both caps.
 
 
 ### Freeze–thaw
@@ -282,10 +306,11 @@ cm. The refreeze is any hour below −1 °C. All three days come from the hourly
 the two days before today were once estimated as their daytime mean ± 3 °C, which missed
 clear-night frosts. Crust costs points by how warm the thaw got. **Slush scores 0** — a real melt
 and never a refreeze over the three days — and so does bare ground, where there is no snow to
-freeze or thaw (owner's call, Oct 2026: both have no firm surface, so the bar is empty like
+freeze or thaw (owner's call, Oct 2026: both have no firm surface, so the factor scores 0 like
 Snowpack's). That overlaps the Temperature factor on warm days, knowingly: a warm, snowy day loses
 the factor's weight (skate 16 points, classic 11, downhill 6, snowshoe 5), and the verdict names
-it as "expect slush". The Why row's value is the low and high over the three days. Rain followed
+it as "expect slush". In the Why? detail, "Crust from a thaw" or "Slush" shows the low and high
+over the three days; otherwise the line says "no crust" or "light crust". Rain followed
 by a refreeze ices the surface without any melt, which the rain factor counts. The order of melt
 and refreeze is not checked: the surface model below is meant to replace this factor for classic
 and skate.
@@ -294,7 +319,7 @@ and skate.
 
 `src/lib/surface.ts` estimates what the weather is doing to the snow surface, hour by hour, and
 names it: **Fresh, Soft, Packed, Firm, Icy or Slushy**. Added Oct 2026, in **shadow mode**: shown
-for classic and skate (a row labelled "Surface (not scored)" in the "Why?" detail on Today, the
+for classic and skate (a line labelled "Surface (not scored)" in the "Why?" detail on Today, the
 place screen and the Forecast detail, explained in the guide, and a line in the feedback
 diagnostics), but **never part of the score** and never coloured — a colour is a verdict. Do not promote it into the score until its calls have been compared with real winter days.
 
@@ -491,8 +516,8 @@ sends anything itself. There are two ways in. Help → Send feedback (`src/app/f
 for bugs, ideas and anything else. **"Not right? ›"** at the foot of every answer card (Today,
 the place screen, the Forecast detail; added Oct 2026) opens a sheet (`src/app/verdict/[id].tsx`)
 where the user taps what is off. Its email names the place, day and verdict above the divider,
-because that is what the report is about. With diagnostics on, it adds the Why rows with each
-factor's 0–100, the usual diagnostics and the forecast attachment. The email is built from the
+because that is what the report is about. With diagnostics on, it adds every factor with its
+value and 0–100 (more than the Why? card shows), the usual diagnostics and the forecast attachment. The email is built from the
 same `shownAnswer()` the card uses, so it describes exactly what was on screen. The diagnostics
 switch stays on both screens, because the privacy policy promises the user chooses. When either
 email's contents change, update the policy's "Feedback you send" section and its date.
@@ -667,8 +692,8 @@ The owner's working agreements, for any session, on the owner's PC or in the clo
 
 - `npm run check` type-checks the app (`tsc --noEmit -p .`) and runs `scripts/check.mts`:
   made-up weather put through the real scoring code, asserting the behaviour decided above
-  (crust and slush, bare ground, deep snow, the "Why?" rows, the "Not right?" email). Run it
-  after any change to scoring, tuning, the "Why?" rows or feedback; add a check when you fix a
+  (crust and slush, bare ground, deep snow, the "Why?" detail, the "Not right?" email). Run it
+  after any change to scoring, tuning, the "Why?" detail or feedback; add a check when you fix a
   bug it would have caught, or when a decision changes what the app should do.
 - `npm run build-guide` and `npm run build-site-demo` build the website's generated parts; both
   stop on a problem. `scripts/app-loader.mts` is what lets Node run the app's TypeScript for

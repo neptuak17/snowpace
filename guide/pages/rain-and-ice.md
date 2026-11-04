@@ -10,15 +10,15 @@ Rain is bad for every activity, so there's no setting for it: any rain lowers th
 - **Rain forecast for later today** matters too.
 - **Rain in the last three days** matters less the longer ago it fell.
 
-The **{{ui.breakdown.rain}}** row shows the one that matters most: today's rain in millimetres, then rain over the last three days ("10.1 mm, 3 d"), then "{{ui.format.mmLater}}" for rain due later today, or "{{ui.format.mmNone}}". The bar counts all of them.
+When rain is holding the day back, **{{ui.why.show}}** lists it as "{{ui.why.rows.rain}}" with today's millimetres, or "{{ui.why.rows.rainRecent}}" with their total. Otherwise it's in the line underneath: "{{ui.why.fine.noRain}}", or the amount.
 
 ## Rain that refroze
 
-When rain in the last three days is followed by a frost, the wet surface freezes into ice, which is worse than wet snow. The value gains "· ice", and the sentence may say "{{ui.rain.refroze}}".
+When rain in the last three days is followed by a frost, the wet surface freezes into ice, which is worse than wet snow. **{{ui.why.show}}** says "{{ui.why.rows.rainIced}}", or "refrozen" in the line underneath, and the sentence may say "{{ui.rain.refroze}}".
 
 ## In the hour strip
 
-An hour with any rain shows as the worst colour, because even light rain spoils snow.
+Each hour's score counts the rain falling in that hour, and rain still to come later in the day.
 
 ## Snow falling is different
 

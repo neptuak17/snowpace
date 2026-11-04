@@ -2,7 +2,7 @@
 title: A score looks wrong
 description: The usual reasons a score doesn't match the day, and how to tell which one it is.
 ---
-Start with **{{ui.why.show}}** under the answer: the emptiest bar is usually the reason, and the sentence under the dial names it.
+Start with **{{ui.why.show}}** under the answer: **{{ui.why.holding}}** lists what's pulling the score down, the biggest first, and the sentence under the dial names it.
 
 ## Check these first
 

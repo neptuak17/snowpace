@@ -370,26 +370,68 @@ export const strings = {
     failed: 'Could not reach windy.com. Try again later.',
   },
 
-  // The detail behind a day's score, opened from the answer.
+  // The detail behind a day's score, opened from the answer: what is holding
+  // it back, in words, and the rest in one line. No numbers, no bars.
   why: {
     show: 'Why? ›',
     hide: 'Hide the detail ›',
-    kicker: 'Behind the score',
-    hours: 'Hour by hour',
-    // What VoiceOver reads for a row: "Temperature, 3°C, 18 out of 100".
-    rowLabel: (label: string, value: string, v: number | null) => (v === null ? `${label}, ${value}` : `${label}, ${value}, ${v} out of 100`),
+    holding: 'Holding it back',
+    // Heads the rest when something is holding the day back, and when nothing is.
+    otherwise: 'Otherwise fine',
+    nothing: 'Nothing holding it back',
+    // Heads the rest on bare ground, where none of it counts.
+    weather: 'The weather',
+    // The ceilings, as banners above the rest.
+    caps: {
+      bare: { title: 'Snowpack: bare', text: 'Not enough snow on the ground, so the score is 0 whatever the weather.' },
+      thin: { title: 'Snowpack: thin', text: 'Not much snow on the ground, which holds the whole score down.' },
+      deep: (s: string) => ({ title: `Deep new snow: ${s}`, text: 'This much fresh snow holds the whole score down.' }),
+    },
+    // A factor holding the day back, said as what is wrong with it.
+    rows: {
+      colder: 'Colder than you like',
+      warmer: 'Warmer than you like',
+      notMuchNew: 'Not much new snow',
+      tooMuchNew: 'More new snow than you like',
+      little3d: 'Little snow in 3 days',
+      crust: 'Crust from a thaw',
+      slush: 'Slush',
+      windy: 'Windier than you like',
+      rain: 'Rain',
+      rainIced: 'Rain that refroze',
+      rainRecent: 'Rain in the last 3 days',
+      fallOnTrack: 'Snow falling on the track',
+      fallTooMuch: 'More snow falling than you like',
+      fallNotMuch: 'Not much snow falling',
+      flatLight: 'Flat light',
+    },
+    // The other factors, a few words each: "−4°C · no rain · 80% cloud".
+    fine: {
+      newSnow: (s: string) => `${s} new`,
+      threeDay: (s: string) => `${s} in 3 days`,
+      noCrust: 'no crust',
+      lightCrust: 'light crust',
+      wind: (w: string) => `wind ${w}`,
+      noRain: 'no rain',
+      rain: (mm: string) => `${mm} rain`,
+      rainRecent: (mm: string) => `${mm} rain in 3 days`,
+      rainIced: (mm: string) => `${mm} rain in 3 days, refrozen`,
+      falling: (mm: string) => `${mm} snow falling`,
+      noFalling: 'no snow falling',
+      cloud: (pct: number) => `${pct}% cloud`,
+    },
+    rest: (parts: string[]) => parts.join(' · '),
+    // What VoiceOver reads: "Windier than you like, 28 km/h"; "Otherwise fine: −4°C, no rain".
+    rowLabel: (label: string, value: string) => `${label}, ${value}`,
+    restLabel: (kicker: string, parts: string[]) => `${kicker}: ${parts.join(', ')}`,
   },
 
-  // Today's hours, under the answer, and the condition rows in the detail.
+  // Today's hours, under the answer.
   hourGrid: {
     title: 'Today, hour by hour',
-    rows: { all: 'Overall', t: 'Temp', w: 'Wind', precip: 'Snow/rain', light: 'Light', sky: 'Sky' },
-    // Spoken by VoiceOver for one hour of the Overall row.
+    // Spoken by VoiceOver for one hour of the strip.
     cellLabel: (hour: string, band: string, score: number | null) =>
       score === null ? `${hour}, no forecast` : `${hour}, ${band}, ${score}`,
-    // Spoken for a whole condition row: "Wind: Excellent 7 AM to 1 PM, Poor 2 PM to 5 PM".
-    rowLabel: (row: string, runs: string[]) => `${row}: ${runs.join(', ')}`,
-    rowRun: (band: string, from: string, to: string) => (from === to ? `${band} at ${from}` : `${band} ${from} to ${to}`),
     noForecast: 'no forecast',
     // The line under the strip for the tapped hour: "3 PM · Fair 62 · 2°C · wind 30 km/h".
     line: (parts: (string | null)[]) => parts.filter(Boolean).join(' · '),
@@ -399,8 +441,8 @@ export const strings = {
     snow: (mm: string) => `snow ${mm} mm`,
   },
 
-  // The rows of the breakdown card ("Behind the score"). No explanations
-  // under the rows: Help explains the factors.
+  // The factor names in a "Not right?" email's "Behind the score" line, with
+  // each factor's value and 0–100; the Why? card says it in words instead.
   breakdown: {
     temp: 'Temperature',
     newSnow: 'New snow, 24 h',
