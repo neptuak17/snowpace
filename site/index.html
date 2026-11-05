@@ -10,6 +10,9 @@
   - The support and privacy pages are support/index.html and
     privacy/index.html. The header and footer are repeated on all three
     pages, so a change to a footer link belongs in all three.
+  - The picture shown when a link to the site is shared is img/og.png.
+    It is made from scripts/og-image.html, which says how to remake it.
+    The og: tags pointing at it are repeated on every page too.
   - The sample days, the eight factors and the score bands are not
     written here. They come from the app itself, through
     demo-data.js. To change those, change the app and run
@@ -25,11 +28,15 @@
   <meta name="theme-color" content="#edf2f7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0b1626" media="(prefers-color-scheme: dark)">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Snowpace">
   <meta property="og:title" content="Snowpace: is it worth going out today?">
   <meta property="og:description" content="A score out of 100 for the places you ski and snowshoe, the best hours, and what's holding the day back.">
-  <meta property="og:image" content="https://snowpace.com/img/icon.png">
   <meta property="og:url" content="https://snowpace.com/">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="https://snowpace.com/img/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Snowpace: is it worth going out today? A sample day scoring 79, Good, best from noon to 3 PM.">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="img/icon.png">
   <link rel="apple-touch-icon" href="img/icon.png">
   <link rel="stylesheet" href="styles.css">

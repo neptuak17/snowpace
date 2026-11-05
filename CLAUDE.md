@@ -502,8 +502,6 @@ The about/credits screen must include:
 
 * **Noticed, not acted on (Oct 2026):**
   - "Snow falling" is measured over 24 hours; look at it again in the winter retune.
-  - The website's link-preview image is the square app icon; a wider one would show better
-    when the link is shared.
 
 * **Monetising: none planned (owner's call, Nov 2026).** Snowpace launches free and there are
   no plans to monetise it. Kept from the Oct 2026 discussion in case that changes: the simplest
@@ -576,6 +574,13 @@ four sports side by side, how the score is decided, features, privacy, and a foo
   never Windy (the Windy key must not reach the site, and no webcam image is republished there).
 * **Download button:** "Coming soon to the App Store" until the app is live; Apple's badge only
   once it is.
+* **Link previews (Nov 2026).** Every page, the guide's included, carries Open Graph tags
+  pointing at `site/img/og.png`, a 1200 × 630 picture of the site's top: wordmark, headline,
+  the four sports, a sample answer card (the demo's "Bluebird and cold" day for classic, 79
+  Good) and the ridges. Light version only, as an image cannot follow dark mode. Its source is
+  `scripts/og-image.html`, rendered by hand with headless Edge (the command is in that file);
+  it is not part of any build, and its card is a fixed snapshot, not engine output. Remake it if
+  the headline, the brand or the light-mode band colours change.
 * Preview by opening `site/index.html` in a browser, or with the `website` entry in
   `.claude/launch.json`. Test light and dark, and phone width.
 

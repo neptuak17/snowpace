@@ -1,0 +1,86 @@
+<!doctype html>
+<!--
+  The link-preview image: the picture Messages, Slack and social sites show
+  when a link to snowpace.com is shared. It is site/img/og.png, 1200 x 630,
+  and every page's og:image tag points at it (the three hand-written pages
+  and guide/template.html).
+
+  This page is its source. It is not published and not part of any build:
+  after changing it, render it again by hand and commit the new PNG. From
+  the repository root, in PowerShell, with the Edge that ships with Windows:
+
+    Start-Process -Wait "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" -ArgumentList "--headless=new","--hide-scrollbars","--force-device-scale-factor=1","--window-size=1200,630","--user-data-dir=$env:TEMP\og-edge","--screenshot=$PWD\site\img\og.png","file:///$($PWD -replace '\\','/')/scripts/og-image.html"
+
+  The card is a fixed snapshot of the website demo's "Bluebird and cold"
+  day for classic (79, Good, best 12-3 PM), not live engine output, so it
+  does not change when scoring does. Its colours are the light-mode tokens
+  in site/styles.css; if those change, change them here too.
+-->
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<title>Snowpace link-preview image</title>
+<style>
+@font-face { font-family: 'Caprasimo'; src: url('../site/fonts/Caprasimo-Regular.ttf'); }
+@font-face { font-family: 'Figtree'; src: url('../site/fonts/Figtree-Regular.ttf'); font-weight: 400; }
+@font-face { font-family: 'Figtree'; src: url('../site/fonts/Figtree-Bold.ttf'); font-weight: 700; }
+@font-face { font-family: 'Figtree'; src: url('../site/fonts/Figtree-ExtraBold.ttf'); font-weight: 800; }
+html, body { margin: 0; }
+body { width: 1200px; height: 630px; overflow: hidden; position: relative; background: #edf2f7; color: #0f2440; font-family: 'Figtree', sans-serif; }
+.ridge { position: absolute; left: 0; bottom: 0; width: 1200px; height: 128px; }
+.copy { position: absolute; left: 76px; top: 58px; width: 600px; }
+.brand { display: flex; align-items: center; gap: 16px; }
+.brand svg { width: 60px; height: 60px; border-radius: 16px; }
+.brand b { font-family: 'Caprasimo', serif; font-weight: 400; font-size: 40px; }
+h1 { font-family: 'Caprasimo', serif; font-weight: 400; font-size: 74px; line-height: 1.04; margin: 30px 0 20px; }
+.sub { font-size: 27px; line-height: 1.35; color: rgba(15, 36, 64, 0.75); }
+.card { position: absolute; left: 720px; top: 92px; width: 404px; box-sizing: border-box; padding: 30px 30px 26px; background: #fff; border-radius: 30px; box-shadow: 0 1px 2px rgba(30, 42, 58, 0.14), 0 14px 40px rgba(30, 42, 58, 0.14); }
+.ans { display: flex; align-items: center; gap: 22px; }
+.dial { position: relative; width: 132px; height: 132px; flex: none; }
+.dial svg { position: absolute; inset: 0; }
+.num { position: absolute; inset: 0; display: grid; place-items: center; font-family: 'Caprasimo', serif; font-size: 50px; color: #12704f; }
+.word { font-family: 'Caprasimo', serif; font-size: 40px; color: #12704f; line-height: 1; }
+.best { font-size: 20px; font-weight: 700; color: #2a6f97; margin-top: 8px; }
+.lab { font-size: 14px; font-weight: 800; letter-spacing: 0.08em; color: rgba(15, 36, 64, 0.7); margin: 28px 0 10px; }
+.cells { display: flex; gap: 4px; }
+.cells i { flex: 1; height: 34px; border-radius: 8px; }
+.go { background: #a3d9c3; }
+.hi { background: #62bd9c; }
+.hrs { display: flex; gap: 4px; margin-top: 7px; font-size: 13px; color: rgba(15, 36, 64, 0.7); }
+.hrs span { flex: 1; text-align: center; }
+.mark { display: flex; gap: 4px; margin-top: 4px; }
+.mark span { flex: 1; height: 4px; border-radius: 2px; }
+.mark .w { background: #2a6f97; }
+</style>
+</head>
+<body>
+<svg class="ridge" viewBox="0 0 1440 220" preserveAspectRatio="none" aria-hidden="true">
+  <path fill="#7a9cc0" d="M0 120C120 90 200 60 300 80C420 104 520 40 640 50C780 62 860 110 980 96C1100 82 1200 40 1320 58C1380 66 1420 80 1440 84V220H0Z"/>
+  <path fill="#1d2b3d" d="M0 170H90C150 150 200 120 240 95C300 60 330 10 380 4C430 10 480 90 560 118C610 132 650 70 700 58C760 70 820 140 900 150C980 158 1040 120 1100 112C1180 104 1260 150 1340 160C1390 166 1420 168 1440 168V220H0Z"/>
+</svg>
+<div class="copy">
+  <div class="brand">
+    <svg viewBox="0 0 1024 1024" aria-hidden="true"><rect width="1024" height="1024" fill="#eef3fa"/><rect y="424" width="1024" height="600" fill="#7a9cc0"/><path fill="#232d3a" d="M0 656H128C175 620 205 590 238 566C300 520 330 300 404 258C460 300 540 520 616 536C680 545 712 420 766 396C840 440 930 580 1024 606V1024H0Z"/></svg>
+    <b>Snowpace</b>
+  </div>
+  <h1>Is it worth going out today?</h1>
+  <div class="sub">Downhill, classic, skate and snowshoe</div>
+</div>
+<div class="card">
+  <div class="ans">
+    <div class="dial">
+      <svg viewBox="0 0 132 132" aria-hidden="true"><circle cx="66" cy="66" r="58" fill="none" stroke="#e9eef4" stroke-width="16"/><circle cx="66" cy="66" r="58" fill="none" stroke="#12704f" stroke-width="16" stroke-dasharray="287.9 364.4" transform="rotate(-90 66 66)"/></svg>
+      <div class="num">79</div>
+    </div>
+    <div>
+      <div class="word">Good</div>
+      <div class="best">Best 12–3 PM</div>
+    </div>
+  </div>
+  <div class="lab">TODAY, HOUR BY HOUR</div>
+  <div class="cells"><i class="go"></i><i class="go"></i><i class="go"></i><i class="hi"></i><i class="hi"></i><i class="hi"></i><i class="hi"></i><i class="hi"></i><i class="hi"></i><i class="hi"></i><i class="go"></i></div>
+  <div class="hrs"><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+  <div class="mark"><span></span><span></span><span></span><span></span><span></span><span class="w"></span><span class="w"></span><span class="w"></span><span></span><span></span><span></span></div>
+</div>
+</body>
+</html>
