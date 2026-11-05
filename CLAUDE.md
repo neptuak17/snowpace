@@ -678,9 +678,10 @@ Store Connect. Decided Oct 2026 (owner's calls):
 * **The winter retune is not a launch blocker**, but check the scores against a few real
   December days before submitting.
 
-Before launch: email Windy (free-tier use, how "never stretch" counts pixels); a courtesy note
-to OpenSkiData's maintainer about the coming traffic; a TestFlight pass (fresh install, offline,
-location refused, largest text, VoiceOver, dark mode). Once live: Apple's badge and an App Store
+Before launch: email Windy (free-tier use, how "never stretch" counts pixels); a TestFlight pass
+(fresh install, offline, location refused, largest text, VoiceOver, dark mode). Done Nov 2026:
+App Store Connect set up (listing, privacy label, age rating, manual release); a courtesy note
+sent to OpenSkiData's maintainer about the coming traffic. Once live: Apple's badge and an App Store
 link in place of "Coming soon" on all four page shells, a Smart App Banner meta tag, and the
 README.
 
