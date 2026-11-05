@@ -36,30 +36,30 @@ resorts' names, which Apple rejects.
 
 ## Description (4000)
 
-    Is it worth going out today?
+IS IT WORTH GOING OUT TODAY?
+Snowpace reads the mountain forecasts for the places you ski and gives each day a score out of 100 for your selected snow sports. It does the morning's homework for you: last week's snow and rain, today's temperature, wind and new snow, and what the snowpack is like. Then it sums it up in an easy to understand verdict you can read at a glance.
 
-    Snowpace reads the mountain forecast for the places you ski and gives each day a score out of 100 for the way you ski it: downhill, classic, skate or snowshoe. It does the morning's homework for you: last week's snow and rain, today's temperature, wind and new snow, and what the snowpack has been through. Then it sums it up in a verdict you can read at a glance.
+MADE FOR THE WAY YOU SKI
+A powder day that makes downhill skiing great will bog down a skate ski. Every place gets its own score for each activity, measured against your own preferences for temperature, wind and new snow.
 
-    MADE FOR THE WAY YOU SKI
-    A powder day that makes downhill great bogs down a skate ski. Every place gets its own score for each activity, measured against your own preferences for temperature, wind and new snow.
+THE ANSWER, AND WHY - SNOWPACE PROVIDES
+• Conditions today, hour by hour, with the best three hours in a row marked
+• The verdict and reason with every factor behind the score one tap away
+• A forecast for five days for every place you save
+• On a poor day at your selected home hill, places nearby that score better
+• A recent daylight webcam picture, where available
 
-    THE ANSWER, AND WHY
-    • Today, hour by hour, with the best three hours in a row marked
-    • What's holding the score back, in plain words, one tap away
-    • Five days ahead for every place you save
-    • On a poor day at your home hill, places nearby that score better
-    • A recent daylight webcam picture, where a place has one
+OVER 1,300 RESORTS AND SKI CENTRES ACROSS NORTH AMERICA
+Downhill resorts, nordic centres and snowshoe trails in Canada and the United States, from OpenStreetMap and Skimap.org. Search by name or town and save the places you visit.
 
-    OVER 1,300 PLACES ACROSS NORTH AMERICA
-    Downhill hills, nordic centres and snowshoe trails in Canada and the United States, from OpenStreetMap and Skimap.org. Search by name or town and save the places you go.
+PRIVATE BY DESIGN
+No account, no ads, no analytics, no tracking. Your places and settings stay on your phone. Location is optional: it only shows how far away each place is, and it never leaves your phone.
 
-    PRIVATE BY DESIGN
-    No account, no ads, no analytics, no tracking. Your places and settings stay on your phone. Location is optional: it only shows how far away each place is, and it never leaves your phone.
+SNOWPACE ONLY SCORES THE WEATHER
+It doesn't know whether lifts are running or trails are groomed, so every place includes a link to its operator's web site. Check it, and the avalanche forecast for the area, before you go.
 
-    SNOWPACE ONLY SCORES THE WEATHER
-    It doesn't know whether lifts are running or trails are groomed, so every place links to its operator's web site. Check it, and the avalanche forecast for the area, before you go.
+Weather data by Open-Meteo.com. Ski areas © OpenStreetMap contributors and Skimap.org, via OpenSkiData. Webcams provided by windy.com.
 
-    Free, with nothing to buy. Weather data by Open-Meteo.com. Ski areas © OpenStreetMap contributors and Skimap.org, via OpenSkiData. Webcams provided by windy.com.
 
 ## URLs
 
