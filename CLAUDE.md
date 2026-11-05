@@ -84,7 +84,7 @@ conservative:
   reach out rather than block: `Snowpace/1.0 (+https://snowpace.com/)`, defined once in
   `src/data/project.ts` and sent by every fetcher. It names the website rather than the GitHub
   repository (changed Oct 2026, before the App Store launch), because shipped builds keep it for
-  good and the repository may go private.
+  good and a website address outlives any change to where the code lives.
 - **Request gzip** (`Accept-Encoding`) and honour HTTP caching headers. Use a conditional request
   (`If-Modified-Since` / `If-None-Match`) so an unchanged file costs a 304 rather than 4.6 MB.
 
@@ -506,9 +506,10 @@ The about/credits screen must include:
   - The website's link-preview image is the square app icon; a wider one would show better
     when the link is shared.
 
-* **Monetising: discussed Oct 2026, not decided.** Snowpace launches free (owner's call, Oct
-  2026), so this waits until after launch. The simplest route is a one-off App Store
-  price: no code, and Apple keeps 15% under its Small Business Program. But any income at all
+* **Monetising: none planned (owner's call, Nov 2026).** Snowpace launches free and there are
+  no plans to monetise it. Kept from the Oct 2026 discussion in case that changes: the simplest
+  route is a one-off App Store price: no code, and Apple keeps 15% under its Small Business
+  Program. But any income at all
   ends Open-Meteo's free tier (a paid plan and `customer-api.open-meteo.com`, a monthly cost
   that grows with use), and Windy's free tier requires webcams not to sit behind a payment.
   Ads are ruled out by the hard constraints. A tip jar or a subscription needs an in-app
@@ -617,9 +618,8 @@ your settings, the activity and the snowpack shape the score; it never gives wei
 thresholds, penalties or formulas. The score bands and the default settings are fine: the app
 shows both. The same goes for the website's home page, which lists the factors without their
 weights, and `site/demo-data.js`, which no longer carries them. The code (`TUNING` included) is
-still public on GitHub; whether to make the repository private is an open question for the owner
-(GitHub Pages on a private repository needs a paid plan, and the Credits screen's "Source"
-link and the website footers point at it; the User-Agent no longer does).
+public on GitHub, and the repository stays public (owner's call, Nov 2026), so the Credits
+screen's "Source" link and the website footers keep pointing at it.
 
 **Explanations are hand-written, and kept current in the same commit.** When behaviour a user
 can see changes, update the guide pages that describe it alongside the code, as the privacy
@@ -680,8 +680,7 @@ Store Connect. Decided Oct 2026 (owner's calls):
 
 Before launch: email Windy (free-tier use, how "never stretch" counts pixels); a courtesy note
 to OpenSkiData's maintainer about the coming traffic; a TestFlight pass (fresh install, offline,
-location refused, largest text, VoiceOver, dark mode); drop "Source on GitHub" from Credits and
-the site footers if the repository is going private. Once live: Apple's badge and an App Store
+location refused, largest text, VoiceOver, dark mode). Once live: Apple's badge and an App Store
 link in place of "Coming soon" on all four page shells, a Smart App Banner meta tag, and the
 README.
 
