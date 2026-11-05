@@ -501,7 +501,6 @@ The about/credits screen must include:
   that case would fix it. Not built.
 
 * **Noticed, not acted on (Oct 2026):**
-  - The Good and Fair hour-cell colours look pale in light mode.
   - "Snow falling" is measured over 24 hours; look at it again in the winter retune.
   - The website's link-preview image is the square app icon; a wider one would show better
     when the link is shared.

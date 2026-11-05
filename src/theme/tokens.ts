@@ -84,12 +84,15 @@ const light: Theme = {
   tagAccent: { bg: ramps.accent[100], fg: ramps.accent[800] },
   tagNeutral: { bg: ramps.neutral[100], fg: ramps.neutral[800] },
   drag: { bg: ramps.accent2[200], fg: ramps.accent2[900] },
+  // Hour cells carry their band by colour alone, so on the white card each
+  // fill must stand clear of white and of Poor's grey (darkened Nov 2026:
+  // Good and Fair at the 100 stops read as nearly white).
   score: {
-    hi: { bg: ramps.success[300], fg: ramps.success[900] },
-    go: { bg: ramps.success[100], fg: ramps.success[800] },
-    fair: { bg: ramps.accent2[100], fg: ramps.accent2[800] },
+    hi: { bg: ramps.success[400], fg: ramps.success[900] },
+    go: { bg: ramps.success[300], fg: ramps.success[800] },
+    fair: { bg: ramps.accent2[300], fg: ramps.accent2[800] },
     poor: { bg: ramps.neutral[200], fg: ramps.neutral[800] },
-    skip: { bg: ramps.danger[100], fg: ramps.danger[800] },
+    skip: { bg: ramps.danger[300], fg: ramps.danger[800] },
     none: { bg: ramps.neutral[200], fg: ramps.neutral[700] },
   },
   ringFair: ramps.accent2[500],
