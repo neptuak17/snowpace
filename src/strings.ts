@@ -171,7 +171,7 @@ export const strings = {
     ] as const,
     // `id` is the engine's factor key; the website's factor list matches weights to rows by it.
     factors: [
-      { id: 's', k: 'New snow, 24 hours', v: 'how much has fallen since yesterday' },
+      { id: 's', k: 'New snow, 24 hours', v: 'what has fallen in the 24 hours up to midday' },
       { id: 'base', k: 'Snowfall, 3 days', v: 'a stand-in for coverage and how fresh the surface is' },
       { id: 'ft', k: 'Freeze–thaw', v: 'whether it melted and refroze into crust, or melted and stayed above freezing as slush' },
       { id: 't', k: 'Temperature', v: 'measured against the temperature you said you prefer' },
@@ -375,6 +375,7 @@ export const strings = {
 
   // The detail behind a day's score, opened inside the answer card: what is
   // holding it back, in words, and the rest in one line. No numbers, no bars.
+  // Snow falling is shown in cm an hour ("0.4 cm/h snow falling"), rain in mm.
   why: {
     show: 'Why? ›',
     hide: 'Hide the detail ›',
@@ -392,6 +393,7 @@ export const strings = {
       bare: { title: 'Snowpack: bare', text: 'Not enough snow on the ground, so the score is 0 whatever the weather.' },
       thin: { title: 'Snowpack: thin', text: 'Not much snow on the ground, which holds the whole score down.' },
       deep: (s: string) => ({ title: `Deep new snow: ${s}`, text: 'This much fresh snow holds the whole score down.' }),
+      rain: (mm: string) => ({ title: `Rain today: ${mm}`, text: 'Rain while you are out holds the whole score down.' }),
     },
     // A factor holding the day back, said as what is wrong with it.
     rows: {
@@ -444,7 +446,8 @@ export const strings = {
     scored: (band: string, score: number) => `${band} ${score}`,
     wind: (w: string) => `wind ${w}`,
     rain: (mm: string) => `rain ${mm} mm`,
-    snow: (mm: string) => `snow ${mm} mm`,
+    // The hour's snow, with its unit: "snow 0.6 cm".
+    snow: (amount: string) => `snow ${amount}`,
   },
 
   // The factor names in a "Not right?" email's "Behind the score" line, with
@@ -453,6 +456,7 @@ export const strings = {
     temp: 'Temperature',
     newSnow: 'New snow, 24 h',
     deepSnow: 'Deep new snow',
+    rainToday: 'Rain today',
     threeDay: 'Snowfall, 3 days',
     freezeThaw: 'Freeze–thaw',
     // The value is the low and high over the day and the two before it.

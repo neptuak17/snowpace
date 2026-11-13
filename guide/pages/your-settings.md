@@ -16,10 +16,14 @@ A light breeze costs nothing. As the wind picks up towards your limit the wind f
 
 ## New snow
 
+New snow is what fell in the 24 hours up to midday: overnight, and through the morning. Snow that comes later in the day is tomorrow's new snow.
+
 - **Downhill and snowshoeing** (**{{ui.snowPref.labelDownhill}}**, **{{ui.snowPref.labelSnowshoe}}**): more is better. The factor climbs to full as the day's new snow reaches your amount.
 - **Classic and skate** (**{{ui.snowPref.labelNordic}}**): your amount is the ideal. A little less is fine; much more is slow going in a set track or on a skate lane, and a big snowfall also [holds the score down](/guide/snowpack-and-deep-snow/#deep-new-snow).
 
 ## Snow falling
+
+This is the snow coming down while you're out, between {{derived.hourStrip.from}} and {{derived.hourStrip.to}}, measured by how fast it falls. Snow overnight or in the evening doesn't count here.
 
 - **Downhill and snowshoeing** (**{{ui.fall.labelOut}}**): snow coming down while you're out is a bonus. Your setting decides how much counts as too much.
 - **Classic and skate** (**{{ui.fall.labelTolerance}}**): snow filling the track is slow going. The higher your tolerance, the less it bothers the score.

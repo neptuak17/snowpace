@@ -18,15 +18,16 @@ The dot beside each is red when that factor is bad today, and amber when it's mo
 
 Everything else goes on one line under **{{ui.why.otherwise}}**, a few words each: the temperature, new snow, wind, rain and so on. None of it is costing the score much. When nothing is holding the day back, the line is headed **{{ui.why.nothing}}**.
 
-## Snowpack and deep new snow
+## Snowpack, deep new snow and rain today
 
-These two hold the whole score down, so when either is doing that, a banner leads the detail:
+These three hold the whole score down, so when one is doing that, a banner leads the detail:
 
 - **{{ui.why.caps.bare.title}}:** the score is 0 whatever the weather. Below it is just **{{ui.why.weather}}**, for what it's worth.
 - **{{ui.why.caps.thin.title}}:** the score is held down, but not to 0.
 - **{{ui.breakdown.deepSnow}}:** skate and classic only, after a big snowfall.
+- **{{ui.breakdown.rainToday}}:** rain while you're out, with the millimetres.
 
-See [Snowpack and deep new snow](/guide/snowpack-and-deep-snow/).
+See [Snowpack and deep new snow](/guide/snowpack-and-deep-snow/) and [Rain and ice](/guide/rain-and-ice/).
 
 ## Surface, for classic and skate
 
@@ -37,15 +38,15 @@ The detail ends with **{{ui.breakdown.surface}}**, a word for what the weather i
 | What it says | The factor |
 | --- | --- |
 | {{ui.why.rows.colder}}, {{ui.why.rows.warmer}} | Temperature, against your ideal |
-| {{ui.why.rows.notMuchNew}}, {{ui.why.rows.tooMuchNew}} | New snow since yesterday, against the amount you want, or will put up with |
+| {{ui.why.rows.notMuchNew}}, {{ui.why.rows.tooMuchNew}} | New snow in the 24 hours up to midday, against the amount you want, or will put up with |
 | {{ui.why.rows.little3d}} | Snowfall over three days: a stand-in for how fresh the surface is |
 | {{ui.why.rows.crust}}, {{ui.why.rows.slush}} | [Freeze–thaw](/guide/freeze-thaw/), with the low and high over three days |
 | {{ui.why.rows.windy}} | Wind, against your limit |
-| {{ui.why.rows.rain}}, {{ui.why.rows.rainRecent}}, {{ui.why.rows.rainIced}} | [Rain](/guide/rain-and-ice/), today or over three days |
-| {{ui.why.rows.fallOnTrack}}, {{ui.why.rows.fallTooMuch}}, {{ui.why.rows.fallNotMuch}} | Snow falling during the day, in millimetres of water, against your setting |
+| {{ui.why.rows.rain}}, {{ui.why.rows.rainRecent}}, {{ui.why.rows.rainIced}} | [Rain](/guide/rain-and-ice/): a trace today, or rain before the day's skiing, over three days. More than a trace while you're out is the banner above. |
+| {{ui.why.rows.fallOnTrack}}, {{ui.why.rows.fallTooMuch}}, {{ui.why.rows.fallNotMuch}} | Snow falling while you're out, in centimetres an hour, against your setting |
 | {{ui.why.rows.flatLight}} | Cloud cover |
 
-Temperature, wind and cloud are daytime averages, over the same hours as the hour strip, {{derived.hourStrip.from}} to {{derived.hourStrip.to}}.
+Temperature, wind, cloud and snow falling are daytime averages, over the same hours as the hour strip, {{derived.hourStrip.from}} to {{derived.hourStrip.to}}.
 
 With VoiceOver, each item in the list is read as one, and so is the line under it.
 

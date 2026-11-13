@@ -23,6 +23,7 @@ const OUT = join(ROOT, 'site', 'demo-data.js');
 
 
 const { band, dayFacts, DEFAULT_PREFS, hourGrid, hourLine, isBare, score, why, windowLabel } = await import('../src/lib/scoring.ts');
+const { SNOW_CM_PER_MM } = await import('../src/data/open-meteo.ts');
 const { ACTS, localDate, placeFromArea } = await import('../src/data/places.ts');
 const { TUNING } = await import('../src/lib/tuning.ts');
 const { strings } = await import('../src/strings.ts');
@@ -103,7 +104,8 @@ function samplePlace(s: (typeof SAMPLES)[number]) {
       const snow = h.snow ?? 0, rain = h.rain ?? 0;
       hours.push({
         time: `${dateAt(day)}T${String(hr).padStart(2, '0')}:00`,
-        t: round1(h.t), snow, rain, precip: snow + rain, wind: h.wind, gust: round1(h.wind * 1.5),
+        // Precipitation is in mm of water, as Open-Meteo gives it: 7 cm of snow to 10 mm.
+        t: round1(h.t), snow, rain, precip: snow / SNOW_CM_PER_MM + rain, wind: h.wind, gust: round1(h.wind * 1.5),
         cloud: h.cloud, depth: h.depth, sun: h.cloud > 80 ? 100 : 600,
       });
     }

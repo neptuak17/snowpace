@@ -23,6 +23,15 @@ export const HOURLY_VARS = [
 export const PAST_DAYS = 7;
 export const FORECAST_DAYS = 5;
 
+/**
+ * Open-Meteo's own conversion between its snowfall (cm) and the same snow as
+ * precipitation (mm of water): 7 cm to 10 mm, on every model. Checked against
+ * the live endpoint, Nov 2026 (0.70 on both gem_seamless and best_match).
+ * The engine measures falling snow in mm of water; this turns it into the cm
+ * a skier reads.
+ */
+export const SNOW_CM_PER_MM = 0.7;
+
 export type Model = 'gem_seamless' | 'best_match';
 
 /** Which elevation a series was requested at. */

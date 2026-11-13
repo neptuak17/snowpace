@@ -3,14 +3,16 @@
  * inventory record (OpenSkiData) plus its cached forecast (Open-Meteo).
  *
  * Daily figures are aggregated here from the hourly series. A day is only
- * present when every value the engine needs is present — a missing value
- * makes the day null, never zero.
+ * present when every value the engine needs is present, its look-back over
+ * the days before it included — a missing value makes the day null, never
+ * zero.
  */
 
 import { meanSeries, type Forecast, type HourWx } from '@/data/open-meteo';
 import type { SkiArea } from '@/data/openskidata';
 import { distanceKm, type LatLon } from '@/lib/geo';
 import { surfaceSeries, type SurfaceSeries } from '@/lib/surface';
+import { TUNING } from '@/lib/tuning';
 import { strings } from '@/strings';
 
 export type ActivityKey = 'classic' | 'skate' | 'snowshoe' | 'downhill';
@@ -25,7 +27,16 @@ export const ACTS: Activity[] = (['classic', 'skate', 'snowshoe', 'downhill'] as
 
 export const ACT_NOTES: Record<ActivityKey, string> = strings.activityNotes;
 
-/** One day as the engine sees it. Daytime (7–17) means for feel, 24 h sums for fall. */
+/**
+ * One day as the engine sees it. The ski day is the daytime hours (7–17, the
+ * hours of the hour strip): temperature, wind and cloud are means over it,
+ * and so are the snow and rain falling "while you are out". What had already
+ * fallen is counted up to the day, not through it, so snow due this evening
+ * is tomorrow's new snow, not today's (Nov 2026, owner's call).
+ *
+ * Every day carries its own look-back, read from the hourly series: the days
+ * ahead are judged by exactly the rule today is.
+ */
 export type DayWx = {
   /** Local date at the place, YYYY-MM-DD. */
   date: string;
@@ -36,29 +47,29 @@ export type DayWx = {
   lo: number;
   /** Degree-hours above 0 °C over the day (an hour at +2 °C is 2): how much the warmth could melt. */
   thawDegH: number;
-  /** New snow over the 24 h, cm. */
+  /** What freeze–thaw reads: the range, and the biggest melt, over this day and the two before it. */
+  thaw: { maxHi: number; minLo: number; meltDegH: number };
+  /** New snow, cm: what fell in the 24 hours up to midday (TUNING.day.newSnowToHour). */
   snow: number;
+  /** Snowfall over the 72 hours up to midday, cm. */
+  snow3d: number;
   /** Daytime mean wind, km/h. */
   wind: number;
   /** Daytime max gust, km/h. */
   gust: number;
   /** Daytime mean cloud cover, %. */
   cloud: number;
-  /** Precipitation over the 24 h, mm. */
-  precip: number;
-  /** Rain over the 24 h, mm. */
+  /** Snow falling while you are out: the daytime mean, mm of water an hour. */
+  fall: number;
+  /** Rain while you are out: the daytime mean, mm an hour. */
   rain: number;
+  /** The same rain as a total over the daytime hours, mm. */
+  rainMm: number;
+  /** Rain before the ski day, mm, in three 24-hour blocks, the latest first. */
+  rainBefore: [number, number, number];
   /** Modelled snow depth at midday, metres; null if the model has none. */
   depth: number | null;
 };
-
-/**
- * The three days before day 0, condensed to what the engine needs: snow and
- * rain totals, and the two days before today as measured for freeze–thaw.
- */
-export type Prior = { snow72: number; thaw: [ThawDay, ThawDay]; rain72: number };
-
-export type ThawDay = Pick<DayWx, 'hi' | 'lo' | 'thawDegH'>;
 
 export type Place = {
   /** Inventory key: osm:way/123, osm:relation/123 or skimap:123. */
@@ -84,8 +95,6 @@ export type Place = {
   forecastAt: string | null;
   /** Today and the next four days at the place; null entries are unscoreable. Empty with no forecast. */
   days: (DayWx | null)[];
-  /** The three days before today, or null if any is incomplete. */
-  prior: Prior | null;
   /** Today's hourly series at the place, when the forecast covers today. */
   hours: HourWx[] | null;
   /** Modelled surface firmness by local date and hour (shadow mode). Null with no forecast. */
@@ -155,9 +164,9 @@ export function placeFromArea(a: SkiArea, here: LatLon | null, forecasts: Foreca
 
 // ── Aggregation ──────────────────────────────────────────────────────────
 
-type Weather = Pick<Place, 'forecastAt' | 'days' | 'prior' | 'hours' | 'surface' | 'timezone'>;
+type Weather = Pick<Place, 'forecastAt' | 'days' | 'hours' | 'surface' | 'timezone'>;
 
-const NO_WEATHER: Weather = { forecastAt: null, days: [], prior: null, hours: null, surface: null, timezone: null };
+const NO_WEATHER: Weather = { forecastAt: null, days: [], hours: null, surface: null, timezone: null };
 
 /** Pick the series to score on: the midpoint, else the mean of base and summit. */
 function seriesOf(forecasts: Forecast[]): { hours: HourWx[]; fetchedAt: string; timezone: string } | null {
@@ -183,72 +192,130 @@ function weatherFrom(forecasts: Forecast[]): Weather {
   const today = localDate(s.timezone);
   const t0 = dates.indexOf(today);
   // The cache may predate today (offline for a day): then there is no "today" and nothing to score.
-  if (t0 < 0) return { forecastAt: s.fetchedAt, days: [], prior: null, hours: null, surface: null, timezone: s.timezone };
+  if (t0 < 0) return { forecastAt: s.fetchedAt, days: [], hours: null, surface: null, timezone: s.timezone };
 
-  const dayAt = (i: number): DayWx | null => (i >= 0 && i < dates.length ? aggregateDay(dates[i], byDate.get(dates[i]) ?? []) : null);
+  const series = seriesOfHours(s.hours);
+  const hoursOn = (i: number): HourWx[] => (i >= 0 && i < dates.length ? (byDate.get(dates[i]) ?? []) : []);
   const days: (DayWx | null)[] = [];
-  for (let i = 0; i < DAY_COUNT; i++) days.push(dayAt(t0 + i));
-
-  const p3 = dayAt(t0 - 3), p2 = dayAt(t0 - 2), p1 = dayAt(t0 - 1);
-  const prior: Prior | null =
-    p3 && p2 && p1
-      ? { snow72: round1(p3.snow + p2.snow + p1.snow), thaw: [thawDay(p2), thawDay(p1)], rain72: round1(p3.rain + p2.rain + p1.rain) }
-      : null;
+  for (let i = t0; i < t0 + DAY_COUNT; i++) {
+    days.push(series && i < dates.length ? aggregateDay(dates[i], series, hoursOn(i), [hoursOn(i - 1), hoursOn(i - 2)]) : null);
+  }
 
   // The surface model runs over the whole series, history included, so its
   // state has settled by the hours anyone looks at.
   return {
-    forecastAt: s.fetchedAt, days, prior, hours: byDate.get(today) ?? null, surface: surfaceSeries(s.hours), timezone: s.timezone,
+    forecastAt: s.fetchedAt, days, hours: byDate.get(today) ?? null, surface: surfaceSeries(s.hours), timezone: s.timezone,
   };
 }
 
 const DAY_START = 7, DAY_END = 17;
 
+/** The whole hourly series, with each hour's position by its time. */
+type Series = { hours: HourWx[]; at: Map<string, number> };
+
 /**
- * One day from its hours. Sums need every hour (a missing hour would silently
- * understate a snowfall); daytime means tolerate a few gaps.
+ * The look-back windows count hours back by position, which is only right
+ * when the series has one value an hour with none missing. Open-Meteo's
+ * always has; if a series ever does not, no day is scored from it rather
+ * than a window quietly covering the wrong hours.
  */
-function aggregateDay(date: string, hours: HourWx[]): DayWx | null {
-  if (hours.length < 24) return null;
-  const sum = (pick: (h: HourWx) => number | null): number | null => {
-    let total = 0;
-    for (const h of hours) {
-      const v = pick(h);
-      if (v === null) return null;
-      total += v;
-    }
-    return total;
-  };
-  const daytime = hours.filter((h) => { const hr = Number(h.time.slice(11, 13)); return hr >= DAY_START && hr <= DAY_END; });
+function seriesOfHours(hours: HourWx[]): Series | null {
+  const first = Number(hours[0].time.slice(11, 13));
+  for (let i = 0; i < hours.length; i++) {
+    if (Number(hours[i].time.slice(11, 13)) !== (first + i) % 24) return null;
+  }
+  return { hours, at: new Map(hours.map((h, i) => [h.time, i])) };
+}
+
+/**
+ * The total of one value over the `n` hours ending at position `end`. Null
+ * when the series does not reach that far back or an hour is missing: a
+ * missing hour would silently understate a snowfall.
+ */
+function sumBack(s: Series, end: number, n: number, pick: (h: HourWx) => number | null): number | null {
+  if (end - n + 1 < 0) return null;
+  let total = 0;
+  for (let i = end - n + 1; i <= end; i++) {
+    const v = pick(s.hours[i]);
+    if (typeof v !== 'number') return null;
+    total += v;
+  }
+  return total;
+}
+
+/** A day's high, low and degree-hours above freezing, or null with too few temperatures. */
+function tempStats(hours: HourWx[]): Pick<DayWx, 'hi' | 'lo' | 'thawDegH'> | null {
+  const all = hours.map((h) => h.t).filter((v): v is number => typeof v === 'number');
+  if (all.length < 20) return null;
+  return { hi: round1(Math.max(...all)), lo: round1(Math.min(...all)), thawDegH: round1(all.reduce((acc, v) => acc + Math.max(0, v), 0)) };
+}
+
+/**
+ * One day from the hourly series. `own` is the day's hours and `before` the
+ * two days before it, the latest first.
+ *
+ *   - Temperature, wind, cloud, and the snow and rain falling while you are
+ *     out: means over the daytime hours, which tolerate a few gaps.
+ *   - New snow: the 24 hours up to midday; three-day snowfall: the 72 hours
+ *     up to midday. Hours stamped after 12:00 belong to the next day.
+ *   - Rain before the ski day: three 24-hour blocks ending at the hour before
+ *     the daytime hours begin, so no hour is counted both as "before" and as
+ *     "while you are out".
+ *   - Freeze–thaw: the range and the biggest melt over three calendar days.
+ *
+ * An Open-Meteo value stamped 12:00 is the fall over the hour before it.
+ */
+function aggregateDay(date: string, s: Series, own: HourWx[], before: [HourWx[], HourWx[]]): DayWx | null {
+  if (own.length < 24) return null;
+  const hh = (h: number) => String(h).padStart(2, '0');
+  const midday = s.at.get(`${date}T${hh(TUNING.day.newSnowToHour)}:00`);
+  const dawn = s.at.get(`${date}T${hh(DAY_START - 1)}:00`);
+  if (midday === undefined || dawn === undefined) return null;
+
+  const daytime = own.filter((h) => { const hr = Number(h.time.slice(11, 13)); return hr >= DAY_START && hr <= DAY_END; });
   const mean = (pick: (h: HourWx) => number | null): number | null => {
-    const vals = daytime.map(pick).filter((v): v is number => v !== null);
+    const vals = daytime.map(pick).filter((v): v is number => typeof v === 'number');
     if (vals.length < daytime.length * 0.8) return null;
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   };
-  const allT = hours.map((h) => h.t).filter((v): v is number => v !== null);
 
   const t = mean((h) => h.t), wind = mean((h) => h.wind), cloud = mean((h) => h.cloud);
-  const snow = sum((h) => h.snow), precip = sum((h) => h.precip), rain = sum((h) => h.rain);
-  const gusts = daytime.map((h) => h.gust).filter((v): v is number => v !== null);
-  if (t === null || wind === null || cloud === null || snow === null || precip === null || rain === null || allT.length < 20) return null;
+  // Snow falling is whatever precipitation is not rain, as the engine has always counted it.
+  const fall = mean((h) => (typeof h.precip === 'number' && typeof h.rain === 'number' ? Math.max(0, h.precip - h.rain) : null));
+  const rain = mean((h) => h.rain);
+  const snow = sumBack(s, midday, 24, (h) => h.snow), snow3d = sumBack(s, midday, 72, (h) => h.snow);
+  const rainBefore = [0, 24, 48].map((ago) => sumBack(s, dawn - ago, 24, (h) => h.rain));
+  const temps = [own, ...before].map(tempStats);
+  const gusts = daytime.map((h) => h.gust).filter((v): v is number => typeof v === 'number');
+  if (t === null || wind === null || cloud === null || fall === null || rain === null || snow === null || snow3d === null) return null;
+  if (rainBefore.some((v) => v === null) || temps.some((v) => v === null)) return null;
+  const [r1, r2, r3] = rainBefore as number[];
+  const [mine, ...earlier] = temps as NonNullable<(typeof temps)[number]>[];
 
-  const noon = hours.find((h) => h.time.slice(11, 13) === '12');
+  const noon = own.find((h) => h.time.slice(11, 13) === '12');
   return {
     date,
-    t: round1(t), hi: round1(Math.max(...allT)), lo: round1(Math.min(...allT)),
-    thawDegH: round1(allT.reduce((acc, v) => acc + Math.max(0, v), 0)),
-    snow: round1(snow), wind: round1(wind), gust: gusts.length ? round1(Math.max(...gusts)) : round1(wind),
-    cloud: Math.round(cloud), precip: round1(precip), rain: round1(rain),
+    t: round1(t), ...mine,
+    thaw: {
+      maxHi: Math.max(mine.hi, ...earlier.map((d) => d.hi)),
+      minLo: Math.min(mine.lo, ...earlier.map((d) => d.lo)),
+      meltDegH: Math.max(mine.thawDegH, ...earlier.map((d) => d.thawDegH)),
+    },
+    snow: round1(snow), snow3d: round1(snow3d),
+    wind: round1(wind), gust: gusts.length ? round1(Math.max(...gusts)) : round1(wind), cloud: Math.round(cloud),
+    // Rates are small numbers (light snow is a few tenths of a mm an hour), so they keep more places.
+    fall: round3(fall), rain: round3(rain), rainMm: round1(rain * daytime.length),
+    rainBefore: [round1(r1), round1(r2), round1(r3)],
     depth: noon?.depth ?? null,
   };
 }
 
-function thawDay({ hi, lo, thawDegH }: DayWx): ThawDay {
-  return { hi, lo, thawDegH };
-}
-
 function round1(x: number): number {
   return Math.round(x * 10) / 10;
+}
+
+function round3(x: number): number {
+  return Math.round(x * 1000) / 1000;
 }
 
 /** Today's date (YYYY-MM-DD) in a named time zone, falling back to the device's. */

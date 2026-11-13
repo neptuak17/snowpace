@@ -76,9 +76,9 @@
     if (text != null) e.textContent = text;
     return e;
   };
-  // The app's Why? detail, always open here: banners for the snowpack or deep
-  // new snow, what is holding the day back (red dot for bad, amber for a
-  // knock, as in the app), then the rest in one line.
+  // The app's Why? detail, always open here: banners for the snowpack, deep
+  // new snow or rain today, what is holding the day back (red dot for bad,
+  // amber for a knock, as in the app), then the rest in one line.
   function renderWhy(w) {
     const root = $('why');
     root.replaceChildren();

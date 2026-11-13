@@ -10,11 +10,22 @@
  */
 import type { ActivityKey } from '@/data/places';
 
-export type FactorKey = 't' | 's' | 'base' | 'ft' | 'w' | 'pr' | 'fall' | 'c' | 'cov' | 'deep';
-/** The factors that go into the weighted blend; coverage and deep snow multiply the result instead. */
-export type BlendKey = Exclude<FactorKey, 'cov' | 'deep'>;
+export type FactorKey = 't' | 's' | 'base' | 'ft' | 'w' | 'pr' | 'fall' | 'c' | 'cov' | 'deep' | 'wet';
+/** The factors that go into the weighted blend; coverage, deep snow and rain today multiply the result instead. */
+export type BlendKey = Exclude<FactorKey, 'cov' | 'deep' | 'wet'>;
 
 export const TUNING = {
+  // ── The ski day. "While you are out" is the daytime hours, the hours of the
+  // hour strip (`hourly.hours`): snow and rain falling then are measured as an
+  // hourly rate, the day's dial on their average and each hour on its own, so
+  // the dial and the strip are on one scale. What had already fallen is
+  // counted up to `newSnowToHour`: new snow is the 24 hours before it, the
+  // three-day snowfall the 72 hours before it. Midday rather than first
+  // thing, so snow that falls through the morning counts as snow you ski on
+  // (and as snow filling a track); 8 would match a resort's morning report.
+  // Anything later belongs to the next day. Nov 2026, owner's call.
+  day: { newSnowToHour: 12 },
+
   // ── Score bands — the dial colour and word. From `excellentFrom`, high
   // in the Excellent band, the Why? detail lists nothing under "Holding it back".
   bands: { hi: 80, go: 70, fair: 55, poor: 40 },
@@ -23,7 +34,7 @@ export const TUNING = {
   // ── Temperature: points off per °C from the user's ideal.
   tempPenaltyPerDeg: 8,
 
-  // ── New snow in the last 24 h, against the user's target (cm).
+  // ── New snow, the 24 hours up to midday, against the user's target (cm).
   newSnow: {
     // Hill activities: score climbs from `floor` to 100 as snow reaches target.
     downhillFloor: 30,
@@ -35,10 +46,9 @@ export const TUNING = {
     classicOverPerCm: 4.5,
   },
 
-  // ── 3-day snowfall as a proxy for coverage: score = 100·(1 − e^(−total/halfLife)).
+  // ── 3-day snowfall (the 72 hours up to midday) as a proxy for coverage:
+  // score = 100·(1 − e^(−total/halfLife)).
   baseHalfLifeCm: { downhill: 9, nordic: 6 },
-  // Weight given to the pre-forecast prior when the window reaches back before day 0.
-  priorSnowWeight: { day0: 1, day1: 0.5 },
 
   // ── Freeze–thaw: crust needs a real melt and a refreeze below `refreezeBelow`,
   // within the day and the two before it. A brief peak just above 0 °C melts
@@ -62,28 +72,47 @@ export const TUNING = {
   // at `zeroFraction` of it.
   wind: { freeFraction: 0.5, zeroFraction: 1.5 },
 
-  // ── Rain: always bad, no user tolerance.
+  // ── Rain: always bad, no user tolerance. Two parts in the blend: rain
+  // while you are out (an hourly rate, see `day` above) and rain before the
+  // ski day, over three days.
   rain: {
-    // Amount below which we treat it as "no rain".
+    // Amount (mm) below which we treat it as "no rain".
     floorMm: 0.05,
-    nowPerMm: 12, nowCap: 55,
+    // Points off per mm an hour. It was 12 per mm of a day's total; times 24
+    // (Nov 2026), so steady all-day rain costs what it did, and an hour of
+    // the strip is judged on the same scale as the day.
+    nowPerMmH: 288, nowCap: 55,
+    // An hour that is itself dry, on a day with rain in its daytime hours.
     laterTodayPenalty: 8,
     priorPerMm: 10, priorCap: 45,
     // Prior rain that then refroze is boilerplate ice, not slush.
     icedMultiplier: 2,
-    // Age weighting for rain 1, 2 and 3 days ago.
+    // Age weighting for rain in the 24 hours before the ski day, the 24 before that, and the 24 before that.
     ageWeights: [1, 0.66, 0.33],
-    // Weight for the pre-forecast prior's 72 h rain total.
-    priorRainWeight: 0.66,
   },
 
-  // ── Snow falling now (precip at or below freezing).
+  // ── Rain today holds the whole score down, as thin snowpack and deep new
+  // snow do. In the blend alone rain could take at most 8 points off, so a
+  // day of steady rain on good snow scored Good (Nov 2026, owner's call that
+  // it must not). Full score with no rain while you are out, down to `floor`
+  // of the blend at an average of `fromMmH + spanMmH` mm an hour through the
+  // ski day, about 10 mm in all; an hour of the strip is judged on its own
+  // rate. The same for every activity. Guesses until winter data flows.
+  rainCap: { fromMmH: 0.05, spanMmH: 1, floor: 0.45 },
+
+  // ── Snow falling while you are out, mm of water an hour (precipitation
+  // that is not rain; Open-Meteo counts 7 cm of snow to 10 mm of water).
   fall: {
-    // Hill: welcome. The user's tolerance sets how much counts as "a lot".
-    hillBaseMm: 0.4, hillTolSpanMm: 2.6,
+    // Hill: welcome. The user's tolerance sets the rate that scores best,
+    // from light snow up to about 2 cm an hour; more than that counts against
+    // the day. These were always rates: applied to a day's total they called
+    // any snowy day "more snow falling than you like".
+    hillBaseMmH: 0.4, hillTolSpanMmH: 2.6,
     hillFloor: 80, hillOverPenaltyPerRel: 30,
-    // Nordic: slow going in a set track. Points off per mm, softened by tolerance.
-    skatePerMm: 14, classicPerMm: 9, tolDivisor: 160,
+    // Nordic: slow going in a set track. Points off per mm an hour, softened
+    // by tolerance. They were 14 and 9 per mm of a day's total; times 24
+    // (Nov 2026), so snow falling steadily all day costs what it did.
+    skatePerMmH: 336, classicPerMmH: 216, tolDivisor: 160,
   },
 
   // ── Cloud: points off per % cover. Light quality, weighted lightly.
@@ -104,8 +133,8 @@ export const TUNING = {
   // ── Deep new snow caps the nordic scores the same way: a skate lane under
   // unpacked snow is soft, slow going, and classic tracks fill in, however
   // good the rest of the day is. The blend alone let a calm, cold day after
-  // 20 cm score Good for both. Full score up to `fromCm` of new snow in 24 h
-  // (or the user's own tolerance, if higher), then down to `floor` of the
+  // 20 cm score Good for both. Full score up to `fromCm` of new snow (the 24
+  // hours up to midday; or the user's own tolerance, if higher), then down to `floor` of the
   // blend `spanCm` later. Classic copes better with fresh snow than skate, so
   // its cap starts later and stops higher. Guesses until winter data flows;
   // the surface model should replace this when it is promoted.

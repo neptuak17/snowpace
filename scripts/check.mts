@@ -19,7 +19,8 @@ import assert from 'node:assert/strict';
 // Lets Node load the app's TypeScript; see app-loader.mts.
 import './app-loader.mts';
 
-const { breakdown, DEFAULT_PREFS, freezeThaw, rainPrior, score, shownAnswer, subsFor, why } = await import('../src/lib/scoring.ts');
+const { breakdown, DEFAULT_PREFS, freezeThaw, hourGrid, rainPrior, score, shownAnswer, snow72, subsFor, why } = await import('../src/lib/scoring.ts');
+const { SNOW_CM_PER_MM } = await import('../src/data/open-meteo.ts');
 const { localDate, placeFromArea } = await import('../src/data/places.ts');
 const { buildFeedbackMail, verdictIssuesFor } = await import('../src/lib/diagnostics.ts');
 const { strings } = await import('../src/strings.ts');
@@ -39,7 +40,8 @@ const dateAt = (offset: number) => new Date(Date.UTC(Y, M - 1, D + offset)).toIS
 /** A day's temperature curve: `lo` overnight, rising to `hi` in mid-afternoon. */
 const diurnal = (lo: number, hi: number, hr: number) => lo + (hi - lo) * Math.max(0, Math.sin((Math.PI * (hr - 6)) / 14));
 
-type Hour = { t: number; depth: number; snow?: number; rain?: number; cloud?: number };
+/** `snow` is cm in the hour, `rain` mm; a null `snow` is an hour the forecast is missing. */
+type Hour = { t: number; depth: number; snow?: number | null; rain?: number; cloud?: number };
 /** day: −7 (a week ago) to 4 (four days ahead); hr: 0–23. */
 type Weather = (day: number, hr: number) => Hour;
 
@@ -48,10 +50,11 @@ function place(weather: Weather, name = 'Test Mountain Resort'): Place {
   for (let day = -7; day <= 4; day++) {
     for (let hr = 0; hr < 24; hr++) {
       const h = weather(day, hr);
-      const snow = h.snow ?? 0, rain = h.rain ?? 0;
+      const snow = h.snow === undefined ? 0 : h.snow, rain = h.rain ?? 0;
       hours.push({
         time: `${dateAt(day)}T${String(hr).padStart(2, '0')}:00`,
-        t: Math.round(h.t * 10) / 10, snow, rain, precip: snow + rain, wind: 8, gust: 12,
+        // Precipitation is in mm of water, as Open-Meteo gives it: 7 cm of snow to 10 mm.
+        t: Math.round(h.t * 10) / 10, snow, rain, precip: snow === null ? null : snow / SNOW_CM_PER_MM + rain, wind: 8, gust: 12,
         cloud: h.cloud ?? 30, depth: h.depth, sun: 400,
       });
     }
@@ -124,6 +127,87 @@ const checks: [string, () => void][] = [
     assert.ok(w.bare && w.caps.length === 1 && w.caps[0].bare, JSON.stringify(w.caps));
     assert.equal(w.holding.length, 0);
     assert.ok(w.rest.length > 0, 'the weather is still shown');
+  }],
+
+  // The ski day (CLAUDE.md: The ski day: what has fallen, and what falls while you are out)
+  ['Snow that fell overnight is today\'s new snow, and nothing is falling on a clear day', () => {
+    // 25 cm between 6 PM and midnight yesterday; clear and cold today.
+    const p = place((d, hr) => ({ t: -8, depth: 1.5, cloud: 10, snow: d === -1 && hr >= 18 ? 25 / 6 : 0 }));
+    const x = subsFor(p, 0, 'downhill', P);
+    assert.equal(x.s, 100, `new snow ${x.s}`);
+    assert.equal(x.fall, TUNING.fall.hillFloor, 'no snow falling is the hill\'s floor, not a penalty');
+    assert.match(shownAnswer(p, 0, 'downhill', P, 'metric')!.facts, /25 cm new/);
+    assert.ok(score(p, 0, 'downhill', P)! >= TUNING.excellentFrom, `downhill ${score(p, 0, 'downhill', P)}`);
+    assert.equal(whyOf(p, 'downhill').holding.length, 0);
+  }],
+  ['Snow due this evening is tomorrow\'s new snow, not today\'s', () => {
+    const dry = place(() => ({ t: -8, depth: 1.5 }));
+    const p = place((d, hr) => ({ t: -8, depth: 1.5, snow: d === 0 && hr >= 19 ? 3 : 0 }));
+    for (const act of ACTS) assert.equal(score(p, 0, act, P), score(dry, 0, act, P), act);
+    assert.equal(whyOf(p, 'classic').caps.length, 0, 'no deep-snow banner today');
+    assert.ok(subsFor(p, 1, 'classic', P).deep < 100, 'tomorrow it is deep new snow');
+    assert.ok(subsFor(p, 1, 'downhill', P).s > subsFor(p, 0, 'downhill', P).s, 'and tomorrow\'s new snow for downhill');
+  }],
+  ['On a hill, snow falling at an ordinary rate is welcome, never "more than you like"', () => {
+    const p = place((d) => ({ t: -8, depth: 1.5, snow: d === 0 ? 20 / 24 : 0 }));
+    for (const act of ['downhill', 'snowshoe'] as const) {
+      const fall = subsFor(p, 0, act, P).fall;
+      assert.ok(fall > TUNING.fall.hillFloor, `${act} ${fall}`);
+      assert.ok(!whyOf(p, act).holding.some((r) => r.label === strings.why.rows.fallTooMuch), act);
+    }
+  }],
+  ['Snow or rain through the day: the dial agrees with the hours', () => {
+    // Steady weather, so every hour is the day in miniature.
+    for (const falling of [{ snow: 0.25 }, { rain: 0.4 }]) {
+      const p = place((d) => ({ t: -3, depth: 1.5, ...(d === 0 ? falling : {}) }));
+      for (const act of ACTS) {
+        const dial = score(p, 0, act, P)!;
+        for (const cell of hourGrid(p, act, P)!.cells) {
+          assert.ok(cell !== null && Math.abs(cell - dial) <= 1, `${act}, ${JSON.stringify(falling)}: hour ${cell}, dial ${dial}`);
+        }
+      }
+    }
+  }],
+  ['The "in 3 days" figure is the 72 hours up to midday, on every day', () => {
+    const old = place((d) => ({ t: -8, depth: 1.5, snow: d === -4 ? 10 / 24 : 0 }));
+    assert.deepEqual([0, 1].map((di) => snow72(old, di)), [0, 0], 'snow four days ago is outside it');
+    const recent = place((d, hr) => ({ t: -8, depth: 1.5, snow: d === -1 && hr >= 13 ? 1 : 0 }));
+    assert.deepEqual([0, 1, 2, 3].map((di) => snow72(recent, di)), [11, 11, 11, 0]);
+  }],
+  ['A missing hour in a day\'s look-back leaves the day unscored, never scored as no snow', () => {
+    // One hour of snowfall missing yesterday evening: inside the 72 hours days 0 to 2 look back over, outside day 3's.
+    const p = place((d, hr) => ({ t: -8, depth: 1.5, snow: d === -1 && hr === 20 ? null : 0 }));
+    assert.deepEqual([0, 1, 2, 3].map((di) => score(p, di, 'downhill', P) === null), [true, true, true, false]);
+  }],
+
+  // Rain (CLAUDE.md: Rain today holds the whole score down)
+  ['Rain while you are out holds the whole score down, and leads the Why? detail', () => {
+    const wet = place((d, hr) => ({ t: d === 0 ? 2 : -6, depth: 1.5, rain: d === 0 && hr >= 8 && hr < 16 ? 15 / 8 : 0 }));
+    const dry = place((d) => ({ t: d === 0 ? 2 : -6, depth: 1.5 }));
+    for (const act of ACTS) {
+      assert.ok(score(wet, 0, act, P)! < TUNING.bands.poor, `${act} ${score(wet, 0, act, P)}`);
+      // The same day without the rain is far better: the ceiling is what bites, not the blend.
+      assert.ok(score(dry, 0, act, P)! - score(wet, 0, act, P)! > 25, `${act}: dry ${score(dry, 0, act, P)}, wet ${score(wet, 0, act, P)}`);
+      const w = whyOf(wet, act);
+      assert.equal(w.caps[0]?.key, 'wet', act);
+      assert.ok(!w.holding.some((r) => r.key === 'pr'), `${act}: the banner says it, so there is no rain row`);
+    }
+    assert.equal(breakdown(wet, 0, 'downhill', P, 'metric')[0].label, strings.breakdown.rainToday, 'and leads the email\'s rows');
+    assert.equal(whyOf(dry, 'downhill').caps.length, 0);
+  }],
+  ['Rain that stops before the ski day is recent rain, not rain today', () => {
+    const p = place((d, hr) => ({ t: 1, depth: 1.5, rain: d === 0 && hr < 6 ? 2 : 0 }));
+    const x = subsFor(p, 0, 'classic', P);
+    assert.equal(x.wet, 100);
+    assert.ok(rainPrior(p, 0).mm > 0 && x.pr < 100, `prior ${rainPrior(p, 0).mm} mm, rain factor ${x.pr}`);
+    assert.ok(!whyOf(p, 'classic').caps.some((c) => c.key === 'wet'));
+  }],
+  ['Rain yesterday still counts tomorrow, fading over three days', () => {
+    // Just below freezing throughout, so nothing refreezes into ice and the fading shows.
+    const p = place((d, hr) => ({ t: -0.5, depth: 1.5, rain: d === -1 && hr >= 10 && hr < 13 ? 1 : 0 }));
+    const pr = [0, 1, 2, 3].map((di) => subsFor(p, di, 'classic', P).pr);
+    assert.ok(pr[0] < pr[1] && pr[1] < pr[2] && pr[2] < 100, pr.join(', '));
+    assert.equal(pr[3], 100, 'gone after three days');
   }],
 
   // The Why? detail (CLAUDE.md: The "Why?" detail says what is holding the score back)

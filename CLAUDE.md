@@ -258,8 +258,9 @@ looked like no data, the same "no snow" read red for new snow and green for snow
 snowpack ceiling looked like one bar among nine. `why()` in `src/lib/scoring.ts` builds it; the
 detail is `DayBreakdown`. From the top:
 
-* **A banner** while snowpack ("Snowpack: thin" / "Snowpack: bare") or deep new snow is holding
-  the whole score down: amber, or red when bare. On bare ground the rest is only "The weather".
+* **A banner** while snowpack ("Snowpack: thin" / "Snowpack: bare"), deep new snow or rain today
+  ("Rain today: 10.8 mm", added Nov 2026) is holding the whole score down: amber, or red when
+  bare. On bare ground the rest is only "The weather".
 * **"Holding it back":** each factor said as what is wrong ("Windier than you like") with its
   value, and a dot, red when the factor scores in the Skip it band, amber otherwise, the
   costliest first. Nothing on a day from `TUNING.excellentFrom` (90); only the costliest factor
@@ -301,7 +302,69 @@ same day from Good 75 to Fair 64 and leaves days without much snow untouched. Ra
 weight on falling snow was tried and rejected: it lifted every snow-free day, and rain on snow
 went from Poor to Fair. When a cap bites, a "Deep new snow" banner leads the Why? detail, as
 Snowpack does for coverage. Thresholds are guesses; the surface model below is meant to replace
-both caps.
+both caps. "New snow" here, as everywhere, is the 24 hours up to midday (see The ski day, next).
+
+### The ski day: what has fallen, and what falls while you are out
+
+Decided Nov 2026 (questions 32–36, owner's calls), after a review found that the labels and the
+numbers disagreed. "New snow" and "snow falling" were both the calendar day's total, midnight to
+midnight, hours still to come included, and the day's score put that total through numbers tuned
+for one hour's rate. So a clear morning after 25 cm overnight read "0 cm new" if the snow had
+stopped before midnight; a downhill powder day's only complaint was "More snow falling than you
+like"; and snow due at 7 PM marked classic down, under a "Deep new snow" banner, from first thing
+that morning. The website's own "Powder day" sample said so too.
+
+* **The ski day is the daytime hours**: the eleven hours of the hour strip, stamped 7 AM to
+  5 PM, which the guide calls 7 AM to 6 PM, counting the last one through. Temperature, wind and
+  cloud were already averaged over them.
+* **New snow is the 24 hours up to midday** (`TUNING.day.newSnowToHour`), and the three-day
+  snowfall the 72 hours up to midday. Midday rather than 8 AM, which would match a resort's
+  morning report, so that snow falling through the morning counts as snow you ski on, and as snow
+  filling a track. Anything after midday is the next day's new snow.
+* **Snow falling and rain today count only in the daytime hours, as an hourly rate.** The dial
+  uses the average over those hours and each hour of the strip its own, so the two are on one
+  scale: in steady weather they agree. Before, the dial read lower than every hour under it.
+* **The numbers.** Downhill's and snowshoeing's snow-falling numbers are unchanged: they always
+  read as hourly rates (best at about 0.3 to 2 cm an hour, by the user's setting), which is why a
+  day's total tripped them. Classic's and skate's, and the rain-now number, were set for a day's
+  total and were multiplied by 24, so steady all-day snow or rain costs what it did. An hour of
+  the strip with snow or rain in it now scores lower than it used to, which settles the old open
+  item that "rain now" read lighter by the hour.
+* **Rain today holds the whole score down** (`TUNING.rainCap`), as thin snowpack and deep new
+  snow do. In the blend alone rain could take at most 8 points off (its factor was capped, and
+  weighs 13–14%), so 20 mm of rain on good snow scored skate 78, Good. Now the blend is
+  multiplied down from 1 with no rain to 0.45 at an average of about 1 mm an hour through the ski
+  day, roughly 10 mm, the same for every activity; that day scores 32 to 40. A "Rain today"
+  banner leads the Why? detail with the daytime total. A ceiling being a banner and never a row,
+  the rain row then says only what fell before today, or is left out. Guesses, like the other
+  ceilings.
+* **Rain before the ski day** stays a factor in the blend: three 24-hour blocks ending at 6 AM,
+  weighted 1, 0.66 and 0.33. Rain that stops before the ski day is recent rain, not rain today.
+* **Every day carries its own look-back** (`DayWx` in `src/data/places.ts`), read from the hourly
+  series. The three days before today used to be condensed into totals that only today read
+  properly, so rain yesterday vanished from tomorrow's score, and "in 3 days" was four days today
+  and half a lump tomorrow. A day is now scoreable exactly when its own windows are complete: a
+  missing hour inside one leaves the day "—", never a zero.
+* **Shown as:** snow falling in cm an hour ("0.4 cm/h", inches in imperial) and, for an hour of
+  the strip, "snow 0.6 cm"; it was mm of water. Open-Meteo counts 7 cm of snow to 10 mm of water
+  on both models (checked live, Nov 2026): `SNOW_CM_PER_MM` in `src/data/open-meteo.ts`. The
+  engine still measures falling snow in mm of water. The made-up weather in `scripts/check.mts`
+  and `scripts/build-site-demo.mts` uses the same ratio; it used to count 1 cm as 1 mm.
+
+Left for the winter retune:
+
+* **The hour strip keeps the day's new-snow figure for every hour** (question 36). When heavy
+  snow starts after midday, the afternoon hours of skate and classic are marked down for the snow
+  falling and the wind, not for what has piled up: the website's "Afternoon storm" sample reads
+  Fair for skate through the afternoon. Rolling the figure hour by hour would be more exact.
+* **Rain overnight that stops before the ski day** counts only as recent rain, so it can cost at
+  most the rain factor's weight.
+* **"Rain that refroze"** can show for rain that fell after the frost: the order of frost and
+  rain is not checked, as with freeze–thaw.
+* **Snow and rain show an hour late on the strip.** An Open-Meteo precipitation value stamped
+  5 PM is the fall over the hour before it, while the strip reads each square as the hour
+  starting then. Temperature, wind and cloud are values at the hour, so they are unaffected.
+  Noticed Nov 2026, not acted on.
 
 
 ### Freeze–thaw
@@ -438,10 +501,12 @@ The about/credits screen must include:
 
 ### Open items
 
-* The scoring tuning was calibrated on the design's daily placeholder figures; the "rain now"
-  factor now sees hourly mm rather than daily totals and will read lighter. Retune once real
+* The scoring tuning was calibrated on the design's daily placeholder figures. Retune once real
   winter data is flowing — and at the same time compare the shadow-mode surface words with how
   real days actually skied, before promoting them into the score (see Surface firmness above).
+  That "rain now" read lighter by the hour than by the day was settled in Nov 2026, when snow
+  falling and rain became hourly rates for both (see The ski day above); what that change left
+  for the retune is listed there.
 
 * **Fat biking and data-driven snowshoe, if OpenSkiData exposes more activities.** OSM tags
   `piste:type=fatbike` and `piste:type=hike` on individual runs, but the published ski areas
@@ -500,8 +565,8 @@ The about/credits screen must include:
   pick one for that place themselves (the guide says so). A small "Find a webcam ›" link in
   that case would fix it. Not built.
 
-* **Noticed, not acted on (Oct 2026):**
-  - "Snow falling" is measured over 24 hours; look at it again in the winter retune.
+* **Noticed, not acted on:** nothing outstanding. "Snow falling" being measured over 24 hours
+  (noticed Oct 2026) was fixed in Nov 2026: see The ski day above.
 
 * **Monetising: none planned (owner's call, Nov 2026).** Snowpace launches free and there are
   no plans to monetise it. Kept from the Oct 2026 discussion in case that changes: the simplest
@@ -705,7 +770,8 @@ The owner's working agreements, for any session, on the owner's PC or in the clo
 
 - `npm run check` type-checks the app (`tsc --noEmit -p .`) and runs `scripts/check.mts`:
   made-up weather put through the real scoring code, asserting the behaviour decided above
-  (crust and slush, bare ground, deep snow, the "Why?" detail, the "Not right?" email). Run it
+  (crust and slush, bare ground, deep snow, the ski day's windows, rain, the "Why?" detail, the
+  "Not right?" email). Run it
   after any change to scoring, tuning, the "Why?" detail or feedback; add a check when you fix a
   bug it would have caught, or when a decision changes what the app should do.
 - `npm run build-guide` and `npm run build-site-demo` build the website's generated parts; both

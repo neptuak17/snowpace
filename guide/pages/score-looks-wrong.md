@@ -22,6 +22,8 @@ The snowpack comes from a weather model's estimate, and the model doesn't know a
 - **Elevation.** Downhill scores use the average of base and summit; your runs may be colder or warmer.
 - **Crust, slush or ice.** See [Freeze–thaw](/guide/freeze-thaw/) and [Rain and ice](/guide/rain-and-ice/).
 - **A big snowfall on skate or classic.** Deep new snow holds the score down until the trails are packed. See [Deep new snow](/guide/snowpack-and-deep-snow/#deep-new-snow).
+- **Rain while you're out.** Rain during the day holds the whole score down, however good the snow is. See [Rain and ice](/guide/rain-and-ice/#rain-while-youre-out).
+- **Snow that hasn't fallen yet.** New snow is counted up to midday. Snow due in the afternoon or evening is tomorrow's new snow, so today can show "0 cm new" with a storm on the way.
 
 ## Tell me
 

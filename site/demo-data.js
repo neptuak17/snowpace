@@ -97,14 +97,14 @@ window.SNOWPACE_DEMO = {
    ],
    "acts": {
     "classic": {
-     "score": 64,
+     "score": 69,
      "band": "fair",
      "word": "Fair",
      "best": "Best 10 AM–1 PM",
      "bands": [
       "fair",
       "fair",
-      "go",
+      "fair",
       "go",
       "go",
       "go",
@@ -122,7 +122,7 @@ window.SNOWPACE_DEMO = {
       "why": {
        "caps": [
         {
-         "title": "Deep new snow: 22.2 cm",
+         "title": "Deep new snow: 22.7 cm",
          "text": "This much fresh snow holds the whole score down.",
          "bare": false
         }
@@ -131,31 +131,26 @@ window.SNOWPACE_DEMO = {
        "holding": [
         {
          "label": "More new snow than you like",
-         "value": "22.2 cm",
-         "skip": true
-        },
-        {
-         "label": "Snow falling on the track",
-         "value": "22.2 mm",
+         "value": "22.7 cm",
          "skip": true
         }
        ],
        "restKicker": "Otherwise fine",
-       "rest": "-7°C · 26 cm in 3 days · no crust · wind 8 km/h · no rain · 30% cloud",
+       "rest": "-7°C · 26 cm in 3 days · no crust · wind 8 km/h · no rain · 0.1 cm/h snow falling · 30% cloud",
        "surface": "Surface (not scored): Fresh"
       },
-      "facts": "-7°C · wind 8 km/h · 22.2 cm new",
+      "facts": "-7°C · wind 8 km/h · 22.7 cm new",
       "lines": [
-       "7 AM · Fair 68 · -11°C · wind 8 km/h · snow 0.4 mm",
-       "8 AM · Fair 69 · -9°C · wind 8 km/h · snow 0.4 mm",
-       "9 AM · Good 70 · -8°C · wind 8 km/h · snow 0.4 mm",
-       "10 AM · Good 73 · -7°C · wind 8 km/h",
+       "7 AM · Fair 60 · -11°C · wind 8 km/h · snow 0.4 cm",
+       "8 AM · Fair 61 · -9°C · wind 8 km/h · snow 0.4 cm",
+       "9 AM · Fair 63 · -8°C · wind 8 km/h · snow 0.4 cm",
+       "10 AM · Good 72 · -7°C · wind 8 km/h",
        "11 AM · Good 72 · -7°C · wind 8 km/h",
-       "Noon · Good 72 · -6°C · wind 8 km/h",
-       "1 PM · Good 72 · -6°C · wind 8 km/h",
-       "2 PM · Good 72 · -6°C · wind 8 km/h",
+       "Noon · Good 71 · -6°C · wind 8 km/h",
+       "1 PM · Good 71 · -6°C · wind 8 km/h",
+       "2 PM · Good 71 · -6°C · wind 8 km/h",
        "3 PM · Good 72 · -7°C · wind 8 km/h",
-       "4 PM · Good 73 · -7°C · wind 8 km/h",
+       "4 PM · Good 72 · -7°C · wind 8 km/h",
        "5 PM · Good 71 · -8°C · wind 8 km/h"
       ]
      },
@@ -163,7 +158,7 @@ window.SNOWPACE_DEMO = {
       "why": {
        "caps": [
         {
-         "title": "Deep new snow: 8.7\"",
+         "title": "Deep new snow: 8.9\"",
          "text": "This much fresh snow holds the whole score down.",
          "bare": false
         }
@@ -172,37 +167,32 @@ window.SNOWPACE_DEMO = {
        "holding": [
         {
          "label": "More new snow than you like",
-         "value": "8.7\"",
-         "skip": true
-        },
-        {
-         "label": "Snow falling on the track",
-         "value": "22.2 mm",
+         "value": "8.9\"",
          "skip": true
         }
        ],
        "restKicker": "Otherwise fine",
-       "rest": "19°F · 10.2\" in 3 days · no crust · wind 5 mph · no rain · 30% cloud",
+       "rest": "19°F · 10.2\" in 3 days · no crust · wind 5 mph · no rain · 0.0\"/h snow falling · 30% cloud",
        "surface": "Surface (not scored): Fresh"
       },
-      "facts": "19°F · wind 5 mph · 8.7\" new",
+      "facts": "19°F · wind 5 mph · 8.9\" new",
       "lines": [
-       "7 AM · Fair 68 · 13°F · wind 5 mph · snow 0.4 mm",
-       "8 AM · Fair 69 · 15°F · wind 5 mph · snow 0.4 mm",
-       "9 AM · Good 70 · 17°F · wind 5 mph · snow 0.4 mm",
-       "10 AM · Good 73 · 19°F · wind 5 mph",
+       "7 AM · Fair 60 · 13°F · wind 5 mph · snow 0.2\"",
+       "8 AM · Fair 61 · 15°F · wind 5 mph · snow 0.2\"",
+       "9 AM · Fair 63 · 17°F · wind 5 mph · snow 0.2\"",
+       "10 AM · Good 72 · 19°F · wind 5 mph",
        "11 AM · Good 72 · 20°F · wind 5 mph",
-       "Noon · Good 72 · 21°F · wind 5 mph",
-       "1 PM · Good 72 · 21°F · wind 5 mph",
-       "2 PM · Good 72 · 21°F · wind 5 mph",
+       "Noon · Good 71 · 21°F · wind 5 mph",
+       "1 PM · Good 71 · 21°F · wind 5 mph",
+       "2 PM · Good 71 · 21°F · wind 5 mph",
        "3 PM · Good 72 · 20°F · wind 5 mph",
-       "4 PM · Good 73 · 19°F · wind 5 mph",
+       "4 PM · Good 72 · 19°F · wind 5 mph",
        "5 PM · Good 71 · 17°F · wind 5 mph"
       ]
      }
     },
     "skate": {
-     "score": 46,
+     "score": 49,
      "band": "poor",
      "word": "Poor",
      "best": "Best 12–3 PM",
@@ -227,7 +217,7 @@ window.SNOWPACE_DEMO = {
       "why": {
        "caps": [
         {
-         "title": "Deep new snow: 22.2 cm",
+         "title": "Deep new snow: 22.7 cm",
          "text": "This much fresh snow holds the whole score down.",
          "bare": false
         }
@@ -236,24 +226,19 @@ window.SNOWPACE_DEMO = {
        "holding": [
         {
          "label": "More new snow than you like",
-         "value": "22.2 cm",
-         "skip": true
-        },
-        {
-         "label": "Snow falling on the track",
-         "value": "22.2 mm",
+         "value": "22.7 cm",
          "skip": true
         }
        ],
        "restKicker": "Otherwise fine",
-       "rest": "-7°C · 26 cm in 3 days · no crust · wind 8 km/h · no rain · 30% cloud",
+       "rest": "-7°C · 26 cm in 3 days · no crust · wind 8 km/h · no rain · 0.1 cm/h snow falling · 30% cloud",
        "surface": "Surface (not scored): Fresh"
       },
-      "facts": "-7°C · wind 8 km/h · 22.2 cm new",
+      "facts": "-7°C · wind 8 km/h · 22.7 cm new",
       "lines": [
-       "7 AM · Poor 47 · -11°C · wind 8 km/h · snow 0.4 mm",
-       "8 AM · Poor 48 · -9°C · wind 8 km/h · snow 0.4 mm",
-       "9 AM · Poor 49 · -8°C · wind 8 km/h · snow 0.4 mm",
+       "7 AM · Poor 43 · -11°C · wind 8 km/h · snow 0.4 cm",
+       "8 AM · Poor 44 · -9°C · wind 8 km/h · snow 0.4 cm",
+       "9 AM · Poor 45 · -8°C · wind 8 km/h · snow 0.4 cm",
        "10 AM · Poor 51 · -7°C · wind 8 km/h",
        "11 AM · Poor 51 · -7°C · wind 8 km/h",
        "Noon · Poor 52 · -6°C · wind 8 km/h",
@@ -268,7 +253,7 @@ window.SNOWPACE_DEMO = {
       "why": {
        "caps": [
         {
-         "title": "Deep new snow: 8.7\"",
+         "title": "Deep new snow: 8.9\"",
          "text": "This much fresh snow holds the whole score down.",
          "bare": false
         }
@@ -277,24 +262,19 @@ window.SNOWPACE_DEMO = {
        "holding": [
         {
          "label": "More new snow than you like",
-         "value": "8.7\"",
-         "skip": true
-        },
-        {
-         "label": "Snow falling on the track",
-         "value": "22.2 mm",
+         "value": "8.9\"",
          "skip": true
         }
        ],
        "restKicker": "Otherwise fine",
-       "rest": "19°F · 10.2\" in 3 days · no crust · wind 5 mph · no rain · 30% cloud",
+       "rest": "19°F · 10.2\" in 3 days · no crust · wind 5 mph · no rain · 0.0\"/h snow falling · 30% cloud",
        "surface": "Surface (not scored): Fresh"
       },
-      "facts": "19°F · wind 5 mph · 8.7\" new",
+      "facts": "19°F · wind 5 mph · 8.9\" new",
       "lines": [
-       "7 AM · Poor 47 · 13°F · wind 5 mph · snow 0.4 mm",
-       "8 AM · Poor 48 · 15°F · wind 5 mph · snow 0.4 mm",
-       "9 AM · Poor 49 · 17°F · wind 5 mph · snow 0.4 mm",
+       "7 AM · Poor 43 · 13°F · wind 5 mph · snow 0.2\"",
+       "8 AM · Poor 44 · 15°F · wind 5 mph · snow 0.2\"",
+       "9 AM · Poor 45 · 17°F · wind 5 mph · snow 0.2\"",
        "10 AM · Poor 51 · 19°F · wind 5 mph",
        "11 AM · Poor 51 · 20°F · wind 5 mph",
        "Noon · Poor 52 · 21°F · wind 5 mph",
@@ -307,7 +287,7 @@ window.SNOWPACE_DEMO = {
      }
     },
     "snowshoe": {
-     "score": 82,
+     "score": 92,
      "band": "hi",
      "word": "Excellent",
      "best": "Best 12–3 PM",
@@ -332,22 +312,16 @@ window.SNOWPACE_DEMO = {
       "why": {
        "caps": [],
        "holdingKicker": "Holding it back",
-       "holding": [
-        {
-         "label": "More snow falling than you like",
-         "value": "22.2 mm",
-         "skip": true
-        }
-       ],
-       "restKicker": "Otherwise fine",
-       "rest": "-7°C · 22.2 cm new · 26 cm in 3 days · no crust · wind 8 km/h · no rain · 30% cloud",
+       "holding": [],
+       "restKicker": "Nothing holding it back",
+       "rest": "-7°C · 22.7 cm new · 26 cm in 3 days · no crust · wind 8 km/h · no rain · 0.1 cm/h snow falling · 30% cloud",
        "surface": null
       },
-      "facts": "-7°C · wind 8 km/h · 22.2 cm new",
+      "facts": "-7°C · wind 8 km/h · 22.7 cm new",
       "lines": [
-       "7 AM · Excellent 86 · -11°C · wind 8 km/h · snow 0.4 mm",
-       "8 AM · Excellent 88 · -9°C · wind 8 km/h · snow 0.4 mm",
-       "9 AM · Excellent 90 · -8°C · wind 8 km/h · snow 0.4 mm",
+       "7 AM · Excellent 87 · -11°C · wind 8 km/h · snow 0.4 cm",
+       "8 AM · Excellent 88 · -9°C · wind 8 km/h · snow 0.4 cm",
+       "9 AM · Excellent 90 · -8°C · wind 8 km/h · snow 0.4 cm",
        "10 AM · Excellent 92 · -7°C · wind 8 km/h",
        "11 AM · Excellent 93 · -7°C · wind 8 km/h",
        "Noon · Excellent 94 · -6°C · wind 8 km/h",
@@ -362,22 +336,16 @@ window.SNOWPACE_DEMO = {
       "why": {
        "caps": [],
        "holdingKicker": "Holding it back",
-       "holding": [
-        {
-         "label": "More snow falling than you like",
-         "value": "22.2 mm",
-         "skip": true
-        }
-       ],
-       "restKicker": "Otherwise fine",
-       "rest": "19°F · 8.7\" new · 10.2\" in 3 days · no crust · wind 5 mph · no rain · 30% cloud",
+       "holding": [],
+       "restKicker": "Nothing holding it back",
+       "rest": "19°F · 8.9\" new · 10.2\" in 3 days · no crust · wind 5 mph · no rain · 0.0\"/h snow falling · 30% cloud",
        "surface": null
       },
-      "facts": "19°F · wind 5 mph · 8.7\" new",
+      "facts": "19°F · wind 5 mph · 8.9\" new",
       "lines": [
-       "7 AM · Excellent 86 · 13°F · wind 5 mph · snow 0.4 mm",
-       "8 AM · Excellent 88 · 15°F · wind 5 mph · snow 0.4 mm",
-       "9 AM · Excellent 90 · 17°F · wind 5 mph · snow 0.4 mm",
+       "7 AM · Excellent 87 · 13°F · wind 5 mph · snow 0.2\"",
+       "8 AM · Excellent 88 · 15°F · wind 5 mph · snow 0.2\"",
+       "9 AM · Excellent 90 · 17°F · wind 5 mph · snow 0.2\"",
        "10 AM · Excellent 92 · 19°F · wind 5 mph",
        "11 AM · Excellent 93 · 20°F · wind 5 mph",
        "Noon · Excellent 94 · 21°F · wind 5 mph",
@@ -390,10 +358,10 @@ window.SNOWPACE_DEMO = {
      }
     },
     "downhill": {
-     "score": 84,
+     "score": 96,
      "band": "hi",
      "word": "Excellent",
-     "best": "Best 9 AM–noon",
+     "best": "Best 8–11 AM",
      "bands": [
       "hi",
       "hi",
@@ -408,29 +376,23 @@ window.SNOWPACE_DEMO = {
       "hi"
      ],
      "window": {
-      "from": 2,
-      "to": 4
+      "from": 1,
+      "to": 3
      },
      "metric": {
       "why": {
        "caps": [],
        "holdingKicker": "Holding it back",
-       "holding": [
-        {
-         "label": "More snow falling than you like",
-         "value": "22.2 mm",
-         "skip": true
-        }
-       ],
-       "restKicker": "Otherwise fine",
-       "rest": "-7°C · 22.2 cm new · 26 cm in 3 days · no crust · wind 8 km/h · no rain · 30% cloud",
+       "holding": [],
+       "restKicker": "Nothing holding it back",
+       "rest": "-7°C · 22.7 cm new · 26 cm in 3 days · no crust · wind 8 km/h · no rain · 0.1 cm/h snow falling · 30% cloud",
        "surface": null
       },
-      "facts": "-7°C · wind 8 km/h · 22.2 cm new",
+      "facts": "-7°C · wind 8 km/h · 22.7 cm new",
       "lines": [
-       "7 AM · Excellent 93 · -11°C · wind 8 km/h · snow 0.4 mm",
-       "8 AM · Excellent 94 · -9°C · wind 8 km/h · snow 0.4 mm",
-       "9 AM · Excellent 96 · -8°C · wind 8 km/h · snow 0.4 mm",
+       "7 AM · Excellent 93 · -11°C · wind 8 km/h · snow 0.4 cm",
+       "8 AM · Excellent 95 · -9°C · wind 8 km/h · snow 0.4 cm",
+       "9 AM · Excellent 96 · -8°C · wind 8 km/h · snow 0.4 cm",
        "10 AM · Excellent 96 · -7°C · wind 8 km/h",
        "11 AM · Excellent 95 · -7°C · wind 8 km/h",
        "Noon · Excellent 94 · -6°C · wind 8 km/h",
@@ -445,22 +407,16 @@ window.SNOWPACE_DEMO = {
       "why": {
        "caps": [],
        "holdingKicker": "Holding it back",
-       "holding": [
-        {
-         "label": "More snow falling than you like",
-         "value": "22.2 mm",
-         "skip": true
-        }
-       ],
-       "restKicker": "Otherwise fine",
-       "rest": "19°F · 8.7\" new · 10.2\" in 3 days · no crust · wind 5 mph · no rain · 30% cloud",
+       "holding": [],
+       "restKicker": "Nothing holding it back",
+       "rest": "19°F · 8.9\" new · 10.2\" in 3 days · no crust · wind 5 mph · no rain · 0.0\"/h snow falling · 30% cloud",
        "surface": null
       },
-      "facts": "19°F · wind 5 mph · 8.7\" new",
+      "facts": "19°F · wind 5 mph · 8.9\" new",
       "lines": [
-       "7 AM · Excellent 93 · 13°F · wind 5 mph · snow 0.4 mm",
-       "8 AM · Excellent 94 · 15°F · wind 5 mph · snow 0.4 mm",
-       "9 AM · Excellent 96 · 17°F · wind 5 mph · snow 0.4 mm",
+       "7 AM · Excellent 93 · 13°F · wind 5 mph · snow 0.2\"",
+       "8 AM · Excellent 95 · 15°F · wind 5 mph · snow 0.2\"",
+       "9 AM · Excellent 96 · 17°F · wind 5 mph · snow 0.2\"",
        "10 AM · Excellent 96 · 19°F · wind 5 mph",
        "11 AM · Excellent 95 · 20°F · wind 5 mph",
        "Noon · Excellent 94 · 21°F · wind 5 mph",
@@ -1439,16 +1395,16 @@ window.SNOWPACE_DEMO = {
    ],
    "acts": {
     "classic": {
-     "score": 65,
+     "score": 69,
      "band": "fair",
      "word": "Fair",
      "best": "Best 8–11 AM",
      "bands": [
-      "go",
       "hi",
       "hi",
       "hi",
-      "go",
+      "hi",
+      "hi",
       "go",
       "fair",
       "fair",
@@ -1462,312 +1418,298 @@ window.SNOWPACE_DEMO = {
      },
      "metric": {
       "why": {
-       "caps": [
-        {
-         "title": "Deep new snow: 16.5 cm",
-         "text": "This much fresh snow holds the whole score down.",
-         "bare": false
-        }
-       ],
+       "caps": [],
        "holdingKicker": "Holding it back",
        "holding": [
         {
-         "label": "More new snow than you like",
-         "value": "16.5 cm",
-         "skip": false
-        },
-        {
          "label": "Snow falling on the track",
-         "value": "16.5 mm",
+         "value": "0.7 cm/h",
          "skip": true
         },
         {
          "label": "Windier than you like",
          "value": "27 km/h",
          "skip": false
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "3 cm",
+         "skip": true
         }
        ],
        "restKicker": "Otherwise fine",
-       "rest": "-6°C · 24 cm in 3 days · no crust · no rain · 68% cloud",
+       "rest": "-6°C · 0 cm new · no crust · no rain · 68% cloud",
        "surface": "Surface (not scored): Firm → Fresh"
       },
-      "facts": "-6°C · wind 27 km/h · 16.5 cm new",
+      "facts": "-6°C · wind 27 km/h · 0 cm new",
       "lines": [
-       "7 AM · Good 79 · -9°C · wind 12 km/h",
-       "8 AM · Excellent 80 · -8°C · wind 12 km/h",
-       "9 AM · Excellent 81 · -7°C · wind 12 km/h",
-       "10 AM · Excellent 80 · -6°C · wind 12 km/h",
-       "11 AM · Good 79 · -5°C · wind 12 km/h",
-       "Noon · Good 72 · -5°C · wind 25 km/h",
-       "1 PM · Fair 68 · -5°C · wind 31 km/h · snow 1.5 mm",
-       "2 PM · Fair 66 · -5°C · wind 37 km/h · snow 1.5 mm",
-       "3 PM · Fair 65 · -5°C · wind 43 km/h · snow 1.5 mm",
-       "4 PM · Fair 65 · -6°C · wind 49 km/h · snow 1.5 mm",
-       "5 PM · Fair 66 · -7°C · wind 55 km/h · snow 1.5 mm"
+       "7 AM · Excellent 84 · -9°C · wind 12 km/h",
+       "8 AM · Excellent 86 · -8°C · wind 12 km/h",
+       "9 AM · Excellent 87 · -7°C · wind 12 km/h",
+       "10 AM · Excellent 86 · -6°C · wind 12 km/h",
+       "11 AM · Excellent 85 · -5°C · wind 12 km/h",
+       "Noon · Good 77 · -5°C · wind 25 km/h",
+       "1 PM · Fair 65 · -5°C · wind 31 km/h · snow 1.5 cm",
+       "2 PM · Fair 62 · -5°C · wind 37 km/h · snow 1.5 cm",
+       "3 PM · Fair 61 · -5°C · wind 43 km/h · snow 1.5 cm",
+       "4 PM · Fair 62 · -6°C · wind 49 km/h · snow 1.5 cm",
+       "5 PM · Fair 63 · -7°C · wind 55 km/h · snow 1.5 cm"
       ]
      },
      "imperial": {
       "why": {
-       "caps": [
-        {
-         "title": "Deep new snow: 6.5\"",
-         "text": "This much fresh snow holds the whole score down.",
-         "bare": false
-        }
-       ],
+       "caps": [],
        "holdingKicker": "Holding it back",
        "holding": [
         {
-         "label": "More new snow than you like",
-         "value": "6.5\"",
-         "skip": false
-        },
-        {
          "label": "Snow falling on the track",
-         "value": "16.5 mm",
+         "value": "0.3\"/h",
          "skip": true
         },
         {
          "label": "Windier than you like",
          "value": "17 mph",
          "skip": false
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "1.2\"",
+         "skip": true
         }
        ],
        "restKicker": "Otherwise fine",
-       "rest": "21°F · 9.4\" in 3 days · no crust · no rain · 68% cloud",
+       "rest": "21°F · 0.0\" new · no crust · no rain · 68% cloud",
        "surface": "Surface (not scored): Firm → Fresh"
       },
-      "facts": "21°F · wind 17 mph · 6.5\" new",
+      "facts": "21°F · wind 17 mph · 0.0\" new",
       "lines": [
-       "7 AM · Good 79 · 16°F · wind 7 mph",
-       "8 AM · Excellent 80 · 18°F · wind 7 mph",
-       "9 AM · Excellent 81 · 20°F · wind 7 mph",
-       "10 AM · Excellent 80 · 21°F · wind 7 mph",
-       "11 AM · Good 79 · 22°F · wind 7 mph",
-       "Noon · Good 72 · 23°F · wind 16 mph",
-       "1 PM · Fair 68 · 23°F · wind 19 mph · snow 1.5 mm",
-       "2 PM · Fair 66 · 23°F · wind 23 mph · snow 1.5 mm",
-       "3 PM · Fair 65 · 22°F · wind 27 mph · snow 1.5 mm",
-       "4 PM · Fair 65 · 21°F · wind 30 mph · snow 1.5 mm",
-       "5 PM · Fair 66 · 20°F · wind 34 mph · snow 1.5 mm"
+       "7 AM · Excellent 84 · 16°F · wind 7 mph",
+       "8 AM · Excellent 86 · 18°F · wind 7 mph",
+       "9 AM · Excellent 87 · 20°F · wind 7 mph",
+       "10 AM · Excellent 86 · 21°F · wind 7 mph",
+       "11 AM · Excellent 85 · 22°F · wind 7 mph",
+       "Noon · Good 77 · 23°F · wind 16 mph",
+       "1 PM · Fair 65 · 23°F · wind 19 mph · snow 0.6\"",
+       "2 PM · Fair 62 · 23°F · wind 23 mph · snow 0.6\"",
+       "3 PM · Fair 61 · 22°F · wind 27 mph · snow 0.6\"",
+       "4 PM · Fair 62 · 21°F · wind 30 mph · snow 0.6\"",
+       "5 PM · Fair 63 · 20°F · wind 34 mph · snow 0.6\""
       ]
      }
     },
     "skate": {
-     "score": 42,
-     "band": "poor",
-     "word": "Poor",
-     "best": "Best 9 AM–noon",
-     "bands": [
-      "poor",
-      "poor",
-      "fair",
-      "fair",
-      "fair",
-      "poor",
-      "poor",
-      "poor",
-      "poor",
-      "poor",
-      "poor"
-     ],
-     "window": {
-      "from": 2,
-      "to": 4
-     },
-     "metric": {
-      "why": {
-       "caps": [
-        {
-         "title": "Deep new snow: 16.5 cm",
-         "text": "This much fresh snow holds the whole score down.",
-         "bare": false
-        }
-       ],
-       "holdingKicker": "Holding it back",
-       "holding": [
-        {
-         "label": "More new snow than you like",
-         "value": "16.5 cm",
-         "skip": true
-        },
-        {
-         "label": "Windier than you like",
-         "value": "27 km/h",
-         "skip": true
-        },
-        {
-         "label": "Snow falling on the track",
-         "value": "16.5 mm",
-         "skip": true
-        }
-       ],
-       "restKicker": "Otherwise fine",
-       "rest": "-6°C · 24 cm in 3 days · no crust · no rain · 68% cloud",
-       "surface": "Surface (not scored): Firm → Fresh"
-      },
-      "facts": "-6°C · wind 27 km/h · 16.5 cm new",
-      "lines": [
-       "7 AM · Poor 53 · -9°C · wind 12 km/h",
-       "8 AM · Poor 54 · -8°C · wind 12 km/h",
-       "9 AM · Fair 55 · -7°C · wind 12 km/h",
-       "10 AM · Fair 56 · -6°C · wind 12 km/h",
-       "11 AM · Fair 55 · -5°C · wind 12 km/h",
-       "Noon · Poor 47 · -5°C · wind 25 km/h",
-       "1 PM · Poor 43 · -5°C · wind 31 km/h · snow 1.5 mm",
-       "2 PM · Poor 43 · -5°C · wind 37 km/h · snow 1.5 mm",
-       "3 PM · Poor 43 · -5°C · wind 43 km/h · snow 1.5 mm",
-       "4 PM · Poor 43 · -6°C · wind 49 km/h · snow 1.5 mm",
-       "5 PM · Poor 43 · -7°C · wind 55 km/h · snow 1.5 mm"
-      ]
-     },
-     "imperial": {
-      "why": {
-       "caps": [
-        {
-         "title": "Deep new snow: 6.5\"",
-         "text": "This much fresh snow holds the whole score down.",
-         "bare": false
-        }
-       ],
-       "holdingKicker": "Holding it back",
-       "holding": [
-        {
-         "label": "More new snow than you like",
-         "value": "6.5\"",
-         "skip": true
-        },
-        {
-         "label": "Windier than you like",
-         "value": "17 mph",
-         "skip": true
-        },
-        {
-         "label": "Snow falling on the track",
-         "value": "16.5 mm",
-         "skip": true
-        }
-       ],
-       "restKicker": "Otherwise fine",
-       "rest": "21°F · 9.4\" in 3 days · no crust · no rain · 68% cloud",
-       "surface": "Surface (not scored): Firm → Fresh"
-      },
-      "facts": "21°F · wind 17 mph · 6.5\" new",
-      "lines": [
-       "7 AM · Poor 53 · 16°F · wind 7 mph",
-       "8 AM · Poor 54 · 18°F · wind 7 mph",
-       "9 AM · Fair 55 · 20°F · wind 7 mph",
-       "10 AM · Fair 56 · 21°F · wind 7 mph",
-       "11 AM · Fair 55 · 22°F · wind 7 mph",
-       "Noon · Poor 47 · 23°F · wind 16 mph",
-       "1 PM · Poor 43 · 23°F · wind 19 mph · snow 1.5 mm",
-       "2 PM · Poor 43 · 23°F · wind 23 mph · snow 1.5 mm",
-       "3 PM · Poor 43 · 22°F · wind 27 mph · snow 1.5 mm",
-       "4 PM · Poor 43 · 21°F · wind 30 mph · snow 1.5 mm",
-       "5 PM · Poor 43 · 20°F · wind 34 mph · snow 1.5 mm"
-      ]
-     }
-    },
-    "snowshoe": {
-     "score": 78,
+     "score": 71,
      "band": "go",
      "word": "Good",
      "best": "Best 9 AM–noon",
      "bands": [
-      "hi",
-      "hi",
-      "hi",
-      "hi",
-      "hi",
-      "hi",
-      "hi",
-      "hi",
-      "hi",
-      "hi",
-      "go"
-     ],
-     "window": {
-      "from": 2,
-      "to": 4
-     },
-     "metric": {
-      "why": {
-       "caps": [],
-       "holdingKicker": "Holding it back",
-       "holding": [
-        {
-         "label": "More snow falling than you like",
-         "value": "16.5 mm",
-         "skip": true
-        }
-       ],
-       "restKicker": "Otherwise fine",
-       "rest": "-6°C · 16.5 cm new · 24 cm in 3 days · no crust · wind 27 km/h · no rain · 68% cloud",
-       "surface": null
-      },
-      "facts": "-6°C · wind 27 km/h · 16.5 cm new",
-      "lines": [
-       "7 AM · Excellent 90 · -9°C · wind 12 km/h",
-       "8 AM · Excellent 91 · -8°C · wind 12 km/h",
-       "9 AM · Excellent 92 · -7°C · wind 12 km/h",
-       "10 AM · Excellent 94 · -6°C · wind 12 km/h",
-       "11 AM · Excellent 94 · -5°C · wind 12 km/h",
-       "Noon · Excellent 89 · -5°C · wind 25 km/h",
-       "1 PM · Excellent 89 · -5°C · wind 31 km/h · snow 1.5 mm",
-       "2 PM · Excellent 87 · -5°C · wind 37 km/h · snow 1.5 mm",
-       "3 PM · Excellent 84 · -5°C · wind 43 km/h · snow 1.5 mm",
-       "4 PM · Excellent 81 · -6°C · wind 49 km/h · snow 1.5 mm",
-       "5 PM · Good 78 · -7°C · wind 55 km/h · snow 1.5 mm"
-      ]
-     },
-     "imperial": {
-      "why": {
-       "caps": [],
-       "holdingKicker": "Holding it back",
-       "holding": [
-        {
-         "label": "More snow falling than you like",
-         "value": "16.5 mm",
-         "skip": true
-        }
-       ],
-       "restKicker": "Otherwise fine",
-       "rest": "21°F · 6.5\" new · 9.4\" in 3 days · no crust · wind 17 mph · no rain · 68% cloud",
-       "surface": null
-      },
-      "facts": "21°F · wind 17 mph · 6.5\" new",
-      "lines": [
-       "7 AM · Excellent 90 · 16°F · wind 7 mph",
-       "8 AM · Excellent 91 · 18°F · wind 7 mph",
-       "9 AM · Excellent 92 · 20°F · wind 7 mph",
-       "10 AM · Excellent 94 · 21°F · wind 7 mph",
-       "11 AM · Excellent 94 · 22°F · wind 7 mph",
-       "Noon · Excellent 89 · 23°F · wind 16 mph",
-       "1 PM · Excellent 89 · 23°F · wind 19 mph · snow 1.5 mm",
-       "2 PM · Excellent 87 · 23°F · wind 23 mph · snow 1.5 mm",
-       "3 PM · Excellent 84 · 22°F · wind 27 mph · snow 1.5 mm",
-       "4 PM · Excellent 81 · 21°F · wind 30 mph · snow 1.5 mm",
-       "5 PM · Good 78 · 20°F · wind 34 mph · snow 1.5 mm"
-      ]
-     }
-    },
-    "downhill": {
-     "score": 75,
-     "band": "go",
-     "word": "Good",
-     "best": "Best 7–10 AM",
-     "bands": [
-      "hi",
-      "hi",
-      "hi",
-      "hi",
       "hi",
       "hi",
       "hi",
       "hi",
       "hi",
       "go",
-      "hi"
+      "fair",
+      "fair",
+      "fair",
+      "fair",
+      "fair"
+     ],
+     "window": {
+      "from": 2,
+      "to": 4
+     },
+     "metric": {
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Windier than you like",
+         "value": "27 km/h",
+         "skip": true
+        },
+        {
+         "label": "Snow falling on the track",
+         "value": "0.7 cm/h",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "3 cm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "-6°C · 0 cm new · no crust · no rain · 68% cloud",
+       "surface": "Surface (not scored): Firm → Fresh"
+      },
+      "facts": "-6°C · wind 27 km/h · 0 cm new",
+      "lines": [
+       "7 AM · Excellent 87 · -9°C · wind 12 km/h",
+       "8 AM · Excellent 88 · -8°C · wind 12 km/h",
+       "9 AM · Excellent 89 · -7°C · wind 12 km/h",
+       "10 AM · Excellent 90 · -6°C · wind 12 km/h",
+       "11 AM · Excellent 90 · -5°C · wind 12 km/h",
+       "Noon · Good 79 · -5°C · wind 25 km/h",
+       "1 PM · Fair 67 · -5°C · wind 31 km/h · snow 1.5 cm",
+       "2 PM · Fair 66 · -5°C · wind 37 km/h · snow 1.5 cm",
+       "3 PM · Fair 67 · -5°C · wind 43 km/h · snow 1.5 cm",
+       "4 PM · Fair 67 · -6°C · wind 49 km/h · snow 1.5 cm",
+       "5 PM · Fair 66 · -7°C · wind 55 km/h · snow 1.5 cm"
+      ]
+     },
+     "imperial": {
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Windier than you like",
+         "value": "17 mph",
+         "skip": true
+        },
+        {
+         "label": "Snow falling on the track",
+         "value": "0.3\"/h",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "1.2\"",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "21°F · 0.0\" new · no crust · no rain · 68% cloud",
+       "surface": "Surface (not scored): Firm → Fresh"
+      },
+      "facts": "21°F · wind 17 mph · 0.0\" new",
+      "lines": [
+       "7 AM · Excellent 87 · 16°F · wind 7 mph",
+       "8 AM · Excellent 88 · 18°F · wind 7 mph",
+       "9 AM · Excellent 89 · 20°F · wind 7 mph",
+       "10 AM · Excellent 90 · 21°F · wind 7 mph",
+       "11 AM · Excellent 90 · 22°F · wind 7 mph",
+       "Noon · Good 79 · 23°F · wind 16 mph",
+       "1 PM · Fair 67 · 23°F · wind 19 mph · snow 0.6\"",
+       "2 PM · Fair 66 · 23°F · wind 23 mph · snow 0.6\"",
+       "3 PM · Fair 67 · 22°F · wind 27 mph · snow 0.6\"",
+       "4 PM · Fair 67 · 21°F · wind 30 mph · snow 0.6\"",
+       "5 PM · Fair 66 · 20°F · wind 34 mph · snow 0.6\""
+      ]
+     }
+    },
+    "snowshoe": {
+     "score": 73,
+     "band": "go",
+     "word": "Good",
+     "best": "Best 9 AM–noon",
+     "bands": [
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "fair",
+      "fair",
+      "fair"
+     ],
+     "window": {
+      "from": 2,
+      "to": 4
+     },
+     "metric": {
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Not much new snow",
+         "value": "0 cm",
+         "skip": false
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "3 cm",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "-6°C · no crust · wind 27 km/h · no rain · 0.7 cm/h snow falling · 68% cloud",
+       "surface": null
+      },
+      "facts": "-6°C · wind 27 km/h · 0 cm new",
+      "lines": [
+       "7 AM · Good 74 · -9°C · wind 12 km/h",
+       "8 AM · Good 75 · -8°C · wind 12 km/h",
+       "9 AM · Good 77 · -7°C · wind 12 km/h",
+       "10 AM · Good 78 · -6°C · wind 12 km/h",
+       "11 AM · Good 79 · -5°C · wind 12 km/h",
+       "Noon · Good 73 · -5°C · wind 25 km/h",
+       "1 PM · Good 73 · -5°C · wind 31 km/h · snow 1.5 cm",
+       "2 PM · Good 71 · -5°C · wind 37 km/h · snow 1.5 cm",
+       "3 PM · Fair 68 · -5°C · wind 43 km/h · snow 1.5 cm",
+       "4 PM · Fair 65 · -6°C · wind 49 km/h · snow 1.5 cm",
+       "5 PM · Fair 62 · -7°C · wind 55 km/h · snow 1.5 cm"
+      ]
+     },
+     "imperial": {
+      "why": {
+       "caps": [],
+       "holdingKicker": "Holding it back",
+       "holding": [
+        {
+         "label": "Not much new snow",
+         "value": "0.0\"",
+         "skip": false
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "1.2\"",
+         "skip": true
+        }
+       ],
+       "restKicker": "Otherwise fine",
+       "rest": "21°F · no crust · wind 17 mph · no rain · 0.3\"/h snow falling · 68% cloud",
+       "surface": null
+      },
+      "facts": "21°F · wind 17 mph · 0.0\" new",
+      "lines": [
+       "7 AM · Good 74 · 16°F · wind 7 mph",
+       "8 AM · Good 75 · 18°F · wind 7 mph",
+       "9 AM · Good 77 · 20°F · wind 7 mph",
+       "10 AM · Good 78 · 21°F · wind 7 mph",
+       "11 AM · Good 79 · 22°F · wind 7 mph",
+       "Noon · Good 73 · 23°F · wind 16 mph",
+       "1 PM · Good 73 · 23°F · wind 19 mph · snow 0.6\"",
+       "2 PM · Good 71 · 23°F · wind 23 mph · snow 0.6\"",
+       "3 PM · Fair 68 · 22°F · wind 27 mph · snow 0.6\"",
+       "4 PM · Fair 65 · 21°F · wind 30 mph · snow 0.6\"",
+       "5 PM · Fair 62 · 20°F · wind 34 mph · snow 0.6\""
+      ]
+     }
+    },
+    "downhill": {
+     "score": 67,
+     "band": "fair",
+     "word": "Fair",
+     "best": "Best 7–10 AM",
+     "bands": [
+      "go",
+      "go",
+      "go",
+      "go",
+      "go",
+      "fair",
+      "fair",
+      "fair",
+      "fair",
+      "fair",
+      "fair"
      ],
      "window": {
       "from": 0,
@@ -1779,28 +1721,33 @@ window.SNOWPACE_DEMO = {
        "holdingKicker": "Holding it back",
        "holding": [
         {
-         "label": "More snow falling than you like",
-         "value": "16.5 mm",
+         "label": "Not much new snow",
+         "value": "0 cm",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "3 cm",
          "skip": true
         }
        ],
        "restKicker": "Otherwise fine",
-       "rest": "-6°C · 16.5 cm new · 24 cm in 3 days · no crust · wind 27 km/h · no rain · 68% cloud",
+       "rest": "-6°C · no crust · wind 27 km/h · no rain · 0.7 cm/h snow falling · 68% cloud",
        "surface": null
       },
-      "facts": "-6°C · wind 27 km/h · 16.5 cm new",
+      "facts": "-6°C · wind 27 km/h · 0 cm new",
       "lines": [
-       "7 AM · Excellent 94 · -9°C · wind 12 km/h",
-       "8 AM · Excellent 94 · -8°C · wind 12 km/h",
-       "9 AM · Excellent 93 · -7°C · wind 12 km/h",
-       "10 AM · Excellent 92 · -6°C · wind 12 km/h",
-       "11 AM · Excellent 92 · -5°C · wind 12 km/h",
-       "Noon · Excellent 85 · -5°C · wind 25 km/h",
-       "1 PM · Excellent 85 · -5°C · wind 31 km/h · snow 1.5 mm",
-       "2 PM · Excellent 82 · -5°C · wind 37 km/h · snow 1.5 mm",
-       "3 PM · Excellent 81 · -5°C · wind 43 km/h · snow 1.5 mm",
-       "4 PM · Good 79 · -6°C · wind 49 km/h · snow 1.5 mm",
-       "5 PM · Excellent 80 · -7°C · wind 55 km/h · snow 1.5 mm"
+       "7 AM · Good 73 · -9°C · wind 12 km/h",
+       "8 AM · Good 74 · -8°C · wind 12 km/h",
+       "9 AM · Good 73 · -7°C · wind 12 km/h",
+       "10 AM · Good 72 · -6°C · wind 12 km/h",
+       "11 AM · Good 71 · -5°C · wind 12 km/h",
+       "Noon · Fair 64 · -5°C · wind 25 km/h",
+       "1 PM · Fair 64 · -5°C · wind 31 km/h · snow 1.5 cm",
+       "2 PM · Fair 62 · -5°C · wind 37 km/h · snow 1.5 cm",
+       "3 PM · Fair 60 · -5°C · wind 43 km/h · snow 1.5 cm",
+       "4 PM · Fair 59 · -6°C · wind 49 km/h · snow 1.5 cm",
+       "5 PM · Fair 60 · -7°C · wind 55 km/h · snow 1.5 cm"
       ]
      },
      "imperial": {
@@ -1809,28 +1756,33 @@ window.SNOWPACE_DEMO = {
        "holdingKicker": "Holding it back",
        "holding": [
         {
-         "label": "More snow falling than you like",
-         "value": "16.5 mm",
+         "label": "Not much new snow",
+         "value": "0.0\"",
+         "skip": true
+        },
+        {
+         "label": "Little snow in 3 days",
+         "value": "1.2\"",
          "skip": true
         }
        ],
        "restKicker": "Otherwise fine",
-       "rest": "21°F · 6.5\" new · 9.4\" in 3 days · no crust · wind 17 mph · no rain · 68% cloud",
+       "rest": "21°F · no crust · wind 17 mph · no rain · 0.3\"/h snow falling · 68% cloud",
        "surface": null
       },
-      "facts": "21°F · wind 17 mph · 6.5\" new",
+      "facts": "21°F · wind 17 mph · 0.0\" new",
       "lines": [
-       "7 AM · Excellent 94 · 16°F · wind 7 mph",
-       "8 AM · Excellent 94 · 18°F · wind 7 mph",
-       "9 AM · Excellent 93 · 20°F · wind 7 mph",
-       "10 AM · Excellent 92 · 21°F · wind 7 mph",
-       "11 AM · Excellent 92 · 22°F · wind 7 mph",
-       "Noon · Excellent 85 · 23°F · wind 16 mph",
-       "1 PM · Excellent 85 · 23°F · wind 19 mph · snow 1.5 mm",
-       "2 PM · Excellent 82 · 23°F · wind 23 mph · snow 1.5 mm",
-       "3 PM · Excellent 81 · 22°F · wind 27 mph · snow 1.5 mm",
-       "4 PM · Good 79 · 21°F · wind 30 mph · snow 1.5 mm",
-       "5 PM · Excellent 80 · 20°F · wind 34 mph · snow 1.5 mm"
+       "7 AM · Good 73 · 16°F · wind 7 mph",
+       "8 AM · Good 74 · 18°F · wind 7 mph",
+       "9 AM · Good 73 · 20°F · wind 7 mph",
+       "10 AM · Good 72 · 21°F · wind 7 mph",
+       "11 AM · Good 71 · 22°F · wind 7 mph",
+       "Noon · Fair 64 · 23°F · wind 16 mph",
+       "1 PM · Fair 64 · 23°F · wind 19 mph · snow 0.6\"",
+       "2 PM · Fair 62 · 23°F · wind 23 mph · snow 0.6\"",
+       "3 PM · Fair 60 · 22°F · wind 27 mph · snow 0.6\"",
+       "4 PM · Fair 59 · 21°F · wind 30 mph · snow 0.6\"",
+       "5 PM · Fair 60 · 20°F · wind 34 mph · snow 0.6\""
       ]
      }
     }
@@ -1899,22 +1851,22 @@ window.SNOWPACE_DEMO = {
    ],
    "acts": {
     "classic": {
-     "score": 50,
-     "band": "poor",
-     "word": "Poor",
+     "score": 24,
+     "band": "skip",
+     "word": "Skip it",
      "best": "Best 7–10 AM",
      "bands": [
       "fair",
       "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair"
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip"
      ],
      "window": {
       "from": 0,
@@ -1922,7 +1874,13 @@ window.SNOWPACE_DEMO = {
      },
      "metric": {
       "why": {
-       "caps": [],
+       "caps": [
+        {
+         "title": "Rain today: 10.8 mm",
+         "text": "Rain while you are out holds the whole score down.",
+         "bare": false
+        }
+       ],
        "holdingKicker": "Holding it back",
        "holding": [
         {
@@ -1934,11 +1892,6 @@ window.SNOWPACE_DEMO = {
          "label": "Little snow in 3 days",
          "value": "0 cm",
          "skip": true
-        },
-        {
-         "label": "Rain",
-         "value": "18.0 mm",
-         "skip": false
         },
         {
          "label": "Windier than you like",
@@ -1954,20 +1907,26 @@ window.SNOWPACE_DEMO = {
       "lines": [
        "7 AM · Fair 59 · 2°C · wind 25 km/h",
        "8 AM · Fair 58 · 2°C · wind 25 km/h",
-       "9 AM · Fair 56 · 3°C · wind 25 km/h · rain 1.2 mm",
-       "10 AM · Fair 56 · 3°C · wind 25 km/h · rain 1.2 mm",
-       "11 AM · Fair 55 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "Noon · Fair 55 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "1 PM · Fair 55 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "2 PM · Fair 55 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "3 PM · Fair 55 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "4 PM · Fair 56 · 3°C · wind 25 km/h · rain 1.2 mm",
-       "5 PM · Fair 56 · 3°C · wind 25 km/h · rain 1.2 mm"
+       "9 AM · Skip it 23 · 3°C · wind 25 km/h · rain 1.2 mm",
+       "10 AM · Skip it 23 · 3°C · wind 25 km/h · rain 1.2 mm",
+       "11 AM · Skip it 22 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "Noon · Skip it 22 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "1 PM · Skip it 22 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "2 PM · Skip it 22 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "3 PM · Skip it 22 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "4 PM · Skip it 23 · 3°C · wind 25 km/h · rain 1.2 mm",
+       "5 PM · Skip it 23 · 3°C · wind 25 km/h · rain 1.2 mm"
       ]
      },
      "imperial": {
       "why": {
-       "caps": [],
+       "caps": [
+        {
+         "title": "Rain today: 10.8 mm",
+         "text": "Rain while you are out holds the whole score down.",
+         "bare": false
+        }
+       ],
        "holdingKicker": "Holding it back",
        "holding": [
         {
@@ -1979,11 +1938,6 @@ window.SNOWPACE_DEMO = {
          "label": "Little snow in 3 days",
          "value": "0.0\"",
          "skip": true
-        },
-        {
-         "label": "Rain",
-         "value": "18.0 mm",
-         "skip": false
         },
         {
          "label": "Windier than you like",
@@ -1999,35 +1953,35 @@ window.SNOWPACE_DEMO = {
       "lines": [
        "7 AM · Fair 59 · 35°F · wind 16 mph",
        "8 AM · Fair 58 · 36°F · wind 16 mph",
-       "9 AM · Fair 56 · 37°F · wind 16 mph · rain 1.2 mm",
-       "10 AM · Fair 56 · 38°F · wind 16 mph · rain 1.2 mm",
-       "11 AM · Fair 55 · 39°F · wind 16 mph · rain 1.2 mm",
-       "Noon · Fair 55 · 39°F · wind 16 mph · rain 1.2 mm",
-       "1 PM · Fair 55 · 39°F · wind 16 mph · rain 1.2 mm",
-       "2 PM · Fair 55 · 39°F · wind 16 mph · rain 1.2 mm",
-       "3 PM · Fair 55 · 39°F · wind 16 mph · rain 1.2 mm",
-       "4 PM · Fair 56 · 38°F · wind 16 mph · rain 1.2 mm",
-       "5 PM · Fair 56 · 37°F · wind 16 mph · rain 1.2 mm"
+       "9 AM · Skip it 23 · 37°F · wind 16 mph · rain 1.2 mm",
+       "10 AM · Skip it 23 · 38°F · wind 16 mph · rain 1.2 mm",
+       "11 AM · Skip it 22 · 39°F · wind 16 mph · rain 1.2 mm",
+       "Noon · Skip it 22 · 39°F · wind 16 mph · rain 1.2 mm",
+       "1 PM · Skip it 22 · 39°F · wind 16 mph · rain 1.2 mm",
+       "2 PM · Skip it 22 · 39°F · wind 16 mph · rain 1.2 mm",
+       "3 PM · Skip it 22 · 39°F · wind 16 mph · rain 1.2 mm",
+       "4 PM · Skip it 23 · 38°F · wind 16 mph · rain 1.2 mm",
+       "5 PM · Skip it 23 · 37°F · wind 16 mph · rain 1.2 mm"
       ]
      }
     },
     "skate": {
-     "score": 50,
-     "band": "poor",
-     "word": "Poor",
+     "score": 25,
+     "band": "skip",
+     "word": "Skip it",
      "best": "Best 7–10 AM",
      "bands": [
       "fair",
       "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair"
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip"
      ],
      "window": {
       "from": 0,
@@ -2035,7 +1989,13 @@ window.SNOWPACE_DEMO = {
      },
      "metric": {
       "why": {
-       "caps": [],
+       "caps": [
+        {
+         "title": "Rain today: 10.8 mm",
+         "text": "Rain while you are out holds the whole score down.",
+         "bare": false
+        }
+       ],
        "holdingKicker": "Holding it back",
        "holding": [
         {
@@ -2054,11 +2014,6 @@ window.SNOWPACE_DEMO = {
          "skip": false
         },
         {
-         "label": "Rain",
-         "value": "18.0 mm",
-         "skip": false
-        },
-        {
          "label": "Little snow in 3 days",
          "value": "0 cm",
          "skip": true
@@ -2072,20 +2027,26 @@ window.SNOWPACE_DEMO = {
       "lines": [
        "7 AM · Fair 58 · 2°C · wind 25 km/h",
        "8 AM · Fair 58 · 2°C · wind 25 km/h",
-       "9 AM · Fair 56 · 3°C · wind 25 km/h · rain 1.2 mm",
-       "10 AM · Fair 55 · 3°C · wind 25 km/h · rain 1.2 mm",
-       "11 AM · Fair 55 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "Noon · Fair 55 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "1 PM · Fair 55 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "2 PM · Fair 55 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "3 PM · Fair 55 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "4 PM · Fair 55 · 3°C · wind 25 km/h · rain 1.2 mm",
-       "5 PM · Fair 56 · 3°C · wind 25 km/h · rain 1.2 mm"
+       "9 AM · Skip it 23 · 3°C · wind 25 km/h · rain 1.2 mm",
+       "10 AM · Skip it 23 · 3°C · wind 25 km/h · rain 1.2 mm",
+       "11 AM · Skip it 22 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "Noon · Skip it 22 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "1 PM · Skip it 22 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "2 PM · Skip it 22 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "3 PM · Skip it 22 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "4 PM · Skip it 23 · 3°C · wind 25 km/h · rain 1.2 mm",
+       "5 PM · Skip it 23 · 3°C · wind 25 km/h · rain 1.2 mm"
       ]
      },
      "imperial": {
       "why": {
-       "caps": [],
+       "caps": [
+        {
+         "title": "Rain today: 10.8 mm",
+         "text": "Rain while you are out holds the whole score down.",
+         "bare": false
+        }
+       ],
        "holdingKicker": "Holding it back",
        "holding": [
         {
@@ -2104,11 +2065,6 @@ window.SNOWPACE_DEMO = {
          "skip": false
         },
         {
-         "label": "Rain",
-         "value": "18.0 mm",
-         "skip": false
-        },
-        {
          "label": "Little snow in 3 days",
          "value": "0.0\"",
          "skip": true
@@ -2122,35 +2078,35 @@ window.SNOWPACE_DEMO = {
       "lines": [
        "7 AM · Fair 58 · 35°F · wind 16 mph",
        "8 AM · Fair 58 · 36°F · wind 16 mph",
-       "9 AM · Fair 56 · 37°F · wind 16 mph · rain 1.2 mm",
-       "10 AM · Fair 55 · 38°F · wind 16 mph · rain 1.2 mm",
-       "11 AM · Fair 55 · 39°F · wind 16 mph · rain 1.2 mm",
-       "Noon · Fair 55 · 39°F · wind 16 mph · rain 1.2 mm",
-       "1 PM · Fair 55 · 39°F · wind 16 mph · rain 1.2 mm",
-       "2 PM · Fair 55 · 39°F · wind 16 mph · rain 1.2 mm",
-       "3 PM · Fair 55 · 39°F · wind 16 mph · rain 1.2 mm",
-       "4 PM · Fair 55 · 38°F · wind 16 mph · rain 1.2 mm",
-       "5 PM · Fair 56 · 37°F · wind 16 mph · rain 1.2 mm"
+       "9 AM · Skip it 23 · 37°F · wind 16 mph · rain 1.2 mm",
+       "10 AM · Skip it 23 · 38°F · wind 16 mph · rain 1.2 mm",
+       "11 AM · Skip it 22 · 39°F · wind 16 mph · rain 1.2 mm",
+       "Noon · Skip it 22 · 39°F · wind 16 mph · rain 1.2 mm",
+       "1 PM · Skip it 22 · 39°F · wind 16 mph · rain 1.2 mm",
+       "2 PM · Skip it 22 · 39°F · wind 16 mph · rain 1.2 mm",
+       "3 PM · Skip it 22 · 39°F · wind 16 mph · rain 1.2 mm",
+       "4 PM · Skip it 23 · 38°F · wind 16 mph · rain 1.2 mm",
+       "5 PM · Skip it 23 · 37°F · wind 16 mph · rain 1.2 mm"
       ]
      }
     },
     "snowshoe": {
-     "score": 52,
-     "band": "poor",
-     "word": "Poor",
+     "score": 25,
+     "band": "skip",
+     "word": "Skip it",
      "best": "Best 7–10 AM",
      "bands": [
       "fair",
       "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair",
-      "fair"
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip"
      ],
      "window": {
       "from": 0,
@@ -2158,7 +2114,13 @@ window.SNOWPACE_DEMO = {
      },
      "metric": {
       "why": {
-       "caps": [],
+       "caps": [
+        {
+         "title": "Rain today: 10.8 mm",
+         "text": "Rain while you are out holds the whole score down.",
+         "bare": false
+        }
+       ],
        "holdingKicker": "Holding it back",
        "holding": [
         {
@@ -2174,11 +2136,6 @@ window.SNOWPACE_DEMO = {
         {
          "label": "Warmer than you like",
          "value": "3°C",
-         "skip": false
-        },
-        {
-         "label": "Rain",
-         "value": "18.0 mm",
          "skip": false
         }
        ],
@@ -2190,20 +2147,26 @@ window.SNOWPACE_DEMO = {
       "lines": [
        "7 AM · Fair 61 · 2°C · wind 25 km/h",
        "8 AM · Fair 60 · 2°C · wind 25 km/h",
-       "9 AM · Fair 58 · 3°C · wind 25 km/h · rain 1.2 mm",
-       "10 AM · Fair 58 · 3°C · wind 25 km/h · rain 1.2 mm",
-       "11 AM · Fair 57 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "Noon · Fair 57 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "1 PM · Fair 57 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "2 PM · Fair 57 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "3 PM · Fair 57 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "4 PM · Fair 58 · 3°C · wind 25 km/h · rain 1.2 mm",
-       "5 PM · Fair 58 · 3°C · wind 25 km/h · rain 1.2 mm"
+       "9 AM · Skip it 24 · 3°C · wind 25 km/h · rain 1.2 mm",
+       "10 AM · Skip it 23 · 3°C · wind 25 km/h · rain 1.2 mm",
+       "11 AM · Skip it 23 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "Noon · Skip it 23 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "1 PM · Skip it 23 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "2 PM · Skip it 23 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "3 PM · Skip it 23 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "4 PM · Skip it 23 · 3°C · wind 25 km/h · rain 1.2 mm",
+       "5 PM · Skip it 24 · 3°C · wind 25 km/h · rain 1.2 mm"
       ]
      },
      "imperial": {
       "why": {
-       "caps": [],
+       "caps": [
+        {
+         "title": "Rain today: 10.8 mm",
+         "text": "Rain while you are out holds the whole score down.",
+         "bare": false
+        }
+       ],
        "holdingKicker": "Holding it back",
        "holding": [
         {
@@ -2220,11 +2183,6 @@ window.SNOWPACE_DEMO = {
          "label": "Warmer than you like",
          "value": "38°F",
          "skip": false
-        },
-        {
-         "label": "Rain",
-         "value": "18.0 mm",
-         "skip": false
         }
        ],
        "restKicker": "Otherwise fine",
@@ -2235,35 +2193,35 @@ window.SNOWPACE_DEMO = {
       "lines": [
        "7 AM · Fair 61 · 35°F · wind 16 mph",
        "8 AM · Fair 60 · 36°F · wind 16 mph",
-       "9 AM · Fair 58 · 37°F · wind 16 mph · rain 1.2 mm",
-       "10 AM · Fair 58 · 38°F · wind 16 mph · rain 1.2 mm",
-       "11 AM · Fair 57 · 39°F · wind 16 mph · rain 1.2 mm",
-       "Noon · Fair 57 · 39°F · wind 16 mph · rain 1.2 mm",
-       "1 PM · Fair 57 · 39°F · wind 16 mph · rain 1.2 mm",
-       "2 PM · Fair 57 · 39°F · wind 16 mph · rain 1.2 mm",
-       "3 PM · Fair 57 · 39°F · wind 16 mph · rain 1.2 mm",
-       "4 PM · Fair 58 · 38°F · wind 16 mph · rain 1.2 mm",
-       "5 PM · Fair 58 · 37°F · wind 16 mph · rain 1.2 mm"
+       "9 AM · Skip it 24 · 37°F · wind 16 mph · rain 1.2 mm",
+       "10 AM · Skip it 23 · 38°F · wind 16 mph · rain 1.2 mm",
+       "11 AM · Skip it 23 · 39°F · wind 16 mph · rain 1.2 mm",
+       "Noon · Skip it 23 · 39°F · wind 16 mph · rain 1.2 mm",
+       "1 PM · Skip it 23 · 39°F · wind 16 mph · rain 1.2 mm",
+       "2 PM · Skip it 23 · 39°F · wind 16 mph · rain 1.2 mm",
+       "3 PM · Skip it 23 · 39°F · wind 16 mph · rain 1.2 mm",
+       "4 PM · Skip it 23 · 38°F · wind 16 mph · rain 1.2 mm",
+       "5 PM · Skip it 24 · 37°F · wind 16 mph · rain 1.2 mm"
       ]
      }
     },
     "downhill": {
-     "score": 42,
-     "band": "poor",
-     "word": "Poor",
+     "score": 21,
+     "band": "skip",
+     "word": "Skip it",
      "best": "Best 7–10 AM",
      "bands": [
       "poor",
       "poor",
-      "poor",
-      "poor",
-      "poor",
-      "poor",
-      "poor",
-      "poor",
-      "poor",
-      "poor",
-      "poor"
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip",
+      "skip"
      ],
      "window": {
       "from": 0,
@@ -2271,7 +2229,13 @@ window.SNOWPACE_DEMO = {
      },
      "metric": {
       "why": {
-       "caps": [],
+       "caps": [
+        {
+         "title": "Rain today: 10.8 mm",
+         "text": "Rain while you are out holds the whole score down.",
+         "bare": false
+        }
+       ],
        "holdingKicker": "Holding it back",
        "holding": [
         {
@@ -2288,11 +2252,6 @@ window.SNOWPACE_DEMO = {
          "label": "Little snow in 3 days",
          "value": "0 cm",
          "skip": true
-        },
-        {
-         "label": "Rain",
-         "value": "18.0 mm",
-         "skip": false
         }
        ],
        "restKicker": "Otherwise fine",
@@ -2303,20 +2262,26 @@ window.SNOWPACE_DEMO = {
       "lines": [
        "7 AM · Poor 51 · 2°C · wind 25 km/h",
        "8 AM · Poor 50 · 2°C · wind 25 km/h",
-       "9 AM · Poor 48 · 3°C · wind 25 km/h · rain 1.2 mm",
-       "10 AM · Poor 48 · 3°C · wind 25 km/h · rain 1.2 mm",
-       "11 AM · Poor 47 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "Noon · Poor 47 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "1 PM · Poor 47 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "2 PM · Poor 47 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "3 PM · Poor 47 · 4°C · wind 25 km/h · rain 1.2 mm",
-       "4 PM · Poor 48 · 3°C · wind 25 km/h · rain 1.2 mm",
-       "5 PM · Poor 48 · 3°C · wind 25 km/h · rain 1.2 mm"
+       "9 AM · Skip it 19 · 3°C · wind 25 km/h · rain 1.2 mm",
+       "10 AM · Skip it 19 · 3°C · wind 25 km/h · rain 1.2 mm",
+       "11 AM · Skip it 19 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "Noon · Skip it 19 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "1 PM · Skip it 19 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "2 PM · Skip it 19 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "3 PM · Skip it 19 · 4°C · wind 25 km/h · rain 1.2 mm",
+       "4 PM · Skip it 19 · 3°C · wind 25 km/h · rain 1.2 mm",
+       "5 PM · Skip it 19 · 3°C · wind 25 km/h · rain 1.2 mm"
       ]
      },
      "imperial": {
       "why": {
-       "caps": [],
+       "caps": [
+        {
+         "title": "Rain today: 10.8 mm",
+         "text": "Rain while you are out holds the whole score down.",
+         "bare": false
+        }
+       ],
        "holdingKicker": "Holding it back",
        "holding": [
         {
@@ -2333,11 +2298,6 @@ window.SNOWPACE_DEMO = {
          "label": "Little snow in 3 days",
          "value": "0.0\"",
          "skip": true
-        },
-        {
-         "label": "Rain",
-         "value": "18.0 mm",
-         "skip": false
         }
        ],
        "restKicker": "Otherwise fine",
@@ -2348,15 +2308,15 @@ window.SNOWPACE_DEMO = {
       "lines": [
        "7 AM · Poor 51 · 35°F · wind 16 mph",
        "8 AM · Poor 50 · 36°F · wind 16 mph",
-       "9 AM · Poor 48 · 37°F · wind 16 mph · rain 1.2 mm",
-       "10 AM · Poor 48 · 38°F · wind 16 mph · rain 1.2 mm",
-       "11 AM · Poor 47 · 39°F · wind 16 mph · rain 1.2 mm",
-       "Noon · Poor 47 · 39°F · wind 16 mph · rain 1.2 mm",
-       "1 PM · Poor 47 · 39°F · wind 16 mph · rain 1.2 mm",
-       "2 PM · Poor 47 · 39°F · wind 16 mph · rain 1.2 mm",
-       "3 PM · Poor 47 · 39°F · wind 16 mph · rain 1.2 mm",
-       "4 PM · Poor 48 · 38°F · wind 16 mph · rain 1.2 mm",
-       "5 PM · Poor 48 · 37°F · wind 16 mph · rain 1.2 mm"
+       "9 AM · Skip it 19 · 37°F · wind 16 mph · rain 1.2 mm",
+       "10 AM · Skip it 19 · 38°F · wind 16 mph · rain 1.2 mm",
+       "11 AM · Skip it 19 · 39°F · wind 16 mph · rain 1.2 mm",
+       "Noon · Skip it 19 · 39°F · wind 16 mph · rain 1.2 mm",
+       "1 PM · Skip it 19 · 39°F · wind 16 mph · rain 1.2 mm",
+       "2 PM · Skip it 19 · 39°F · wind 16 mph · rain 1.2 mm",
+       "3 PM · Skip it 19 · 39°F · wind 16 mph · rain 1.2 mm",
+       "4 PM · Skip it 19 · 38°F · wind 16 mph · rain 1.2 mm",
+       "5 PM · Skip it 19 · 37°F · wind 16 mph · rain 1.2 mm"
       ]
      }
     }
@@ -2607,7 +2567,7 @@ window.SNOWPACE_DEMO = {
   {
    "key": "s",
    "name": "New snow, 24 hours",
-   "what": "How much has fallen since yesterday",
+   "what": "What has fallen in the 24 hours up to midday",
    "personal": true
   },
   {

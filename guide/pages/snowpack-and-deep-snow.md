@@ -2,7 +2,7 @@
 title: Snowpack and deep new snow
 description: Why a bare hill scores 0 on a perfect day, and why skate and classic dip after a big snowfall.
 ---
-Most factors raise or lower a score a little. Two work differently: when there isn't enough snow, or for skate and classic too much new snow, they hold the whole score down, because no amount of sunshine makes up for them.
+Most factors raise or lower a score a little. Three things work differently: when there isn't enough snow, when for skate and classic there's too much new snow, or when it rains while you're out, they hold the whole score down, because no amount of sunshine makes up for them. This page covers the first two; for the third, see [Rain and ice](/guide/rain-and-ice/#rain-while-youre-out).
 
 ## Snowpack
 
@@ -16,4 +16,4 @@ While the snowpack is holding the score down, a banner leads **{{ui.why.show}}**
 
 For skate and classic only. A lot of unpacked new snow makes a skate lane soft and slow until it has been packed, and fills classic tracks until they have been reset, however good the rest of the day is. So after a big snowfall, beyond what you said you'll put up with, their scores are held down, and the more snow, the more they're held down. Skate feels it sooner than classic.
 
-While it's holding the score down, a **{{ui.breakdown.deepSnow}}** banner leads the detail, with the day's new snow.
+While it's holding the score down, a **{{ui.breakdown.deepSnow}}** banner leads the detail, with the day's new snow: what fell in the 24 hours up to midday. Snow due later in the day counts for tomorrow.

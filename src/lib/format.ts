@@ -10,6 +10,11 @@ export function fmtS(cm: number, units: Units): string {
   return units === 'imperial' ? (cm / 2.54).toFixed(1) + '"' : cm + ' cm';
 }
 
+/** How fast snow is falling: "1.2 cm/h" / 0.5"/h. */
+export function fmtSnowRate(cmPerHour: number, units: Units): string {
+  return units === 'imperial' ? (cmPerHour / 2.54).toFixed(1) + '"/h' : cmPerHour.toFixed(1) + ' cm/h';
+}
+
 export function fmtW(kmh: number, units: Units): string {
   return units === 'imperial' ? Math.round(kmh * 0.621) + ' mph' : Math.round(kmh) + ' km/h';
 }
