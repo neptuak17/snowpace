@@ -121,9 +121,10 @@ export default function YouScreen() {
             {y.appearance}
           </AppText>
           <Segmented
-            value={s.theme}
-            options={[{ value: 'light', label: y.light }, { value: 'dark', label: y.dark }]}
-            onChange={s.setTheme}
+            value={s.appearance}
+            options={[{ value: 'system', label: y.system }, { value: 'light', label: y.light }, { value: 'dark', label: y.dark }]}
+            onChange={s.setAppearance}
+            width={216}
           />
         </View>
       </Card>

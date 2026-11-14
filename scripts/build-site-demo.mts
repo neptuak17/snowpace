@@ -111,10 +111,13 @@ function samplePlace(s: (typeof SAMPLES)[number]) {
     }
   }
   const forecast: Forecast = { key: 'sample', level: 'mid', fetchedAt: new Date().toISOString(), elevation: 1500, timezone: TZ, hours };
-  return placeFromArea({
+  const p = placeFromArea({
     key: 'sample', name: 'Sample Hill', lat: 50, lon: -119, minElev: 1200, maxElev: 1900, downhill: true, nordic: true,
     website: null, country: 'CA', region: 'CA-BC', regionName: 'British Columbia', locality: null,
   }, null, [forecast]);
+  // The whole day counts: in the app the best hours are chosen from the hours
+  // still to come, which would make this file depend on when it was built.
+  return { ...p, nowHour: null };
 }
 
 /**

@@ -101,6 +101,13 @@ export type Place = {
   surface: SurfaceSeries | null;
   /** The place's IANA time zone, from its forecast; null with no forecast. */
   timezone: string | null;
+  /**
+   * The hour of the day at the place (0–23) when this was built, so today's
+   * best hours can be chosen from the hours still to come. Null with no
+   * forecast for today, and wherever the whole day should count (the checks
+   * and the website's samples, which must not change with the time of day).
+   */
+  nowHour: number | null;
 };
 
 export const DAY_COUNT = 5;
@@ -164,9 +171,9 @@ export function placeFromArea(a: SkiArea, here: LatLon | null, forecasts: Foreca
 
 // ── Aggregation ──────────────────────────────────────────────────────────
 
-type Weather = Pick<Place, 'forecastAt' | 'days' | 'hours' | 'surface' | 'timezone'>;
+type Weather = Pick<Place, 'forecastAt' | 'days' | 'hours' | 'surface' | 'timezone' | 'nowHour'>;
 
-const NO_WEATHER: Weather = { forecastAt: null, days: [], hours: null, surface: null, timezone: null };
+const NO_WEATHER: Weather = { forecastAt: null, days: [], hours: null, surface: null, timezone: null, nowHour: null };
 
 /**
  * The cached rows for the levels this place asks for now. A place's levels
@@ -205,7 +212,7 @@ function weatherFrom(forecasts: Forecast[]): Weather {
   const today = localDate(s.timezone);
   const t0 = dates.indexOf(today);
   // The cache may predate today (offline for a day): then there is no "today" and nothing to score.
-  if (t0 < 0) return { forecastAt: s.fetchedAt, days: [], hours: null, surface: null, timezone: s.timezone };
+  if (t0 < 0) return { forecastAt: s.fetchedAt, days: [], hours: null, surface: null, timezone: s.timezone, nowHour: null };
 
   const series = seriesOfHours(s.hours);
   const hoursOn = (i: number): HourWx[] => (i >= 0 && i < dates.length ? (byDate.get(dates[i]) ?? []) : []);
@@ -218,6 +225,7 @@ function weatherFrom(forecasts: Forecast[]): Weather {
   // state has settled by the hours anyone looks at.
   return {
     forecastAt: s.fetchedAt, days, hours: byDate.get(today) ?? null, surface: surfaceSeries(s.hours), timezone: s.timezone,
+    nowHour: localHour(s.timezone),
   };
 }
 

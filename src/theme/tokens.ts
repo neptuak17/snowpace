@@ -7,6 +7,9 @@ import { Platform, type TextStyle, type ViewStyle } from 'react-native';
 
 export type Scheme = 'light' | 'dark';
 
+/** What the user chose on the You tab: follow the phone's own setting, or always one scheme. */
+export type Appearance = 'system' | Scheme;
+
 // Tonal ramps — identical in both themes; the role tokens below are what flip.
 export const ramps = {
   neutral: {

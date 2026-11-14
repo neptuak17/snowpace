@@ -26,7 +26,7 @@ import type { Units } from '@/lib/format';
 import type { LatLon } from '@/lib/geo';
 import { DEFAULT_PREFS, knownActivity, mergePrefs, type Prefs, type PrefsByAct } from '@/lib/scoring';
 import { strings } from '@/strings';
-import type { Scheme } from '@/theme/tokens';
+import type { Appearance, Scheme } from '@/theme/tokens';
 
 export type SelCell = { loc: string; day: number };
 
@@ -35,7 +35,14 @@ type State = {
   myActs: ActivityKey[];
   prefs: PrefsByAct;
   units: Units;
-  theme: Scheme;
+  /**
+   * Light, dark, or whatever the phone is set to (the default). The scheme
+   * actually drawn is `theme`, worked out from this and the phone's setting.
+   * Before Nov 2026 the scheme itself was saved, starting as the phone's at
+   * first launch: the first time any setting was saved it stuck, and the app
+   * stopped following the phone without the user having chosen anything.
+   */
+  appearance: Appearance;
   /** Last known phone position; persisted so distances render on the next launch too. */
   location: LatLon | null;
   /** Show a webcam for the place on screen (and so ask windy.com for one). */
@@ -54,7 +61,7 @@ type Actions = {
   setPref: (key: keyof Prefs, v: number) => void;
   resetPrefs: () => void;
   setUnits: (u: Units) => void;
-  setTheme: (t: Scheme) => void;
+  setAppearance: (a: Appearance) => void;
   setWebcams: (on: boolean) => void;
   setSelHour: (h: number) => void;
   setSelCell: (c: SelCell) => void;
@@ -62,6 +69,8 @@ type Actions = {
 };
 
 type Derived = {
+  /** The colour scheme in use: the user's choice, or the phone's when that is "system". Follows the phone live. */
+  theme: Scheme;
   /** Favourites as scoreable places, home hill first. Unlisted ones have `listed: false`. */
   places: Place[];
   /** True while a forecast refresh is in flight (foreground or after a save). */
@@ -77,9 +86,9 @@ type Derived = {
 const Ctx = createContext<(State & Actions & Derived) | null>(null);
 
 /** The slice of state that survives a relaunch. Stored as one JSON blob. */
-export type PersistedState = Pick<State, 'activity' | 'myActs' | 'prefs' | 'units' | 'theme' | 'location' | 'webcams'>;
+export type PersistedState = Pick<State, 'activity' | 'myActs' | 'prefs' | 'units' | 'appearance' | 'location' | 'webcams'>;
 export const PERSIST_KEY = 'state';
-const PERSISTED: (keyof PersistedState)[] = ['activity', 'myActs', 'prefs', 'units', 'theme', 'location', 'webcams'];
+const PERSISTED: (keyof PersistedState)[] = ['activity', 'myActs', 'prefs', 'units', 'appearance', 'location', 'webcams'];
 
 type ProviderProps = {
   children: ReactNode;
@@ -99,7 +108,6 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
     const myActs = (saved.myActs ?? []).filter(knownActivity);
     return {
       units: 'metric',
-      theme: system === 'dark' ? 'dark' : 'light',
       location: null,
       selHour: Math.max(7, Math.min(17, new Date().getHours())),
       selCell: null,
@@ -112,6 +120,10 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
       activity: knownActivity(saved.activity) ? saved.activity : 'classic',
       // On unless turned off; a blob from before webcams existed has no value.
       webcams: typeof saved.webcams === 'boolean' ? saved.webcams : true,
+      // Follows the phone unless the user has chosen. A blob from before this
+      // setting holds a `theme` instead, which may only be the phone's scheme
+      // on the day it stuck, so it is not taken as a choice.
+      appearance: saved.appearance === 'light' || saved.appearance === 'dark' ? saved.appearance : 'system',
     };
   });
   const [favourites, setFavourites] = useState<fav.Favourite[]>(initialFavourites ?? []);
@@ -213,7 +225,7 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
         })),
       resetPrefs: () => patch({ prefs: DEFAULT_PREFS }),
       setUnits: (units) => patch({ units }),
-      setTheme: (theme) => patch({ theme }),
+      setAppearance: (appearance) => patch({ appearance }),
       setWebcams: (webcams) => patch({ webcams }),
       setSelHour: (selHour) => patch({ selHour }),
       setSelCell: (selCell) => patch({ selCell }),
@@ -229,8 +241,10 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
     const homeIndex = favourites.findIndex((f) => f.isHome);
     const home = homeIndex >= 0 && places[homeIndex].listed ? places[homeIndex] : null;
     const savedAreas = favourites.map((f) => f.area).filter((a): a is SkiArea => !!a);
-    return { places, home, refreshing, savedKeys: new Set(favourites.map((f) => f.key)), savedAreas };
-  }, [favourites, forecasts, refreshing, state.location]);
+    // `system` comes from useColorScheme, which re-renders when the phone switches, so this follows it live.
+    const theme: Scheme = state.appearance === 'system' ? (system === 'dark' ? 'dark' : 'light') : state.appearance;
+    return { theme, places, home, refreshing, savedKeys: new Set(favourites.map((f) => f.key)), savedAreas };
+  }, [favourites, forecasts, refreshing, state.location, state.appearance, system]);
 
   const value = useMemo(() => ({ ...state, ...actions, ...derived }), [state, actions, derived]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
@@ -246,7 +260,7 @@ function unlistedPlace(key: string, savedName: string | null): Place {
   return {
     key, name, shortName: shortNameOf(name), lat: 0, lon: 0, minElev: null, maxElev: null, area: null,
     acts: [], website: null, country: null, distanceKm: null, listed: false,
-    forecastAt: null, days: [], hours: null, surface: null, timezone: null,
+    forecastAt: null, days: [], hours: null, surface: null, timezone: null, nowHour: null,
   };
 }
 

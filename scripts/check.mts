@@ -75,8 +75,9 @@ const AREA = {
 const forecastRow = (level: 'mid' | 'base' | 'summit', weather: Weather) =>
   ({ key: AREA.key, level, fetchedAt: new Date().toISOString(), elevation: 1500, timezone: TZ, hours: hoursOf(weather) });
 
+/** `nowHour` is null, so the whole day counts and a check gives the same answer at any time of day. */
 function place(weather: Weather, name = 'Test Mountain Resort'): Place {
-  return placeFromArea({ ...AREA, name }, null, [forecastRow('mid', weather)]);
+  return { ...placeFromArea({ ...AREA, name }, null, [forecastRow('mid', weather)]), nowHour: null };
 }
 
 const snowy = (lo: number, hi: number): Weather => (_d, hr) => ({ t: diurnal(lo, hi, hr), depth: 1 });
@@ -179,6 +180,20 @@ const checks: [string, () => void][] = [
         }
       }
     }
+  }],
+  ['Best hours are chosen from the hours still to come, and there are none once too few are left', () => {
+    // Calm until 1 PM, then a gale, so over the whole day the best hours are in the morning.
+    const p = place((_d, hr) => ({ t: -8, depth: 1.5, wind: hr >= 13 ? 40 : 8 }));
+    const windowAt = (nowHour: number | null) => hourGrid({ ...p, nowHour }, 'downhill', P)!.window;
+    const hours = TUNING.hourly.hours, n = TUNING.hourly.windowHours;
+    const whole = windowAt(null)!;
+    assert.ok(hours[whole.to] < 13, `with the whole day, the calm morning wins: ${JSON.stringify(whole)}`);
+    const late = windowAt(14)!;
+    assert.ok(hours[late.from] >= 14, `at 2 PM the window starts no earlier than 2 PM: ${JSON.stringify(late)}`);
+    assert.equal(windowAt(hours[hours.length - n]) !== null, true, 'exactly enough hours left still gives a window');
+    assert.equal(windowAt(hours[hours.length - n] + 1), null, 'one hour later there are too few');
+    assert.equal(windowAt(22), null, 'after the last hour of the strip');
+    assert.equal(hourGrid({ ...p, nowHour: 14 }, 'downhill', P)!.cells.filter((c) => c !== null).length, hours.length, 'every hour is still scored');
   }],
   ['The "in 3 days" figure is the 72 hours up to midday, on every day', () => {
     const old = place((d) => ({ t: -8, depth: 1.5, snow: d === -4 ? 10 / 24 : 0 }));

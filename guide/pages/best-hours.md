@@ -8,6 +8,8 @@ For today, under the answer, a strip of squares runs from {{derived.hourStrip.fr
 
 "Best 10 AM–1 PM" beside the dial is the best-scoring run of {{tune.hourly.windowHours}} hours in a row, and the strip marks it under the hour numbers. When no hour scores above 0, there is no best window, so none is shown.
 
+It's chosen from the hours still to come, so as the day goes on it can move later: by mid-afternoon it's the best of what's left, not a morning you've already missed. Once fewer than {{tune.hourly.windowHours}} hours of the strip remain, there's no best window. The squares still show every hour, earlier ones included.
+
 ## Tap an hour
 
 Tap a square to see that hour in words, such as "3 PM · Fair 62 · 2°C · wind 30 km/h", with any rain or snow falling.

@@ -23,7 +23,7 @@ Pick an activity with the chips, then set:
 
 ## {{ui.you.display}}
 
-**{{ui.you.units}}:** {{ui.you.metric}}, or {{ui.you.imperial}}. **{{ui.you.appearance}}:** {{ui.you.light}} or {{ui.you.dark}}.
+**{{ui.you.units}}:** {{ui.you.metric}}, or {{ui.you.imperial}}. **{{ui.you.appearance}}:** {{ui.you.system}}, which follows your phone's own light or dark setting, or always {{ui.you.light}} or {{ui.you.dark}}.
 
 ## {{ui.you.reset}}
 

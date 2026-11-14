@@ -18,7 +18,10 @@
   Handle both or note the gap.
 - No analytics SDKs, no ad SDKs, no tracking libraries. Ever.
 - Keep the dependency list minimal — every third-party SDK adds App Store
-  privacy-manifest obligations.
+  privacy-manifest obligations. A package the app's own code never imports may still be needed:
+  check what Expo Router loads before removing one. `@expo/ui` was removed in Nov 2026 (question
+  42): it is an optional peer of Expo Router, loaded only by its Android toolbar. `expo-glass-effect`
+  looked just as unused and stays, because Expo Router's stack header loads it on iOS.
 - iOS is the target platform. Write React Native components, not HTML.
   Do not delete the Expo template's React Native Web support — the .web.tsx
   platform variants are inert on iOS. (The marketing site is plain HTML in
@@ -224,7 +227,9 @@ variables (or more than two weeks) as several calls, so daily aggregates are com
 phone from the hourly series rather than requested. Verified Oct 2026:
 
 * `hourly=temperature_2m,snowfall,rain,precipitation,wind_speed_10m,wind_gusts_10m,cloud_cover,snow_depth,shortwave_radiation`
-  — nine variables, leaving one spare.
+  — nine variables, leaving one spare. `wind_gusts_10m` is fetched and aggregated but nothing
+  reads it yet. It stays (question 39, Nov 2026) until the retune decides whether downhill should
+  use it, since gusts are what close lifts; it costs no extra call.
 * `past_days=7&forecast_days=5&timezone=auto` — a week of history, today plus four ahead for the
   grid, in the place's local time. Twelve days stays under the two-week threshold, so each
   coordinate is still one call. The scoring windows read only the last three days; the week is
@@ -346,6 +351,14 @@ the line as one item. The full rows with each factor's 0–100 (`breakdown()`) n
 "Not right?" email's diagnostics. The hour-by-hour grid is gone: the strip under the answer, with
 tap-for-detail, covers it.
 
+**Best hours are chosen from the hours still to come (Nov 2026, question 40).** At 3 PM the card
+used to say "Best 9 AM–noon". Each place carries the hour it was built at, at the place
+(`Place.nowHour`; places are rebuilt on every return to the app), and the best window is the
+best run from that hour on. With fewer hours left than a window needs there is none, and the
+card shows no "Best" line. The strip still scores and colours every hour, earlier ones included.
+The checks and the website's samples set `nowHour` to null, which counts the whole day, so
+neither changes with the time they are run.
+
 **Deep new snow caps skate and classic the same way (Oct 2026).** The weighted blend let a calm,
 cold day after 20 cm of new snow score Good for skate, because new snow and snow falling, both at
 0, are only 27% of skate's weights. `TUNING.deepSnow` multiplies the skate blend down from 1 at
@@ -439,7 +452,9 @@ the factor's weight (skate 16 points, classic 11, downhill 6, snowshoe 5). In th
 over the three days; otherwise the line says "no crust" or "light crust". Rain followed
 by a refreeze ices the surface without any melt, which the rain factor counts. The order of melt
 and refreeze is not checked: the surface model below is meant to replace this factor for classic
-and skate.
+and skate. Because the surface model does follow the order, the card can say "Crust from a thaw"
+with "Surface (not scored): Slushy" under it, after a frost and then days above freezing. Left
+as it is until the retune (question 43, Nov 2026).
 
 ### Surface firmness — shadow mode
 
@@ -639,6 +654,16 @@ The about/credits screen must include:
   subscription's monthly income matches Open-Meteo's monthly cost; a one-off price does not.
   Ask Open-Meteo and Windy before choosing.
 
+## Appearance
+
+The You tab offers System, Light and Dark, and **System, following the phone, is the default**
+(Nov 2026, question 41). Before, there were only Light and Dark, and what was saved was the
+scheme itself, starting as the phone's at first launch: the first time any setting was saved it
+stuck, so the app stopped following the phone without the user having chosen. The saved setting
+is now `appearance`, and the scheme drawn (`theme`) is worked out from it and the phone's live
+setting. A `theme` saved by an earlier build is ignored, since it may never have been a choice,
+so everyone starts on System; someone who had picked one picks it again.
+
 ## Feedback
 
 Feedback is email the user sends from their own Mail app (`expo-mail-composer`); Snowpace never
@@ -671,9 +696,17 @@ four sports side by side, how the score is decided, features, privacy, and a foo
   work. The domain also has Cloudflare's email-forwarding records (MX, SPF, DKIM):
   `support@snowpace.com` forwards to the developer's own mailbox. It is the only public contact
   address: the app's feedback address (`FEEDBACK_EMAIL`), the support and privacy pages, and the
-  README all use it. The developer's personal address appears nowhere public, and the website
-  does not name the developer (owner's call, Oct 2026): it says "the developer" or speaks in the
-  first person.
+  README all use it. The website does not name the developer (owner's call, Oct 2026): it says
+  "the developer" or speaks in the first person. No file in the repository carries the
+  developer's personal address, and the only one that names the developer is `NOTICE`, in its
+  copyright line: left as it is (question 37, Nov 2026), since the App Store shows the legal name
+  as seller anyway. **Commit history is the exception.** Commits up to 13 Nov 2026 carry the
+  developer's name and personal address as author, in a public repository, and are left alone:
+  changing them means rewriting history. From 14 Nov 2026 commits here are authored as
+  `support@snowpace.com` (question 38), set for this repository only with
+  `git config user.email support@snowpace.com`. That setting lives in the checkout, not the
+  repository, so set it again on any new clone or machine. The author name is unchanged, and
+  stays the developer's own (question 44).
 
 * **Three pages, three App Store Connect fields.** The main page is the Marketing URL;
   `site/support/` is the Support URL: the guide's front door (its search, the troubleshooter,
@@ -854,5 +887,6 @@ The owner's working agreements, for any session, on the owner's PC or in the clo
   by default it writes `.env.local`, which holds the Windy key.
 - The Windy key lives only in `.env.local` on the owner's PC and in EAS. Never print it, paste
   it anywhere or commit it; before committing, check the staged diff for it, and for the
-  owner's name or personal email address, which appear nowhere public. A session without the
-  key has no webcams, which is fine.
+  owner's name or personal email address, which no file carries apart from the name in `NOTICE`
+  (see Website, The domain). Check too that `git config user.email` answers
+  `support@snowpace.com`. A session without the key has no webcams, which is fine.

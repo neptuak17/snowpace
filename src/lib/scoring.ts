@@ -310,24 +310,35 @@ export type HourGrid = {
   wx: (Wx | null)[];
   /** Each hour's score; null where the hour's forecast is missing — shown blank, never estimated. */
   cells: (number | null)[];
-  /** The best run of `windowHours` hours, as indexes into `hours`; null when no hour scores above 0. */
+  /**
+   * The best run of `windowHours` hours among those still to come, as indexes
+   * into `hours`; null when no hour scores above 0, or too few hours are left.
+   */
   window: { from: number; to: number } | null;
 };
 
-/** Today hour by hour for one activity, from the real hourly forecast only. */
+/**
+ * Today hour by hour for one activity, from the real hourly forecast only.
+ * Every hour of the strip is scored, past ones too, but the best window is
+ * chosen from the current hour on (`l.nowHour`): at 3 PM, "Best 9 AM–noon"
+ * was advice nobody could take (Nov 2026, owner's call). With fewer hours
+ * left than a window needs, there is none.
+ */
 export function hourGrid(l: Place, act: ActivityKey, prefs: PrefsByAct): HourGrid | null {
   if (!l.acts.includes(act) || !canScore(l, 0)) return null;
   const wx = HOURS.map((h) => realHour(l, h));
   const cells = wx.map((d) => (d ? blend(subsFor(l, 0, act, prefs, d), act) : null));
-  return { hours: HOURS, wx, cells, window: bestRun(cells) };
+  const now = l.nowHour;
+  const start = now === null ? 0 : HOURS.findIndex((h) => h >= now);
+  return { hours: HOURS, wx, cells, window: start < 0 ? null : bestRun(cells, start) };
 }
 
-// The best-scoring run of consecutive known hours. A day with nothing above
-// zero has no best window; naming one would be advice.
-function bestRun(cells: (number | null)[]): HourGrid['window'] {
+// The best-scoring run of consecutive known hours, from index `start` on. A
+// day with nothing above zero has no best window; naming one would be advice.
+function bestRun(cells: (number | null)[], start: number): HourGrid['window'] {
   const n = T.hourly.windowHours;
   let from = -1, best = 0;
-  for (let i = 0; i + n <= cells.length; i++) {
+  for (let i = start; i + n <= cells.length; i++) {
     const run = cells.slice(i, i + n);
     if (run.some((v) => v === null)) continue;
     const m = (run as number[]).reduce((sum, v) => sum + v, 0) / n;

@@ -45,7 +45,9 @@ export default function RootLayout() {
   if (!fontsLoaded || boot.phase === 'splash') return null;
 
   if (boot.phase === 'loading') {
-    const scheme = boot.initial?.theme ?? (system === 'dark' ? 'dark' : 'light');
+    // The saved choice, or the phone's own scheme when it is "system" or nothing is saved yet.
+    const chosen = boot.initial?.appearance;
+    const scheme = chosen === 'light' || chosen === 'dark' ? chosen : system === 'dark' ? 'dark' : 'light';
     return (
       <SchemeContext.Provider value={scheme}>
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />

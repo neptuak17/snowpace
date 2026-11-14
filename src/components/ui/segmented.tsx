@@ -9,13 +9,15 @@ type Props<T extends string> = {
   value: T;
   options: { value: T; label: string }[];
   onChange: (v: T) => void;
+  /** The control's width in points; the default suits two options. */
+  width?: number;
 };
 
-/** Two-option pill segment control (Units, Appearance). */
-export function Segmented<T extends string>({ value, options, onChange }: Props<T>) {
+/** Pill segment control with two or three options (Units, Appearance). */
+export function Segmented<T extends string>({ value, options, onChange, width }: Props<T>) {
   const theme = useTheme();
   return (
-    <View style={[styles.wrap, { backgroundColor: theme.track }]}>
+    <View style={[styles.wrap, { backgroundColor: theme.track }, width ? { width } : null]}>
       {options.map((o) => {
         const on = o.value === value;
         return (

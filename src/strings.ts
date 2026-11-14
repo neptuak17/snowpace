@@ -121,6 +121,8 @@ export const strings = {
     metric: '°C · cm',
     imperial: '°F · in',
     appearance: 'Appearance',
+    // Follows the phone's own light or dark setting; the default.
+    system: 'System',
     light: 'Light',
     dark: 'Dark',
     reset: 'Reset all activity preferences',
