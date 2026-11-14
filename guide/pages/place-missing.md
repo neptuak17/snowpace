@@ -7,6 +7,7 @@ description: Finding a place, fixing its activities, and what "No longer listed"
 - Try the **town** instead of the area's name, or a shorter word: "Sovereign" rather than "Sovereign Lake Nordic Centre".
 - Nordic areas are often listed under their club's or trail system's name.
 - Search covers every named, operating ski area in North America, near or far.
+- Accents, capitals and apostrophes don't matter: "levis" finds Lévis, and "val d'irene" finds Val-d'Irène.
 
 ## Not in the list at all
 
@@ -20,4 +21,8 @@ The list only knows downhill and nordic. Nordic becomes classic and skate in Sno
 
 ## No longer listed
 
-When a saved place drops out of the list, Snowpace doesn't delete it. It stays at the bottom of **{{ui.tabs.places}}**, marked **{{ui.common.unlisted}}**, with a **{{ui.common.remove}}** button. It usually means the area was renamed, merged, or marked as closed at the source. If it comes back, it's listed again.
+When a saved place drops out of the list, Snowpace doesn't delete it. It stays at the bottom of **{{ui.tabs.places}}** under the name it last had, marked **{{ui.common.unlisted}}**, with a **{{ui.common.remove}}** button. It usually means the area was renamed, merged, or marked as closed at the source. If it comes back, it's listed again.
+
+Sometimes the same place returns as a new entry instead, because it was redrawn at the source. Search for it and save it again, then remove the old one.
+
+If it was your home hill, **{{ui.tabs.today}}** asks you to pick a home hill again. You can remove the old one like any other.

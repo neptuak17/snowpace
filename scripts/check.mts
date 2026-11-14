@@ -20,8 +20,12 @@ import assert from 'node:assert/strict';
 import './app-loader.mts';
 
 const { breakdown, DEFAULT_PREFS, freezeThaw, hourGrid, rainPrior, score, shownAnswer, snow72, subsFor, why } = await import('../src/lib/scoring.ts');
-const { SNOW_CM_PER_MM } = await import('../src/data/open-meteo.ts');
+const { batchesFor, meanSeries, SNOW_CM_PER_MM } = await import('../src/data/open-meteo.ts');
+const { MIN_SHARE, parseSkiAreas, webUrl } = await import('../src/data/openskidata.ts');
+const { inventoryRefreshDue, POLICY } = await import('../src/data/policy.ts');
 const { localDate, placeFromArea } = await import('../src/data/places.ts');
+const { foldText, searchText } = await import('../src/lib/fold.ts');
+const { fmtForecastAge } = await import('../src/lib/format.ts');
 const { buildFeedbackMail, verdictIssuesFor } = await import('../src/lib/diagnostics.ts');
 const { strings } = await import('../src/strings.ts');
 const { withinLimit } = await import('../src/lib/place-text.ts');
@@ -41,11 +45,12 @@ const dateAt = (offset: number) => new Date(Date.UTC(Y, M - 1, D + offset)).toIS
 const diurnal = (lo: number, hi: number, hr: number) => lo + (hi - lo) * Math.max(0, Math.sin((Math.PI * (hr - 6)) / 14));
 
 /** `snow` is cm in the hour, `rain` mm; a null `snow` is an hour the forecast is missing. */
-type Hour = { t: number; depth: number; snow?: number | null; rain?: number; cloud?: number };
+type Hour = { t: number; depth: number; snow?: number | null; rain?: number; cloud?: number; wind?: number };
 /** day: −7 (a week ago) to 4 (four days ahead); hr: 0–23. */
 type Weather = (day: number, hr: number) => Hour;
 
-function place(weather: Weather, name = 'Test Mountain Resort'): Place {
+/** The hourly series a forecast row holds, from made-up weather. */
+function hoursOf(weather: Weather) {
   const hours = [];
   for (let day = -7; day <= 4; day++) {
     for (let hr = 0; hr < 24; hr++) {
@@ -54,17 +59,24 @@ function place(weather: Weather, name = 'Test Mountain Resort'): Place {
       hours.push({
         time: `${dateAt(day)}T${String(hr).padStart(2, '0')}:00`,
         // Precipitation is in mm of water, as Open-Meteo gives it: 7 cm of snow to 10 mm.
-        t: Math.round(h.t * 10) / 10, snow, rain, precip: snow === null ? null : snow / SNOW_CM_PER_MM + rain, wind: 8, gust: 12,
-        cloud: h.cloud ?? 30, depth: h.depth, sun: 400,
+        t: Math.round(h.t * 10) / 10, snow, rain, precip: snow === null ? null : snow / SNOW_CM_PER_MM + rain,
+        wind: h.wind ?? 8, gust: 12, cloud: h.cloud ?? 30, depth: h.depth, sun: 400,
       });
     }
   }
-  return placeFromArea(
-    { key: 'osm:way/1', name, lat: 50, lon: -119, minElev: 1200, maxElev: 1900, downhill: true, nordic: true,
-      website: null, country: 'CA', region: 'CA-BC', regionName: 'British Columbia', locality: null },
-    null,
-    [{ key: 'osm:way/1', level: 'mid', fetchedAt: new Date().toISOString(), elevation: 1500, timezone: TZ, hours }],
-  );
+  return hours;
+}
+
+/** A place with downhill and nordic, and elevations, so it asks for a base and a summit forecast. */
+const AREA = {
+  key: 'osm:way/1', name: 'Test Mountain Resort', lat: 50, lon: -119, minElev: 1200, maxElev: 1900, downhill: true, nordic: true,
+  website: null as string | null, country: 'CA', region: 'CA-BC', regionName: 'British Columbia', locality: null,
+};
+const forecastRow = (level: 'mid' | 'base' | 'summit', weather: Weather) =>
+  ({ key: AREA.key, level, fetchedAt: new Date().toISOString(), elevation: 1500, timezone: TZ, hours: hoursOf(weather) });
+
+function place(weather: Weather, name = 'Test Mountain Resort'): Place {
+  return placeFromArea({ ...AREA, name }, null, [forecastRow('mid', weather)]);
 }
 
 const snowy = (lo: number, hi: number): Weather => (_d, hr) => ({ t: diurnal(lo, hi, hr), depth: 1 });
@@ -250,6 +262,99 @@ const checks: [string, () => void][] = [
         assert.ok(s === null || (s >= 0 && s <= 100), `${act} day ${di}: ${s}`);
       }
     }
+  }],
+
+  ['Wind costing points under your limit is "Breezy"; over it, "Windier than you like"', () => {
+    // Skate, whose wind limit is 16 km/h: a little snow two days ago keeps the other factors quiet, so wind leads.
+    const at = (wind: number) => place((d, hr) => ({ t: -8, depth: 1.5, wind, snow: d === -2 && hr < 6 ? 1 : 0 }));
+    const first = (wind: number) => whyOf(at(wind), 'skate').holding[0];
+    assert.equal(first(P.skate.wind)?.key, 'w', `at the limit, wind should lead: ${JSON.stringify(first(P.skate.wind))}`);
+    assert.equal(first(P.skate.wind).label, strings.why.rows.breezy);
+    assert.equal(first(P.skate.wind + 6).label, strings.why.rows.windy);
+  }],
+  ['A forecast two days old says "2 days", and one day old "1 day"', () => {
+    const ago = (h: number) => fmtForecastAge(new Date(Date.now() - h * 3600_000).toISOString());
+    assert.match(ago(48), /2 days ago/);
+    assert.match(ago(24), /1 day ago/);
+  }],
+
+  // Forecast rows (CLAUDE.md: Weather — Open-Meteo, Caching)
+  ['A place is scored on the levels it asks for now, not a row left from before its listing changed', () => {
+    const cold: Weather = () => ({ t: -8, depth: 1.5 }), warm: Weather = () => ({ t: 6, depth: 1.5 });
+    // It asks for base and summit; the mid-elevation row is from when it had no downhill.
+    const p = placeFromArea(AREA, null, [forecastRow('mid', warm), forecastRow('base', cold), forecastRow('summit', cold)]);
+    assert.equal(p.days[0]?.t, -8);
+    // With only the old row cached (the new ones not fetched yet), it is still shown rather than nothing.
+    assert.equal(placeFromArea(AREA, null, [forecastRow('mid', warm)]).days[0]?.t, 6);
+  }],
+  ['Base and summit are averaged hour for hour by time, not by position', () => {
+    // The temperature is the day's number, and the summit series starts a day later, as one fetched a day on would.
+    const byDay: Weather = (d) => ({ t: d, depth: 1.5 });
+    const base = hoursOf(byDay), summit = hoursOf(byDay).slice(24);
+    const mean = meanSeries(base, summit);
+    assert.equal(mean.length, base.length - 24);
+    assert.ok(mean.every((h) => Number.isInteger(h.t)), 'a day out of step would average two different days');
+  }],
+  ['A place\'s base and summit always travel in one request', () => {
+    const areas = [{ ...AREA, key: 'nordic', downhill: false }, ...Array.from({ length: 20 }, (_, i) => ({ ...AREA, key: `hill${i}` }))];
+    const batches = batchesFor(areas);
+    assert.equal(batches.flatMap((b) => b.coords).length, 41);
+    for (const b of batches) assert.ok(b.coords.length <= 40, `${b.coords.length} coordinates in one request`);
+    for (let i = 0; i < 20; i++) {
+      assert.equal(batches.filter((b) => b.coords.some((c) => c.key === `hill${i}`)).length, 1, `hill${i} is split across requests`);
+    }
+  }],
+
+  // The ski-area listing (CLAUDE.md: Ski area inventory — OpenSkiData)
+  ['A listing whose elevations, countries or activities have gone missing is turned away', () => {
+    const feature = (i: number, over: Record<string, unknown> = {}) => ({ type: 'Feature', properties: {
+      id: `f${i}`, name: `Area ${i}`, status: 'operating', sources: [{ type: 'openstreetmap', id: `way/${i}` }], websites: [],
+      activities: ['downhill'], statistics: { minElevation: 1000, maxElevation: 1500 }, viewportHint: { center: [-119, 50] },
+      places: [{ iso3166_1Alpha2: 'CA', iso3166_2: 'CA-BC', localized: { en: { region: 'British Columbia', locality: 'Vernon' } } }],
+      ...over,
+    } });
+    const parse = (over?: Record<string, unknown>) => parseSkiAreas({ type: 'FeatureCollection', features: Array.from({ length: 30 }, (_, i) => feature(i, over)) });
+    assert.equal(parse().ok, true);
+    // Each is a rename one level down: the property is still there, its contents are not where they were.
+    const renamed: [RegExp, Record<string, unknown>][] = [
+      [/elevation/, { statistics: { minElevationM: 1000, maxElevationM: 1500 } }],
+      [/country/, { places: [{ countryCode: 'CA' }] }],
+      [/activity/, { activities: ['alpine'] }],
+    ];
+    for (const [reason, over] of renamed) {
+      const r = parse(over);
+      assert.ok(!r.ok && reason.test(r.reason), JSON.stringify(r).slice(0, 120));
+    }
+    assert.ok(MIN_SHARE.elevation < 0.9, 'the real file has an elevation on 91% of areas; the floor must sit below that');
+  }],
+  ['A turned-away listing waits a week before the next try; a failed download a day', () => {
+    const now = Date.parse('2027-01-15T12:00:00Z');
+    const ago = (days: number) => new Date(now - days * 24 * 3600_000).toISOString();
+    const old = { fetchedAt: null, seedGeneratedAt: ago(90) };
+    assert.equal(inventoryRefreshDue({ ...old, attemptedAt: null }, now), true, 'never tried');
+    assert.equal(inventoryRefreshDue({ ...old, attemptedAt: ago(0.5) }, now), false, 'failed twelve hours ago');
+    assert.equal(inventoryRefreshDue({ ...old, attemptedAt: ago(2) }, now), true, 'failed two days ago');
+    assert.equal(inventoryRefreshDue({ ...old, attemptedAt: ago(2), rejectedAt: ago(2) }, now), false, 'turned away two days ago');
+    assert.equal(inventoryRefreshDue({ ...old, attemptedAt: ago(8), rejectedAt: ago(8) }, now), true, 'turned away eight days ago');
+    assert.equal(inventoryRefreshDue({ fetchedAt: ago(3), seedGeneratedAt: ago(90), attemptedAt: ago(3) }, now), false, 'fresh data');
+    assert.ok(POLICY.inventoryRejectedRetryDays * 24 > POLICY.inventoryRetryHours);
+  }],
+  ['Search ignores accents, capitals and which apostrophe was typed', () => {
+    const finds = (typed: string, name: string) => foldText(typed).split(' ').every((w) => searchText(name, null, 'Québec').includes(w));
+    assert.ok(finds('levis', 'Centre de plein air de Lévis'));
+    assert.ok(finds('Énergie', 'Énergie CMB') && finds('energie cmb', 'Énergie CMB'));
+    assert.ok(finds('bishop\'s', 'Bishop’s Cross Country Ski Trails') && finds('bishop’s', 'Bishop\'s Cross Country Ski Trails'));
+    assert.ok(finds('irene', 'Val-d\'Irène') && finds('val d’irène', 'Val-d\'Irène'));
+    assert.ok(finds('quebec', 'Mont Édouard'), 'the region is searched too');
+    assert.ok(!finds('whistler', 'Centre de plein air de Lévis'));
+    assert.match(foldText('50%_off'), /^[a-z0-9 ]*$/, 'nothing typed can act as a wildcard');
+  }],
+  ['A web site with no https:// gets one, and one that is not an address is dropped', () => {
+    assert.equal(webUrl('roundtopmountainresort.com'), 'https://roundtopmountainresort.com');
+    assert.equal(webUrl('http://example.com/snow'), 'http://example.com/snow');
+    assert.equal(webUrl('Montage Mountain Ski Resort'), null);
+    assert.equal(webUrl(null), null);
+    assert.equal(placeFromArea({ ...AREA, website: 'www.example.com' }, null, []).website, 'https://www.example.com');
   }],
 
   // Today's suggestions (CLAUDE.md: Distance, not drive time)

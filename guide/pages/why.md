@@ -41,7 +41,7 @@ The detail ends with **{{ui.breakdown.surface}}**, a word for what the weather i
 | {{ui.why.rows.notMuchNew}}, {{ui.why.rows.tooMuchNew}} | New snow in the 24 hours up to midday, against the amount you want, or will put up with |
 | {{ui.why.rows.little3d}} | Snowfall over three days: a stand-in for how fresh the surface is |
 | {{ui.why.rows.crust}}, {{ui.why.rows.slush}} | [Freeze–thaw](/guide/freeze-thaw/), with the low and high over three days |
-| {{ui.why.rows.windy}} | Wind, against your limit |
+| {{ui.why.rows.windy}}, {{ui.why.rows.breezy}} | Wind, against your limit: over it, or under it but already costing the score |
 | {{ui.why.rows.rain}}, {{ui.why.rows.rainRecent}}, {{ui.why.rows.rainIced}} | [Rain](/guide/rain-and-ice/): a trace today, or rain before the day's skiing, over three days. More than a trace while you're out is the banner above. |
 | {{ui.why.rows.fallOnTrack}}, {{ui.why.rows.fallTooMuch}}, {{ui.why.rows.fallNotMuch}} | Snow falling while you're out, in centimetres an hour, against your setting |
 | {{ui.why.rows.flatLight}} | Cloud cover |

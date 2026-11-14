@@ -474,7 +474,10 @@ function sayFactors(l: Place, di: number, act: ActivityKey, prefs: PrefsByAct, u
       value: strings.breakdown.freezeThawRange(fmtT(ft.minLo, units), fmtT(ft.maxHi, units)),
       fine: ft.hit ? f.lightCrust : f.noCrust,
     },
-    w: { label: r.windy, value: fmtW(d.wind, units), fine: f.wind(fmtW(d.wind, units)) },
+    // The wind starts to cost points at half the user's limit, so it can be
+    // holding a day back while still under it: "windier than you like" would
+    // then contradict the setting.
+    w: { label: d.wind > p.wind ? r.windy : r.breezy, value: fmtW(d.wind, units), fine: f.wind(fmtW(d.wind, units)) },
     pr: rainRow,
     fall: {
       label: !onHill ? r.fallOnTrack : tooMuchFall ? r.fallTooMuch : r.fallNotMuch,

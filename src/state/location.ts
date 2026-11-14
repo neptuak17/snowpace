@@ -1,6 +1,6 @@
 /**
  * One foreground location fix. Asks for permission on first use; a denial
- * is final for the session and returns null rather than nagging.
+ * is final for the session and returns no position rather than nagging.
  *
  * Accuracy is deliberately coarse — a few hundred metres is plenty for
  * "45 km away" — which is also faster and kinder to the battery.
@@ -15,20 +15,32 @@ import type { LatLon } from '@/lib/geo';
 // this, settle for the last fix the phone has, however old, or go without.
 const FIX_TIMEOUT_MS = POLICY.locationWaitS * 1000;
 
-export async function requestLocation(): Promise<LatLon | null> {
-  if (Platform.OS === 'web') return null;
+/**
+ * `granted` is whether the app may read the location at all; `position` is
+ * the fix, null when there is none. The two are told apart because they mean
+ * different things to the caller: no fix this time (indoors, a timeout)
+ * leaves the position saved from last time in use, while no permission means
+ * the saved one must be forgotten too.
+ */
+export type LocationFix = { granted: boolean; position: LatLon | null };
+
+export async function requestLocation(): Promise<LocationFix> {
+  if (Platform.OS === 'web') return { granted: false, position: null };
+  let granted = false;
   try {
     // Not timed: the user may be reading the permission prompt.
     const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') return null;
+    granted = status === 'granted';
+    if (!granted) return { granted, position: null };
     // The last known fix is instant; fall back to a fresh one if there is none.
     const last = await Location.getLastKnownPositionAsync({ maxAge: 30 * 60 * 1000 });
     const pos = last
       ?? (await withTimeout(Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low }), FIX_TIMEOUT_MS))
       ?? (await Location.getLastKnownPositionAsync());
-    return pos ? { lat: pos.coords.latitude, lon: pos.coords.longitude } : null;
+    return { granted, position: pos ? { lat: pos.coords.latitude, lon: pos.coords.longitude } : null };
   } catch {
-    return null;
+    // An error asking for permission is not a refusal: keep what was saved.
+    return { granted: true, position: null };
   }
 }
 

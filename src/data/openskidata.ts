@@ -60,6 +60,22 @@ function strOrNull(x: unknown): string | null {
   return typeof x === 'string' && x.length > 0 ? x : null;
 }
 
+/**
+ * A listed web site as an address a browser will open, or null. The listing's
+ * web sites are typed by hand at the source: a few have no "https://"
+ * ("roundtopmountainresort.com") and the odd one is not an address at all (a
+ * resort's name). The in-app browser refuses anything but http and https, so
+ * the first kind gets its scheme and the second is dropped, and no link is
+ * shown that does nothing when tapped.
+ */
+export function webUrl(site: string | null): string | null {
+  const s = site?.trim();
+  if (!s || /\s/.test(s)) return null;
+  if (/^https?:\/\//i.test(s)) return s;
+  // No scheme: only something shaped like a host name ("example.com/path").
+  return /^[a-z0-9-]+(\.[a-z0-9-]+)+([/?#].*)?$/i.test(s) ? `https://${s}` : null;
+}
+
 /** OSM ID first, Skimap.org ID as the fallback; null if the feature has neither. */
 export function identityKey(sources: unknown): string | null {
   if (!Array.isArray(sources)) return null;
@@ -129,8 +145,33 @@ export function parseSkiAreas(doc: unknown): ParseResult {
   }
 
   if (areas.length === 0) return { ok: false, reason: 'zero records survived filtering' };
+
+  // The properties checked by name above are only the top level. Elevation,
+  // country and the activities sit inside them, and a rename there leaves
+  // every record in place with nulls where the values were: the count is
+  // unchanged, so the size gate passes, and every Canadian place would move
+  // to the US weather model, or every place lose its elevation or become
+  // snowshoe-only. So the parse also fails when far fewer records carry
+  // them than the file has ever had.
+  const have: [string, number, number][] = [
+    ['an elevation', areas.filter((a) => a.minElev !== null && a.maxElev !== null).length, MIN_SHARE.elevation],
+    ['a country', areas.filter((a) => a.country !== null).length, MIN_SHARE.country],
+    ['an activity', areas.filter((a) => a.downhill || a.nordic).length, MIN_SHARE.activity],
+  ];
+  for (const [what, count, min] of have) {
+    if (count / areas.length < min) {
+      return { ok: false, reason: `only ${Math.round((100 * count) / areas.length)}% of areas have ${what} (expected at least ${min * 100}%)` };
+    }
+  }
   return { ok: true, areas, total, inBox };
 }
+
+/**
+ * The least share of records that must carry each nested value. Measured
+ * Sep 2026: 91% have an elevation, 100% a country, 99.9% an activity. Set
+ * well below those, so real drift passes and a renamed field does not.
+ */
+export const MIN_SHARE = { elevation: 0.7, country: 0.9, activity: 0.9 };
 
 /** Five decimals is ~1 m; plenty for a weather lookup and keeps the seed small. */
 function round5(x: number): number {

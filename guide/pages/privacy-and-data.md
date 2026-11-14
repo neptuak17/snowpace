@@ -22,7 +22,7 @@ None of these requests includes your location or anything about you. Each one na
 
 ## Your location
 
-If you allow it, Snowpace reads your location to show distances and to list search results nearest first. It's deliberately approximate, it's only read while the app is open, and **it is never sent anywhere.** You can refuse, or withdraw permission later in iOS Settings; Snowpace then just stops showing distances.
+If you allow it, Snowpace reads your location to show distances and to list search results nearest first. It's deliberately approximate, it's only read while the app is open, and **it is never sent anywhere.** You can refuse, or withdraw permission later in iOS Settings; Snowpace then just stops showing distances, and the next time it opens it forgets the position it had saved.
 
 ## Feedback you send
 

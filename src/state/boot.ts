@@ -27,7 +27,7 @@ import { setMeta } from '@/db/database';
 import { listFavourites, type Favourite } from '@/db/favourites';
 import { getForecasts } from '@/db/forecasts';
 import { ensureSeeded, inventoryStatus } from '@/db/inventory';
-import { getSetting } from '@/db/settings';
+import { getSetting, setSetting } from '@/db/settings';
 import { LAUNCH_META, type LaunchTimings } from '@/lib/diagnostics';
 import { PERSIST_KEY, type PersistedState } from '@/state/app-state';
 import { requestLocation } from '@/state/location';
@@ -142,8 +142,17 @@ export function useBoot(): Boot {
         : null;
       mark('forecast', 'done');
 
-      const location = await locationJob;
-      if (location) initial = { ...(initial ?? {}), location };
+      const fix = await locationJob;
+      if (fix.position) {
+        initial = { ...(initial ?? {}), location: fix.position };
+      } else if (!fix.granted && initial?.location) {
+        // Permission refused, or withdrawn in iOS Settings since last time:
+        // forget the position saved then, on the phone too. Distances would
+        // otherwise keep showing from wherever the phone last was, when the
+        // user has said the app may not know where it is.
+        initial = { ...initial, location: null };
+        setSetting(PERSIST_KEY, initial).catch(() => {});
+      }
 
       const remaining = MIN_LOADING_MS - (Date.now() - shownAt);
       if (remaining > 0) await sleep(remaining);

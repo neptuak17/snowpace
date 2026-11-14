@@ -103,6 +103,8 @@ export type Loaded = {
 /** Per place key: loaded, or null for "no camera to show this session". */
 const session = new Map<string, Loaded | null>();
 const inFlight = new Map<string, Promise<void>>();
+/** Per place key: when the last request for its camera failed. Not asked again until W.retryAfterMin has passed. */
+const failedAt = new Map<string, number>();
 const listeners = new Set<() => void>();
 
 export function subscribe(fn: () => void): () => void {
@@ -136,6 +138,11 @@ function watchForeground() {
     if (st === 'background') awayAt = Date.now();
     if (st === 'active' && awayAt !== null && Date.now() - awayAt >= STALE_AFTER_MS) {
       session.clear();
+      failedAt.clear();
+      listeners.forEach((fn) => fn());
+    } else if (st === 'active' && failedAt.size > 0) {
+      // Back in the app with a camera that could not be fetched earlier: let
+      // the screens showing one ask again. ensureWebcam keeps to the wait.
       listeners.forEach((fn) => fn());
     }
     if (st === 'active') awayAt = null;
@@ -145,10 +152,14 @@ function watchForeground() {
 /** Load the place's camera once this session. Safe to call on every render. */
 export function ensureWebcam(p: WebcamPlace): void {
   if (session.has(p.key) || inFlight.has(p.key)) return;
+  const failed = failedAt.get(p.key);
+  if (failed !== undefined && Date.now() - failed < W.retryAfterMin * 60_000) return;
   const job = load(p)
-    .then((v) => set(p.key, v))
-    // Offline or Windy unreachable: the section stays hidden this session.
-    .catch(() => set(p.key, null))
+    .then((v) => { failedAt.delete(p.key); set(p.key, v); })
+    // Offline or Windy unreachable: the section stays hidden, and nothing is
+    // recorded for the session, so it can be tried again after a wait: when
+    // the app is next opened, or a screen showing this place is.
+    .catch(() => { failedAt.set(p.key, Date.now()); })
     .finally(() => inFlight.delete(p.key));
   inFlight.set(p.key, job);
 }

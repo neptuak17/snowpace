@@ -32,10 +32,11 @@ export function useWebcamsOn(): boolean {
   return useAppState().webcams && !!WINDY_API_KEY && Platform.OS !== 'web';
 }
 
-/** Re-render when any camera in the session changes. */
-export function useWebcamSession() {
-  const [, bump] = useReducer((n: number) => n + 1, 0);
+/** Re-render when any camera in the session changes. Returns a count that goes up each time it does. */
+export function useWebcamSession(): number {
+  const [changes, bump] = useReducer((n: number) => n + 1, 0);
   useEffect(() => subscribe(bump), []);
+  return changes;
 }
 
 /**
@@ -49,14 +50,17 @@ export function WebcamSection({ place, style }: { place: Place; style?: StylePro
   const theme = useTheme();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
-  useWebcamSession();
+  const changes = useWebcamSession();
   const wp = asWebcamPlace(place);
 
   useEffect(() => {
     if (on && place.listed) ensureWebcam(wp);
-    // wp is rebuilt every render; the place key is what identifies it.
+    // wp is rebuilt every render; the place key is what identifies it. It
+    // also runs when the session changes (a new session, or coming back to
+    // the app after a failed request): ensureWebcam does nothing unless the
+    // camera is neither loaded nor waiting out a failure.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [on, place.key, place.listed]);
+  }, [on, place.key, place.listed, changes]);
 
   const loaded = on ? webcamFor(place.key) : null;
   if (!loaded) return null;

@@ -8,8 +8,8 @@
  * zero.
  */
 
-import { meanSeries, type Forecast, type HourWx } from '@/data/open-meteo';
-import type { SkiArea } from '@/data/openskidata';
+import { coordinatesFor, meanSeries, type Forecast, type HourWx } from '@/data/open-meteo';
+import { webUrl, type SkiArea } from '@/data/openskidata';
 import { distanceKm, type LatLon } from '@/lib/geo';
 import { surfaceSeries, type SurfaceSeries } from '@/lib/surface';
 import { TUNING } from '@/lib/tuning';
@@ -143,7 +143,7 @@ export function shortNameOf(name: string): string {
 
 /** Build a Place from an inventory record, the phone's location, and its cached forecasts. */
 export function placeFromArea(a: SkiArea, here: LatLon | null, forecasts: Forecast[] = [], listed = true): Place {
-  const wx = weatherFrom(forecasts);
+  const wx = weatherFrom(currentRows(a, forecasts));
   return {
     key: a.key,
     name: a.name,
@@ -154,7 +154,7 @@ export function placeFromArea(a: SkiArea, here: LatLon | null, forecasts: Foreca
     maxElev: a.maxElev,
     area: a.locality ?? a.regionName,
     acts: activitiesOf(a),
-    website: a.website,
+    website: webUrl(a.website),
     country: a.country,
     distanceKm: here ? distanceKm(here, a) : null,
     listed,
@@ -167,6 +167,19 @@ export function placeFromArea(a: SkiArea, here: LatLon | null, forecasts: Foreca
 type Weather = Pick<Place, 'forecastAt' | 'days' | 'hours' | 'surface' | 'timezone'>;
 
 const NO_WEATHER: Weather = { forecastAt: null, days: [], hours: null, surface: null, timezone: null };
+
+/**
+ * The cached rows for the levels this place asks for now. A place's levels
+ * change when the listing changes (a nordic centre gains a downhill run, or
+ * elevations appear), and a row left over from before must not be scored in
+ * place of the fresh ones. Only when none of the current levels is cached
+ * yet is whatever there is used, so the place still shows something.
+ */
+function currentRows(a: SkiArea, forecasts: Forecast[]): Forecast[] {
+  const wanted = coordinatesFor(a).map((c) => c.level);
+  const mine = forecasts.filter((f) => wanted.includes(f.level));
+  return mine.length ? mine : forecasts;
+}
 
 /** Pick the series to score on: the midpoint, else the mean of base and summit. */
 function seriesOf(forecasts: Forecast[]): { hours: HourWx[]; fetchedAt: string; timezone: string } | null {

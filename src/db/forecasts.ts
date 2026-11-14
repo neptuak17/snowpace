@@ -50,6 +50,23 @@ export async function putForecasts(forecasts: Forecast[]): Promise<void> {
   });
 }
 
+/**
+ * Drop a place's rows for levels it no longer asks for. Rows are replaced
+ * level by level, so when a place moves from one mid-elevation forecast to
+ * base and summit (or back), the old level would otherwise stay for good.
+ */
+export async function keepLevels(keep: { key: string; levels: Level[] }[]): Promise<void> {
+  if (keep.length === 0) return;
+  const d = await db();
+  for (const k of keep) {
+    if (k.levels.length === 0) continue;
+    await d.runAsync(
+      `DELETE FROM forecasts WHERE key = ? AND level NOT IN (${k.levels.map(() => '?').join(',')})`,
+      [k.key, ...k.levels],
+    );
+  }
+}
+
 /** Drop rows for places that are no longer favourites, so the table cannot grow forever. */
 export async function pruneForecasts(keepKeys: string[]): Promise<void> {
   const d = await db();

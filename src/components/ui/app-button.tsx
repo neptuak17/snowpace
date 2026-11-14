@@ -49,7 +49,8 @@ export function LinkButton({ href, children, style }: { href: string; children: 
       size={12.5}
       accessibilityRole="link"
       style={[styles.link, style]}
-      onPress={() => openBrowserAsync(href, { presentationStyle: WebBrowserPresentationStyle.AUTOMATIC })}>
+      // An address the browser will not open rejects; there is nothing to do about it here.
+      onPress={() => { openBrowserAsync(href, { presentationStyle: WebBrowserPresentationStyle.AUTOMATIC }).catch(() => {}); }}>
       {children}
     </AppButton>
   );

@@ -11,6 +11,7 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 import { db, getMeta, setMeta } from './database';
 
 import { acceptReplacement, type SkiArea } from '@/data/openskidata';
+import { foldText, searchText } from '@/lib/fold';
 
 // The bundled seed. Replaced by the first successful on-device refresh.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -33,6 +34,8 @@ export const META = {
   attemptedAt: 'inventory.attemptedAt',
   /** Why the last attempt did not replace the data, or absent if it did. */
   lastError: 'inventory.lastError',
+  /** ISO time a download last arrived and was turned away for its contents; cleared by a success. Drives the longer wait. */
+  rejectedAt: 'inventory.rejectedAt',
   etag: 'inventory.etag',
   lastModified: 'inventory.lastModified',
   /** When the seed was built, so the debug view can show how stale a never-refreshed install is. */
@@ -81,20 +84,27 @@ export async function confirmCurrent(): Promise<void> {
   await setMeta(META.fetchedAt, new Date().toISOString());
 }
 
-/** Note that a fetch was attempted; `error` is null when it succeeded or was a 304. */
-export async function recordAttempt(error: string | null): Promise<void> {
-  await setMeta(META.attemptedAt, new Date().toISOString());
+/**
+ * Note that a fetch was attempted; `error` is null when it succeeded or was a
+ * 304. `rejected` marks a download that arrived and was turned away for its
+ * contents; a success clears that mark, a failed download leaves it.
+ */
+export async function recordAttempt(error: string | null, rejected = false): Promise<void> {
+  const now = new Date().toISOString();
+  await setMeta(META.attemptedAt, now);
   await setMeta(META.lastError, error);
+  if (rejected) await setMeta(META.rejectedAt, now);
+  else if (error === null) await setMeta(META.rejectedAt, null);
 }
 
 /** Everything the refresh policy and the debug view need, in one read. */
 export async function inventoryStatus() {
   const d = await db();
-  const [source, fetchedAt, attemptedAt, lastError, etag, lastModified, seedGeneratedAt] = await Promise.all([
+  const [source, fetchedAt, attemptedAt, lastError, etag, lastModified, seedGeneratedAt, rejectedAt] = await Promise.all([
     getMeta(META.source), getMeta(META.fetchedAt), getMeta(META.attemptedAt), getMeta(META.lastError),
-    getMeta(META.etag), getMeta(META.lastModified), getMeta(META.seedGeneratedAt),
+    getMeta(META.etag), getMeta(META.lastModified), getMeta(META.seedGeneratedAt), getMeta(META.rejectedAt),
   ]);
-  return { count: await count(d), source, fetchedAt, attemptedAt, lastError, etag, lastModified, seedGeneratedAt };
+  return { count: await count(d), source, fetchedAt, attemptedAt, lastError, etag, lastModified, seedGeneratedAt, rejectedAt };
 }
 
 async function count(d: SQLiteDatabase): Promise<number> {
@@ -106,14 +116,15 @@ async function writeStaging(d: SQLiteDatabase, areas: SkiArea[]): Promise<void> 
   await d.withExclusiveTransactionAsync(async (txn) => {
     await txn.execAsync('DELETE FROM ski_areas_staging');
     const stmt = await txn.prepareAsync(`
-      INSERT INTO ski_areas_staging
-        (key, name, lat, lon, min_elev, max_elev, downhill, nordic, website, country, region, region_name, locality)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+      INSERT INTO ski_areas_staging (${COLUMNS})
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
     try {
       for (const a of areas) {
         await stmt.executeAsync([
           a.key, a.name, a.lat, a.lon, a.minElev, a.maxElev, a.downhill ? 1 : 0, a.nordic ? 1 : 0,
           a.website, a.country, a.region, a.regionName, a.locality,
+          // What search matches against: accents, capitals and punctuation folded away.
+          searchText(a.name, a.locality, a.regionName),
         ]);
       }
     } finally {
@@ -122,13 +133,23 @@ async function writeStaging(d: SQLiteDatabase, areas: SkiArea[]): Promise<void> 
   });
 }
 
-/** Copy staging over live atomically, then clear staging. */
+// Named, in one order, for the write and for the swap: copying with SELECT *
+// would depend on both tables having had their columns added in the same order.
+const COLUMNS = 'key, name, lat, lon, min_elev, max_elev, downhill, nordic, website, country, region, region_name, locality, search';
+
+/**
+ * Copy staging over live atomically, then clear staging. Each favourite still
+ * listed takes its current name; one that has dropped out keeps the last name
+ * it had, which is what it is shown by from then on.
+ */
 async function swapStagingIntoLive(d: SQLiteDatabase): Promise<void> {
   await d.withExclusiveTransactionAsync(async (txn) => {
     await txn.execAsync(`
       DELETE FROM ski_areas;
-      INSERT INTO ski_areas SELECT * FROM ski_areas_staging;
+      INSERT INTO ski_areas (${COLUMNS}) SELECT ${COLUMNS} FROM ski_areas_staging;
       DELETE FROM ski_areas_staging;
+      UPDATE favourites SET name = (SELECT a.name FROM ski_areas a WHERE a.key = favourites.key)
+        WHERE key IN (SELECT key FROM ski_areas);
     `);
   });
 }
@@ -168,16 +189,21 @@ export async function getAreas(keys: string[]): Promise<Map<string, SkiArea>> {
 
 /**
  * Name/locality search. Every word in the query must appear in the name,
- * locality or region name, case-insensitively, so "whistler nordic" works.
- * Results are sorted by distance when a location is given, else by name.
+ * locality or region name, so "whistler nordic" works. Both sides are folded
+ * (lib/fold.ts): accents, capitals and apostrophes make no difference, which
+ * SQLite's own LOWER and LIKE cannot manage beyond unaccented letters. A
+ * folded word holds only letters and digits, so nothing typed can act as a
+ * LIKE wildcard. Results are sorted by distance when a location is given,
+ * else by name.
  */
 export async function searchAreas(
   query: string, near: { lat: number; lon: number } | null, limit = 50,
 ): Promise<SkiArea[]> {
   const d = await db();
-  const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
-  const where = words.map(() => "(LOWER(name) LIKE ? OR LOWER(IFNULL(locality, '')) LIKE ? OR LOWER(IFNULL(region_name, '')) LIKE ?)");
-  const params: (string | number)[] = words.flatMap((w) => [`%${w}%`, `%${w}%`, `%${w}%`]);
+  const words = foldText(query).split(' ').filter(Boolean);
+  // Every row has its search text; the fallback only covers one that somehow does not.
+  const where = words.map(() => 'IFNULL(search, LOWER(name)) LIKE ?');
+  const params: (string | number)[] = words.map((w) => `%${w}%`);
   // Equirectangular distance is fine for sorting: the error at these latitudes is a few percent.
   const order = near
     ? `((lat - ?) * (lat - ?)) + ((lon - ?) * (lon - ?) * ${Math.cos((near.lat * Math.PI) / 180) ** 2})`

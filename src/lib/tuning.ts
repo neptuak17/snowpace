@@ -69,7 +69,8 @@ export const TUNING = {
   },
 
   // ── Wind: free up to `freeFraction` of the user's limit, then falls to zero
-  // at `zeroFraction` of it.
+  // over a further `zeroFraction` of it: with these, nothing off up to half
+  // the limit, a third off at the limit itself, and zero at twice the limit.
   wind: { freeFraction: 0.5, zeroFraction: 1.5 },
 
   // ── Rain: always bad, no user tolerance. Two parts in the blend: rain
@@ -236,6 +237,11 @@ export const TUNING = {
     resolveForHours: 24,
     // A camera whose newest capture is older than this is dropped as stale.
     staleAfterHours: 24,
+    // After a request to Windy fails (no signal, say), the place's camera is
+    // not asked for again for this long, and then only when the app is next
+    // opened or a screen showing it is. It used to stay hidden until the app
+    // was restarted.
+    retryAfterMin: 5,
     // Free-tier image links expire after 10 minutes (Windy's pricing page
     // says 15); never request one older than this.
     urlTtlMin: 10,

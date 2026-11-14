@@ -4,13 +4,14 @@
  * Runs at launch, behind the loading screen, when the policy says it is due.
  * Never in the background, never mid-session. The rules (CLAUDE.md):
  *   - at most once every 30 days per device;
- *   - one attempt per 24 hours, no retries;
+ *   - one attempt per 24 hours, no retries; a week after a download that
+ *     arrived and was turned away for its contents;
  *   - the download has a time limit (POLICY.inventoryTimeoutS);
  *   - conditional request, so an unchanged file costs a 304;
  *   - on any failure keep what we have and record why.
  */
 import { parseSkiAreas, SOURCE_URL } from '@/data/openskidata';
-import { POLICY } from '@/data/policy';
+import { inventoryRefreshDue, POLICY } from '@/data/policy';
 import { USER_AGENT } from '@/data/project';
 import { confirmCurrent, inventoryStatus, recordAttempt, replaceInventory } from '@/db/inventory';
 
@@ -18,21 +19,10 @@ export const REFRESH_AFTER_DAYS = POLICY.inventoryRefreshDays;
 export const RETRY_AFTER_HOURS = POLICY.inventoryRetryHours;
 const DOWNLOAD_TIMEOUT_MS = POLICY.inventoryTimeoutS * 1000;
 
-const DAY = 24 * 60 * 60 * 1000;
-
 export type Status = Awaited<ReturnType<typeof inventoryStatus>>;
 
-/**
- * Pure: given what we know, should we fetch now? Exported so the rule can be
- * tested without a database.
- */
-export function isRefreshDue(st: Pick<Status, 'fetchedAt' | 'attemptedAt' | 'seedGeneratedAt'>, now = Date.now()): boolean {
-  const dataAt = Date.parse(st.fetchedAt ?? st.seedGeneratedAt ?? '') || 0;
-  if (now - dataAt < REFRESH_AFTER_DAYS * DAY) return false;
-  const attemptedAt = Date.parse(st.attemptedAt ?? '') || 0;
-  if (now - attemptedAt < RETRY_AFTER_HOURS * (DAY / 24)) return false;
-  return true;
-}
+/** Given what we know, should we fetch now? The rule itself is in data/policy.ts, where the checks can run it. */
+export const isRefreshDue = inventoryRefreshDue;
 
 export type RefreshOutcome =
   | { kind: 'skipped' }
@@ -89,13 +79,15 @@ async function refreshInventory(st: Status): Promise<RefreshOutcome> {
     } finally {
       text = null;
     }
-    if (!parsed.ok) return fail(parsed.reason);
+    // The file arrived whole and was turned away for what is in it. Tomorrow's
+    // would be turned away too, so this waits longer than a failed download.
+    if (!parsed.ok) return fail(parsed.reason, true);
 
     const result = await replaceInventory(parsed.areas, {
       etag: res.headers.get('etag'),
       lastModified: res.headers.get('last-modified'),
     });
-    if (!result.ok) return fail(result.reason ?? 'rejected');
+    if (!result.ok) return fail(result.reason ?? 'rejected', true);
     await recordAttempt(null);
     return { kind: 'replaced', count: parsed.areas.length };
   } catch (e) {
@@ -105,9 +97,10 @@ async function refreshInventory(st: Status): Promise<RefreshOutcome> {
   }
 }
 
-async function fail(reason: string): Promise<RefreshOutcome> {
+/** `rejected`: the download arrived and its contents were turned away, which waits longer before the next try. */
+async function fail(reason: string, rejected = false): Promise<RefreshOutcome> {
   try {
-    await recordAttempt(reason);
+    await recordAttempt(reason, rejected);
   } catch {
     // Nothing more to do; the next launch will see the old attempt time.
   }

@@ -175,15 +175,49 @@ export function parseForecasts(doc: unknown, coords: Coordinate[], fetchedAt: st
   return { ok: true, forecasts };
 }
 
-/** Elementwise mean of two series — the mid-mountain proxy for downhill areas. */
+// Keep URLs comfortably short; Open-Meteo has no documented cap but 20 × 2 levels is plenty.
+export const MAX_COORDS_PER_REQUEST = 40;
+
+/**
+ * The requests for a set of places: one per model, split when it grows past
+ * MAX_COORDS_PER_REQUEST. A place's coordinates always travel together, so
+ * its base and summit come from one request and one moment; splitting by
+ * count alone could put them in different requests, and when only one of
+ * the two succeeded the place was left with a base and a summit a day apart.
+ */
+export function batchesFor(
+  areas: (Parameters<typeof coordinatesFor>[0] & { country: string | null })[],
+): { model: Model; coords: Coordinate[] }[] {
+  const out: { model: Model; coords: Coordinate[] }[] = [];
+  const open = new Map<Model, Coordinate[]>();
+  for (const a of areas) {
+    const model = modelFor(a.country), coords = coordinatesFor(a);
+    let batch = open.get(model);
+    if (!batch || batch.length + coords.length > MAX_COORDS_PER_REQUEST) {
+      batch = [];
+      open.set(model, batch);
+      out.push({ model, coords: batch });
+    }
+    batch.push(...coords);
+  }
+  return out;
+}
+
+/**
+ * The mean of two series, hour for hour — the mid-mountain proxy for downhill
+ * areas. Hours are paired by their time, not their position, so two series
+ * fetched on different days are averaged over the hours they share rather
+ * than a day out of step.
+ */
 export function meanSeries(a: HourWx[], b: HourWx[]): HourWx[] {
-  const n = Math.min(a.length, b.length);
+  const other = new Map(b.map((h) => [h.time, h]));
   // typeof rather than === null: a row cached before a variable existed has
   // it undefined, and undefined arithmetic would give NaN, not null.
   const avg = (x: number | null, y: number | null) => (typeof x !== 'number' || typeof y !== 'number' ? null : (x + y) / 2);
   const out: HourWx[] = [];
-  for (let i = 0; i < n; i++) {
-    const p = a[i], q = b[i];
+  for (const p of a) {
+    const q = other.get(p.time);
+    if (!q) continue;
     out.push({
       time: p.time, t: avg(p.t, q.t), snow: avg(p.snow, q.snow), rain: avg(p.rain, q.rain), precip: avg(p.precip, q.precip),
       wind: avg(p.wind, q.wind), gust: avg(p.gust, q.gust), cloud: avg(p.cloud, q.cloud), depth: avg(p.depth, q.depth),

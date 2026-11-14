@@ -9,15 +9,13 @@
  * request leaves the cached rows for its places untouched and records why.
  */
 import type { SkiArea } from '@/data/openskidata';
-import { buildUrl, coordinatesFor, modelFor, parseForecasts, type Coordinate, type Forecast, type Model } from '@/data/open-meteo';
+import { batchesFor, buildUrl, coordinatesFor, parseForecasts, type Coordinate, type Forecast, type Level, type Model } from '@/data/open-meteo';
 import { POLICY } from '@/data/policy';
 import { USER_AGENT } from '@/data/project';
 import { setMeta } from '@/db/database';
-import { getForecasts, putForecasts } from '@/db/forecasts';
+import { getForecasts, keepLevels, putForecasts } from '@/db/forecasts';
 
 export const STALE_AFTER_MS = POLICY.forecastStaleHours * 60 * 60 * 1000;
-// Keep URLs comfortably short; Open-Meteo has no documented cap but 20 × 2 levels is plenty.
-const MAX_COORDS_PER_REQUEST = 40;
 // A request still unanswered after this is abandoned. Left to iOS, a stalled
 // request waited a full minute, and held the loading screen for all of it.
 const REQUEST_TIMEOUT_MS = POLICY.forecastTimeoutS * 1000;
@@ -64,20 +62,23 @@ async function refreshNow(
 ): Promise<{ forecasts: Map<string, Forecast[]>; result: RefreshResult }> {
   const keys = areas.map((a) => a.key);
   const cached = await getForecasts(keys);
-  const due = areas.filter((a) => opts.force || (cached.get(a.key) ?? []).length === 0 || cached.get(a.key)!.some((f) => isStale(f)));
+  // A place is judged on the levels it asks for now. A row left from when it
+  // asked for others (its listing changed) is neither fresh nor wanted, and
+  // counting it made the place look stale for ever, fetched on every return.
+  const wanted = new Map(areas.map((a) => [a.key, coordinatesFor(a).map((c) => c.level)]));
+  const current = (a: SkiArea) => (cached.get(a.key) ?? []).filter((f) => wanted.get(a.key)!.includes(f.level));
+  const due = areas.filter((a) => {
+    const rows = current(a);
+    return opts.force || rows.length < wanted.get(a.key)!.length || rows.some((f) => isStale(f));
+  });
   const result: RefreshResult = { fetched: 0, failed: [], requests: 0 };
-  if (due.length === 0) return { forecasts: cached, result };
+  if (due.length === 0) {
+    await dropOldLevels(areas, cached, wanted);
+    return { forecasts: cached, result };
+  }
 
-  // One request per model, chunked.
-  const byModel = new Map<Model, Coordinate[]>();
-  for (const a of due) {
-    const m = modelFor(a.country);
-    byModel.set(m, [...(byModel.get(m) ?? []), ...coordinatesFor(a)]);
-  }
-  const batches: { model: Model; coords: Coordinate[] }[] = [];
-  for (const [model, coords] of byModel) {
-    for (let i = 0; i < coords.length; i += MAX_COORDS_PER_REQUEST) batches.push({ model, coords: coords.slice(i, i + MAX_COORDS_PER_REQUEST) });
-  }
+  // One request per model, split when long; a place's levels stay together.
+  const batches = batchesFor(due);
   result.requests = batches.length;
 
   // Fetched side by side, so one slow request does not hold up the rest;
@@ -97,6 +98,7 @@ async function refreshNow(
       result.failed.push(outcome.reason);
     }
   }
+  await dropOldLevels(areas, cached, wanted);
   try {
     const failure = result.failed.length ? result.failed.join('; ') : null;
     await setMeta(FORECAST_META.lastAttemptAt, fetchedAt);
@@ -106,6 +108,27 @@ async function refreshNow(
     // The log is a nicety; the data is what matters.
   }
   return { forecasts: cached, result };
+}
+
+/**
+ * Once a place has a row for every level it asks for now, rows for any other
+ * level are dropped, from the cache and from `cached`. Until then they are
+ * kept: an old forecast is better than none while the new one cannot be had.
+ */
+async function dropOldLevels(areas: SkiArea[], cached: Map<string, Forecast[]>, wanted: Map<string, Level[]>): Promise<void> {
+  const drop: { key: string; levels: Level[] }[] = [];
+  for (const a of areas) {
+    const rows = cached.get(a.key) ?? [], levels = wanted.get(a.key) ?? [];
+    const mine = rows.filter((f) => levels.includes(f.level));
+    if (mine.length === rows.length || mine.length < levels.length) continue;
+    cached.set(a.key, mine);
+    drop.push({ key: a.key, levels });
+  }
+  try {
+    await keepLevels(drop);
+  } catch {
+    // Tidying only: the rows are ignored either way, and the next refresh tries again.
+  }
 }
 
 async function fetchBatch(coords: Coordinate[], model: Model, fetchedAt: string) {

@@ -7,7 +7,7 @@ description: Why a place shows no camera or the wrong view, and how to choose a 
 - **No nearby camera's name names the place.** Snowpace only picks a camera automatically when its name matches the place, so it never shows a neighbour's view as if it were this one. This is the most common reason.
 - **There are no cameras on windy.com within {{derived.webcamRadiusDownhillKm}} km** of a downhill area, or {{derived.webcamRadiusNordicKm}} km of a nordic centre.
 - **Webcams are switched off:** **{{ui.you.webcamsLabel}}** on the **{{ui.tabs.you}}** tab.
-- **No connection,** or windy.com didn't answer. The section is left out until it can load.
+- **No connection,** or windy.com didn't answer. The section is left out until it can load. Snowpace tries again when you come back to the app, or open the place, a few minutes later.
 
 When Snowpace hasn't picked a camera, there's no webcam section for that place, so there's currently no way to choose one yourself for it.
 

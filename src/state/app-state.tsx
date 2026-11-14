@@ -18,13 +18,14 @@ import { AppState as RNAppState, Platform, useColorScheme } from 'react-native';
 import { refreshForecasts } from '@/data/forecast-refresh';
 import type { Forecast } from '@/data/open-meteo';
 import type { SkiArea } from '@/data/openskidata';
-import { ACTS, placeFromArea, type ActivityKey, type Place } from '@/data/places';
+import { ACTS, placeFromArea, shortNameOf, type ActivityKey, type Place } from '@/data/places';
 import * as fav from '@/db/favourites';
 import { pruneForecasts } from '@/db/forecasts';
 import { setSetting } from '@/db/settings';
 import type { Units } from '@/lib/format';
 import type { LatLon } from '@/lib/geo';
 import { DEFAULT_PREFS, knownActivity, mergePrefs, type Prefs, type PrefsByAct } from '@/lib/scoring';
+import { strings } from '@/strings';
 import type { Scheme } from '@/theme/tokens';
 
 export type SelCell = { loc: string; day: number };
@@ -223,7 +224,7 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
 
   const derived = useMemo<Derived>(() => {
     const places = favourites.map((f) =>
-      f.area ? placeFromArea(f.area, state.location, forecasts.get(f.key) ?? [], true) : unlistedPlace(f.key),
+      f.area ? placeFromArea(f.area, state.location, forecasts.get(f.key) ?? [], true) : unlistedPlace(f.key, f.name),
     );
     const homeIndex = favourites.findIndex((f) => f.isHome);
     const home = homeIndex >= 0 && places[homeIndex].listed ? places[homeIndex] : null;
@@ -235,10 +236,15 @@ export function AppStateProvider({ children, initial, initialFavourites, initial
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
-/** A favourite the inventory no longer lists: keep it visible, but it cannot be scored. */
-function unlistedPlace(key: string): Place {
+/**
+ * A favourite the inventory no longer lists: keep it visible, under the name
+ * it was last listed by, but it cannot be scored. (It used to show its key,
+ * "osm:way/1135735100", which told the user nothing about which place it was.)
+ */
+function unlistedPlace(key: string, savedName: string | null): Place {
+  const name = savedName ?? strings.places.unlistedName;
   return {
-    key, name: key, shortName: key, lat: 0, lon: 0, minElev: null, maxElev: null, area: null,
+    key, name, shortName: shortNameOf(name), lat: 0, lon: 0, minElev: null, maxElev: null, area: null,
     acts: [], website: null, country: null, distanceKm: null, listed: false,
     forecastAt: null, days: [], hours: null, surface: null, timezone: null,
   };

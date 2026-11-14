@@ -98,6 +98,8 @@ export const strings = {
     emptyKicker: 'No places yet',
     emptyBody: 'Add the centres and hills you go to. Everything you save shows up here, however far away it is.',
     unlistedNote: 'This place has dropped out of the OpenSkiData ski-area listing. You can keep it or remove it.',
+    // For a place saved, and delisted, before its name was kept with it.
+    unlistedName: 'A saved place',
     addPlace: 'Add a place',
   },
 
@@ -303,7 +305,7 @@ export const strings = {
   format: {
     forecastMinAgo: (min: number) => `from ${min} min ago`,
     forecastHoursAgo: (h: number) => `from ${h} h ago`,
-    forecastDaysAgo: (d: number) => `from ${d} day ago`,
+    forecastDaysAgo: (d: number) => `from ${d} ${d === 1 ? 'day' : 'days'} ago`,
     noForecast: 'not yet fetched',
     today: 'Today',
     weekday: (d: Date) => d.toLocaleDateString('en-CA', { weekday: 'short' }),
@@ -405,6 +407,8 @@ export const strings = {
       crust: 'Crust from a thaw',
       slush: 'Slush',
       windy: 'Windier than you like',
+      // Wind that is costing points while still under the user's limit.
+      breezy: 'Breezy',
       rain: 'Rain',
       rainIced: 'Rain that refroze',
       rainRecent: 'Rain in the last 3 days',
